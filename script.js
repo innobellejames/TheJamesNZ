@@ -27685,8 +27685,8 @@ var everyday = [
 	},
 	{
 		title: "Easy homemade recipes",
-		text: "64 recipes, including Filipino and Indian favourites",
-		image: __jamesAsset("./recipe-art.png"),
+		text: "Kiwi, Filipino and Indian homemade favourites",
+		image: __jamesAsset("./recipe-photos/soup.webp"),
 		section: "Homemade recipes"
 	},
 	{
@@ -29907,7 +29907,7 @@ function BibleLibrary() {
 			q: query,
 			page: String(page)
 		}), { signal: c.signal }).then(async (r) => {
-			const d = await r.json();
+			const d = await readJsonResponse(r, "This service could not load. Your text is still here; please retry.");
 			if (!r.ok) throw new Error(d.error);
 			setData(d);
 		}).catch((e) => {
@@ -30092,7 +30092,7 @@ function GospelReading() {
 		let alive = true;
 		setLoading(true);
 		setData(null);
-		fetch("/api/gospel?date=" + date).then((r) => r.json()).then((d) => {
+		fetch("/api/gospel?date=" + date).then((r) => readJsonResponse(r, "The reading service could not load.")).then((d) => {
 			if (alive) setData(d);
 		}).catch(() => {
 			if (alive) setData({ error: "The Gospel reference could not load." });
@@ -30367,7 +30367,7 @@ function ChurchDirectory() {
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 						className: "mass-schedule",
 						children: c.schedule
-					}),
+					}), jH(hChurchShare,{church:c}),
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
 						href: c.source,
 						target: "_blank",
@@ -30393,7 +30393,7 @@ function ChurchDirectory() {
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 					className: "mass-schedule",
 					children: c.schedule
-				}),
+				}), jH(hChurchShare,{church:c}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "church-links",
 					children: [
@@ -30612,7 +30612,7 @@ function FamilyChecklists() {
 	const c = checklists.find((c) => c.id === id);
 	(0, import_react.useEffect)(() => {
 		fetch("/api/checklists").then(async (r) => {
-			const d = await r.json();
+			const d = await readJsonResponse(r, "This service could not load. Your text is still here; please retry.");
 			if (r.status === 401) {
 				setAuth(false);
 				return;
@@ -30633,7 +30633,7 @@ function FamilyChecklists() {
 					item,
 					checked: value
 				})
-			}), d = await r.json();
+			}), d = await readJsonResponse(r, "This service could not load. Please retry.");
 			if (!r.ok) throw new Error(d.error);
 			setChecked((s) => value ? [...s, id + ":" + item] : s.filter((k) => k !== id + ":" + item));
 		} catch (e) {
@@ -34036,7 +34036,7 @@ function Recipes() {
 		/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 			className: "recipe-banner",
 			children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-				src: __jamesAsset("./recipe-art.png"),
+				src: __jamesAsset("./recipe-photos/soup.webp"),
 				alt: "Paper-cut illustration of lentil soup, bread, and vegetables on a kitchen table"
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { children: "A little homemade comfort." }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Start with what is in your kitchen. Choose a simple recipe and make it your own." })] })]
 		}),
@@ -34079,6 +34079,7 @@ function Recipes() {
 				"All cuisines",
 				"Filipino",
 				"Indian",
+				"Kiwi / New Zealand",
 				"Everyday"
 			].map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
 				className: cuisine === c ? "selected" : "",
@@ -35172,9 +35173,10 @@ function Feedback({ kind, canEdit }) {
 		setLoading(true);
 		try {
 			const r = await fetch("/api/feedback?kind=" + kind);
-			const d = await r.json();
+			const d = await readJsonResponse(r, "This service could not load. Your text is still here; please retry.");
 			if (!r.ok) throw new Error(d.error);
 			setItems(d.items);
+            if(d.notice)setError(d.notice);
 		} catch (e) {
 			setError(e.message);
 		} finally {
@@ -35200,10 +35202,10 @@ function Feedback({ kind, canEdit }) {
 					rating: Number(rating)
 				})
 			});
-			const d = await r.json();
+			const d = await readJsonResponse(r, "This service could not load. Your text is still here; please retry.");
 			if (!r.ok) throw new Error(d.error);
 			setMessage("");
-			setSuccess(kind === "review" ? "Thank you. Your review is saved and appears below." : "Thank you. Your report is saved for the site owner to view.");
+			setSuccess(kind === "review" ? "Thank you. Your review is saved and appears below." : d.message || "Thank you. Your report is saved privately for the owner. Email delivery has not been confirmed.");
 			await load();
 		} catch (e) {
 			setError(e.message);
@@ -35263,7 +35265,7 @@ function Feedback({ kind, canEdit }) {
 				})] }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
 					className: "small-note",
-					children: [kind === "review" ? "Your review and display name appear in this tab." : "Reports are visible only to the site owner.", " Please avoid sensitive personal details. Feedback is saved here and is not emailed."]
+					children: [kind === "review" ? "Your review and display name appear in this tab." : "Reports are visible only to the site owner.", " Please avoid sensitive personal details. Reviews appear on the connected site. Reports are private; email delivery status is shown after submission."]
 				}),
 				error && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 					className: "error",
@@ -42200,7 +42202,7 @@ function SaintCalendar() {
 		setLoading(true);
 		setError("");
 		fetch("/api/saint?date=" + date).then(async (r) => {
-			const d = await r.json();
+			const d = await readJsonResponse(r, "This service could not load. Your text is still here; please retry.");
 			if (!r.ok) throw new Error(d.error);
 			if (live) setData(d);
 		}).catch((e) => {
@@ -43038,11 +43040,13 @@ function Home({ canEdit }) {
 	const [deleteId, setDeleteId] = (0, import_react.useState)(null);
 	const [homeStory, setHomeStory] = (0, import_react.useState)(null);
 	function navigate(section) {
+        rRememberSection(section);
 		setHomeStory(null);
 		setTab(section);
 		setSaved("");
 	}
 	function openHomeStory(index) {
+        rRememberSection("Reading nook");
 		setHomeStory(index);
 		setTab("Reading nook");
 		setSaved("");
@@ -43453,7 +43457,7 @@ function Home({ canEdit }) {
 							tab === "Reading nook" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PageTitle, {
 								eyebrow: "JUST ONE MORE PAGE",
 								title: "The reading nook.",
-								text: `${stories.length} original family stories. Read alone or with a grown-up.`
+								text: `${stories.length-jBibleData.length} original family stories. Read alone or with a grown-up.`
 							}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Reading, { initialStory: homeStory })] }),
 							tab === "Saints day" && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(PageTitle, {
 								eyebrow: "CATHOLIC CALENDAR",
@@ -44167,7 +44171,7 @@ var xOriginalCoffee=CoffeeCorner;CoffeeCorner=function(){return jH(import_react.
 var xOriginalWorkouts=Workouts;Workouts=function(){return jH(import_react.Fragment,null,jH(BodyWorkouts),jH(xOriginalWorkouts));};
 navGroups[2].items.push({name:'Real-life inspiration',icon:Heart});
 
-var xPhonics=[['a','apple','short a'],['b','ball','b'],['c','cat','hard c'],['d','dog','d'],['e','egg','short e'],['f','fish','f'],['g','goat','hard g'],['h','hat','h'],['i','insect','short i'],['j','jam','j'],['k','kite','k'],['l','leaf','l'],['m','map','m'],['n','net','n'],['o','octopus','short o'],['p','pan','p'],['q','queen','qu together'],['r','red','r'],['s','sun','s'],['t','top','t'],['u','up','short u'],['v','van','v'],['w','web','w'],['x','box','ks at the end'],['y','yes','y'],['z','zip','z']];
+var xPhonics=[['a','apple','short a'],['b','ball','b'],['c','cat','hard c'],['d','dog','d'],['e','egg','short e'],['f','fish','f'],['g','goat','hard g'],['h','hat','h'],['i','insect','short i'],['j','jam','j'],['k','kite','k'],['l','leaf','l'],['m','map','m'],['n','net','n'],['o','octopus','short o'],['p','pan','p'],['q','queen','qu together'],['r','rabbit','r'],['s','sun','s'],['t','top','t'],['u','umbrella','short u'],['v','van','v'],['w','web','w'],['x','box','ks at the end'],['y','yak','y'],['z','zip','z']];
 var xSight=['the','to','and','a','I','you','it','in','is','on','at','of','we','he','she','me','my','go','no','so','up','am','can','see','like','look','said','was','are','come','here','there','all','have','with','this','that','for','not','they'];
 function xMathQuestion(max){const a=Math.floor(Math.random()*(max+1)),b=Math.floor(Math.random()*(max-a+1));if(Math.random()<.5)return {a,b,op:'+',answer:a+b};return {a:a+b,b,op:'−',answer:a};}
 function MathPractice(){const [max,setMax]=import_react.useState(10),[q,setQ]=import_react.useState(()=>xMathQuestion(10)),[answer,setAnswer]=import_react.useState(''),[message,setMessage]=import_react.useState(''),[checked,setChecked]=import_react.useState(false),[score,setScore]=import_react.useState(0);function next(limit=max){setQ(xMathQuestion(limit));setAnswer('');setMessage('');setChecked(false);}return jH('section',null,jH('h2',null,'A little maths practice'),jH('label',null,'Numbers up to',jH('select',{value:max,onChange:e=>{const n=Number(e.target.value);setMax(n);next(n);}},[5,10,20].map(n=>jH('option',{key:n,value:n},n)))),jH('p',{className:'x-big-question'},q.a+' '+q.op+' '+q.b+' = ?'),jH('form',{className:'x-inline-form',onSubmit:e=>{e.preventDefault();if(checked)return;if(answer.trim()===''){setMessage('Type a number when you are ready.');return;}setChecked(true);if(Number(answer)===q.answer){setScore(s=>s+1);setMessage('Lovely thinking! That is correct.');}else setMessage('Good try. The answer is '+q.answer+'. Count with a grown-up and try the next one.');}},xInput('Your answer',{type:'number',min:0,value:answer,onChange:e=>setAnswer(e.target.value),disabled:checked}),jH('button',{type:'submit',disabled:checked},'Check')),jH('button',{className:'secondary',onClick:()=>next()},'Next question'),jH('p',{role:'status'},message),jH('p',null,score+' correct answers this visit.'));}
@@ -44176,8 +44180,8 @@ function MemoryGame(){const [cards,setCards]=import_react.useState(()=>xShuffle(
 function NoticingGame(){const [position,setPosition]=import_react.useState(()=>Math.floor(Math.random()*9)),[score,setScore]=import_react.useState(0),[message,setMessage]=import_react.useState('');return jH('section',null,jH('h3',null,'Find the little star'),jH('p',null,'Look carefully. Which square has the star?'),jH('div',{className:'x-noticing-grid'},Array.from({length:9},(_,i)=>jH('button',{key:i,'aria-label':i===position?'Star':'Leaf',onClick:()=>{if(i===position){setScore(n=>n+1);setMessage('You found it! Here is a new place to look.');setPosition(p=>(p+1+Math.floor(Math.random()*8))%9);}else setMessage('Keep looking gently. Find the star.');}},i===position?'⭐':'🍃'))),jH('p',{role:'status'},message+' '+score+' stars found.'));}
 function xDrawing(kind){const common='xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 430" role="img" aria-label="'+jEscape(kind)+' activity"';let art='';if(kind==='Garden')art='<path d="M20 390H580M140 390V220M300 390V180M460 390V250"/><ellipse cx="140" cy="195" rx="55" ry="45"/><ellipse cx="300" cy="140" rx="60" ry="55"/><ellipse cx="460" cy="220" rx="55" ry="45"/><path d="M140 320Q70 270 80 330Q120 350 140 320M300 300Q380 250 380 315Q330 345 300 300"/><circle cx="505" cy="70" r="40"/>';else if(kind==='Mateo')art='<ellipse cx="300" cy="290" rx="130" ry="85"/><path d="M205 345V390H255V352M345 352V390H395V345M420 280Q505 190 500 300"/><ellipse cx="300" cy="170" rx="100" ry="85"/><path d="M220 120Q145 100 175 240Q220 250 230 195M380 120Q455 100 425 240Q380 250 370 195"/><circle cx="265" cy="160" r="9"/><circle cx="335" cy="160" r="9"/><ellipse cx="300" cy="195" rx="25" ry="17"/><path d="M300 212V235M300 235Q275 255 255 235M300 235Q325 255 345 235"/>';else if(kind==='Home')art='<path d="M90 200L300 55L510 200M140 170V390H460V170"/><rect x="265" y="260" width="75" height="130"/><rect x="180" y="225" width="55" height="55"/><rect x="370" y="225" width="55" height="55"/><path d="M30 390H570"/><circle cx="515" cy="60" r="35"/>';else if(kind==='Cutting')art='<path stroke-dasharray="12 10" d="M35 90H560M35 180L100 140L165 180L230 140L295 180L360 140L425 180L490 140L555 180M35 280Q100 210 165 280T295 280T425 280T555 280"/><circle stroke-dasharray="12 10" cx="165" cy="360" r="42"/><rect stroke-dasharray="12 10" x="350" y="320" width="110" height="80"/>';else if(kind==='Crown')art='<path d="M35 330V180L130 245L220 130L300 245L380 130L470 245L565 180V330Z"/><path stroke-dasharray="10 8" d="M35 290H565"/><circle cx="300" cy="290" r="24"/>';else if(kind==='Bookmark')art='<rect x="175" y="30" width="250" height="370" rx="15"/><circle cx="300" cy="65" r="10"/><path d="M220 175Q300 80 380 175Q300 260 220 175"/><path d="M220 300H380M220 335H380"/>';else art='<path d="M300 40L355 190L520 195L390 295L435 420L300 335L165 420L210 295L80 195L245 190Z"/>';return '<svg '+common+'><g fill="none" stroke="#26372f" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">'+art+'</g></svg>';}
 var xCrafts={Crown:{materials:'Paper or light card, crayons, child-safe scissors, tape.',steps:'Colour the crown. With a grown-up, cut out the shape, add a paper band sized comfortably, and tape the ends. Remove it for sleep.'},Bookmark:{materials:'Paper or light card, crayons, child-safe scissors.',steps:'Decorate the bookmark, then ask a grown-up to help cut around the outline. Put it in a favourite book. Leave off ribbons or small decorations for babies.'},Star:{materials:'Paper, crayons, child-safe scissors, glue stick and scrap paper.',steps:'Colour or collage inside the star. A grown-up can help cut it out. Display your picture away from a baby’s reach.'}};
-function xWorksheet(kind){let body='';if(kind==='Phonics')body='<p>Say the short sound with a grown-up, then find an example word. Audio on the website reads examples; it is not a recording of pure phonemes.</p><table>'+xPhonics.map(([l,w,c])=>'<tr><td style="font-size:30px">'+l.toUpperCase()+' '+l+'</td><td>'+w+'</td><td>'+c+'</td><td>Draw your example: __________</td></tr>').join('')+'</table>';else if(kind==='Sight words')body='<p>Read, trace and use a word in a sentence.</p><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px">'+xSight.map(w=>'<div style="padding:15px;border:1px solid #aaa;font-size:26px">'+w+'<br>________</div>').join('')+'</div>';else if(kind==='Counting')body='<p>Point to each dot and count. Write the number.</p>'+Array.from({length:20},(_,i)=>'<p>'+('● '.repeat(i+1))+' = ______</p>').join('');else if(kind==='Maths')body='<p>Try ten addition and subtraction questions. Use dots or counters with a grown-up.</p>'+Array.from({length:10},()=>{const q=xMathQuestion(10);return '<p>'+q.a+' '+q.op+' '+q.b+' = ______</p>';}).join('');else if(kind==='Cutting')body='<p>A grown-up should supervise. Use child-safe scissors and keep cut scraps and scissors away from babies. Start with the straight line, then try the zigzag and curve.</p>'+xDrawing('Cutting');else if(xCrafts[kind])body='<p><strong>Materials:</strong> '+xCrafts[kind].materials+'</p><p>'+xCrafts[kind].steps+'</p>'+xDrawing(kind);else body='<p>Make this picture your own with crayons, pencils or paint.</p>'+xDrawing(kind);jDownloadHTML('james-activity-'+kind.replace(/\s+/g,'-').toLowerCase(),kind+' · activity sheet','<section>'+body+'</section>');}
-function KidsLearning(){const [topic,setTopic]=import_react.useState('Phonics'),speech=useSpeech('teacher','Slow');const topics=['Phonics','Sight words','Counting','Easy maths','Cutting','Crafts','Colouring','Focus games'];return jH('section',{className:'j-section'},xTitle('FAMILY & LEARNING · PLAY, NOTICE, DISCOVER','Kids’ learning & activities','Small activities for little learners. Choose what suits your child, take breaks and enjoy learning with a grown-up.'),jH('div',{className:'filters'},topics.map(t=>jH('button',{key:t,className:topic===t?'selected':'','aria-pressed':topic===t,onClick:()=>{speech.stop();setTopic(t);}},t))),['Phonics','Sight words','Counting'].includes(topic)&&jH('p',{className:'small-note'},'Tap to hear an example or word. Speech uses the device’s available voice; a grown-up can model and practise the sounds too.'),topic==='Phonics'&&jH('section',null,jH('h2',null,'Letters and example sounds'),jH('p',null,'Some letters have more than one sound. These cards show a starting example, such as hard c in cat. Use short sounds rather than adding “uh”. The audio reads the example, not a recorded pure phoneme.'),jH('div',{className:'x-learning-grid'},xPhonics.map(([l,w,c])=>jH('button',{className:'x-learning-card',key:l,disabled:speech.supported===false,onClick:()=>speech.read([l+' as in '+w+'. Say the word '+w+'.'])},jH('strong',null,l.toUpperCase()+' '+l),jH('span',null,w),jH('small',null,c)))),jH('button',{className:'secondary',onClick:()=>xWorksheet('Phonics')},'Download phonics worksheet')),topic==='Sight words'&&jH('section',null,jH('h2',null,'Words we see often'),jH('p',null,'Read the word, then try it in a short sentence. Some parts can be sounded out; some spelling patterns need practice.'),jH('div',{className:'x-learning-grid'},xSight.map(w=>jH('button',{className:'x-word-card',key:w,disabled:speech.supported===false,onClick:()=>speech.read([w])},w))),jH('button',{className:'secondary',onClick:()=>xWorksheet('Sight words')},'Download word worksheet')),topic==='Counting'&&jH('section',null,jH('h2',null,'Count from one to twenty'),jH('div',{className:'x-learning-grid'},Array.from({length:20},(_,i)=>jH('button',{className:'x-learning-card',key:i,disabled:speech.supported===false,onClick:()=>speech.read([String(i+1)])},jH('strong',null,i+1),jH('span',{className:'x-dots','aria-hidden':true},'● '.repeat(i+1))))),jH('button',{className:'secondary',onClick:()=>xWorksheet('Counting')},'Download counting worksheet')),topic==='Easy maths'&&jH(import_react.Fragment,null,jH(MathPractice),jH('button',{className:'secondary',onClick:()=>xWorksheet('Maths')},'Download maths worksheet')),topic==='Cutting'&&jH('section',null,jH('h2',null,'Follow the line'),jH('p',null,'Start with a straight line, then try a zigzag, a curve and simple shapes. A grown-up must supervise with child-safe scissors. Keep scissors and scraps away from Mye and other babies.'),jH('div',{className:'x-line-art',dangerouslySetInnerHTML:{__html:xDrawing('Cutting')}}),jH('button',{onClick:()=>xWorksheet('Cutting')},'Download cutting worksheet')),topic==='Crafts'&&jH('div',{className:'j-grid'},Object.entries(xCrafts).map(([name,c])=>jH('article',{className:'j-card',key:name},jH('h2',null,name),jH('div',{className:'x-line-art',dangerouslySetInnerHTML:{__html:xDrawing(name)}}),jH('p',null,c.materials),jH('p',null,c.steps),jH('button',{onClick:()=>xWorksheet(name)},'Download craft template')))),topic==='Colouring'&&jH('div',{className:'j-grid'},['Mateo','Garden','Home','Star'].map(name=>jH('article',{className:'j-card',key:name},jH('h2',null,name),jH('div',{className:'x-line-art',dangerouslySetInnerHTML:{__html:xDrawing(name)}}),jH('button',{onClick:()=>xWorksheet(name)},'Download colouring page')))),topic==='Focus games'&&jH('div',{className:'j-grid'},jH('article',{className:'j-card'},jH(MemoryGame)),jH('article',{className:'j-card'},jH(NoticingGame))),jH('p',{className:'small-note'},'Activity downloads are self-contained printable HTML with the website QR code. Open in a browser, then Print → Save as PDF or print on paper. No timer or score is required for worksheets.'));}
+function xWorksheet(kind){let body='';if(kind==='Phonics')body='<p>Say the short sound with a grown-up, then find an example word. Audio on the website reads examples; it is not a recording of pure phonemes.</p><table>'+xPhonics.map(([l,w,c])=>'<tr><td style="font-size:30px">'+l.toUpperCase()+' '+l+'</td><td>'+w+'</td><td>'+c+'</td><td>Draw your example: __________</td></tr>').join('')+'</table>';else if(kind==='Sight words')body='<p>Read, trace and use a word in a sentence.</p><div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px">'+xSight.map(w=>'<div style="padding:15px;border:1px solid #aaa;font-size:26px">'+w+'<br>________</div>').join('')+'</div>';else if(kind==='Counting')body='<p>Read each number. Practise writing it, then say how many tens and ones it has.</p>'+Array.from({length:100},(_,i)=>'<p>'+((i+1)+' · '+Math.floor((i+1)/10)+' tens and '+((i+1)%10)+' ones')+' = ______</p>').join('');else if(kind==='Maths')body='<p>Try ten addition and subtraction questions. Use dots or counters with a grown-up.</p>'+Array.from({length:10},()=>{const q=xMathQuestion(10);return '<p>'+q.a+' '+q.op+' '+q.b+' = ______</p>';}).join('');else if(kind==='Cutting')body='<p>A grown-up should supervise. Use child-safe scissors and keep cut scraps and scissors away from babies. Start with the straight line, then try the zigzag and curve.</p>'+xDrawing('Cutting');else if(xCrafts[kind])body='<p><strong>Materials:</strong> '+xCrafts[kind].materials+'</p><p>'+xCrafts[kind].steps+'</p>'+xDrawing(kind);else body='<p>Make this picture your own with crayons, pencils or paint.</p>'+xDrawing(kind);jDownloadHTML('james-activity-'+kind.replace(/\s+/g,'-').toLowerCase(),kind+' · activity sheet','<section>'+body+'</section>');}
+function KidsLearning(){const [topic,setTopic]=import_react.useState('Phonics'),speech=useSpeech('teacher','Slow');const topics=['Phonics','Sight words','Counting','Easy maths','Cutting','Crafts','Colouring','Focus games','Kumon-inspired learnings'];return jH('section',{className:'j-section'},xTitle('FAMILY & LEARNING · PLAY, NOTICE, DISCOVER','Kids’ learning & activities','Small activities for little learners. Choose what suits your child, take breaks and enjoy learning with a grown-up.'),jH('div',{className:'filters'},topics.map(t=>jH('button',{key:t,className:topic===t?'selected':'','aria-pressed':topic===t,onClick:()=>{speech.stop();setTopic(t);}},t))),['Phonics','Sight words','Counting'].includes(topic)&&jH('p',{className:'small-note'},'Tap to hear an example or word. Speech uses the device’s available voice; a grown-up can model and practise the sounds too.'),topic==='Phonics'&&jH('section',null,jH('h2',null,'Letters and example sounds'),jH('img',{className:'r-phonics-photo',src:stories[xChurchIndex].image,alt:'Illustration of children learning and reading together',loading:'lazy'}),jH('p',null,'Some letters have more than one sound. These cards show a starting example, such as hard c in cat. Use short sounds rather than adding “uh”. The audio reads the example, not a recorded pure phoneme.'),jH('div',{className:'x-learning-grid'},xPhonics.map(([l,w,c])=>jH('button',{className:'x-learning-card',key:l,disabled:speech.supported===false,onClick:()=>speech.read([l+' as in '+w+'. Say the word '+w+'.'])},jH('strong',null,l.toUpperCase()+' '+l),jH('span',null,w),jH('small',null,c)))),jH('button',{className:'secondary',onClick:()=>xWorksheet('Phonics')},'Download phonics worksheet')),topic==='Sight words'&&jH('section',null,jH('h2',null,'Words we see often'),jH('p',null,'Read the word, then try it in a short sentence. Some parts can be sounded out; some spelling patterns need practice.'),jH('div',{className:'x-learning-grid'},xSight.map(w=>jH('button',{className:'x-word-card',key:w,disabled:speech.supported===false,onClick:()=>speech.read([w])},w))),jH('button',{className:'secondary',onClick:()=>xWorksheet('Sight words')},'Download word worksheet')),topic==='Counting'&&jH('section',null,jH('h2',null,'Count from one to one hundred'),jH('div',{className:'x-learning-grid'},Array.from({length:100},(_,i)=>jH('button',{className:'x-learning-card',key:i,disabled:speech.supported===false,onClick:()=>speech.read([String(i+1)])},jH('strong',null,i+1),jH('span',{className:'x-dots','aria-hidden':true},(i+1)+' · '+Math.floor((i+1)/10)+' tens and '+((i+1)%10)+' ones')))),jH('button',{className:'secondary',onClick:()=>xWorksheet('Counting')},'Download counting worksheet')),topic==='Kumon-inspired learnings'&&jH(hIndependentLearning),topic==='Easy maths'&&jH(import_react.Fragment,null,jH(MathPractice),jH('button',{className:'secondary',onClick:()=>xWorksheet('Maths')},'Download maths worksheet')),topic==='Cutting'&&jH('section',null,jH('h2',null,'Follow the line'),jH('p',null,'Start with a straight line, then try a zigzag, a curve and simple shapes. A grown-up must supervise with child-safe scissors. Keep scissors and scraps away from Mye and other babies.'),jH('div',{className:'x-line-art',dangerouslySetInnerHTML:{__html:xDrawing('Cutting')}}),jH('button',{onClick:()=>xWorksheet('Cutting')},'Download cutting worksheet')),topic==='Crafts'&&jH('div',{className:'j-grid'},Object.entries(xCrafts).map(([name,c])=>jH('article',{className:'j-card',key:name},jH('h2',null,name),jH('div',{className:'x-line-art',dangerouslySetInnerHTML:{__html:xDrawing(name)}}),jH('p',null,c.materials),jH('p',null,c.steps),jH('button',{onClick:()=>xWorksheet(name)},'Download craft template')))),topic==='Colouring'&&jH('div',{className:'j-grid'},['Mateo','Garden','Home','Star'].map(name=>jH('article',{className:'j-card',key:name},jH('h2',null,name),jH('div',{className:'x-line-art',dangerouslySetInnerHTML:{__html:xDrawing(name)}}),jH('button',{onClick:()=>xWorksheet(name)},'Download colouring page')))),topic==='Focus games'&&jH('div',{className:'j-grid'},jH('article',{className:'j-card'},jH(MemoryGame)),jH('article',{className:'j-card'},jH(NoticingGame))),jH('p',{className:'small-note'},'Activity downloads are self-contained printable HTML with the website QR code. Open in a browser, then Print → Save as PDF or print on paper. No timer or score is required for worksheets.'));}
 
 function xQuotePhoto(category){return category==="Pregnancy"?xAsset("care-photos-0"):category==="Breastfeeding"?xAsset("care-photos-1"):category==="Family life"?xAsset("care-photos-2"):jAsset("./photo-share/inspiration.webp");}
 
@@ -44193,9 +44197,9 @@ const octQuiz=StoryQuiz;
 StoryQuiz=function({index}){const questions=storyQuizzes[index], [answers,setAnswers]=import_react.useState({}),[checked,setChecked]=import_react.useState(false);const score=questions.reduce((n,q,i)=>n+(answers[i]===q.answer?1:0),0);const text='I read '+stories[index].title+' and scored '+score+' / '+questions.length+'. Every answer helps me learn!';return jH('section',{className:'story-quiz'},jH('h2',null,'A little discovery'),questions.map((q,i)=>jH('fieldset',{key:i},jH('legend',null,(i+1)+'. '+q.q),jH('div',{className:'answers'},q.options.map((v,k)=>jH('button',{key:k,disabled:checked,'aria-pressed':answers[i]===k,className:checked?(k===q.answer?'correct':answers[i]===k?'incorrect':''):answers[i]===k?'selected':'',onClick:()=>setAnswers(a=>({...a,[i]:k}))},v))),checked&&jH('p',null,q.why))),checked?jH('div',null,jH('p',{role:'status'},text),jH(PhotoShare,{label:'Share quiz result',post:{title:'My reading discovery',text,credit:'',background:stories[index].image,filename:'james-reading-quiz-result'}}),jH('button',{className:'secondary',onClick:()=>{setChecked(false);setAnswers({})}},'Try again')):jH('button',{className:'primary',disabled:Object.keys(answers).length!==questions.length,onClick:()=>setChecked(true)},'Check my answers'));};
 function OctViews(){return null}
 const octFeedback=Feedback;
-Feedback=function(props){const [name,setName]=import_react.useState(''),[message,setMessage]=import_react.useState(''),[busy,setBusy]=import_react.useState(false),[status,setStatus]=import_react.useState(''),[error,setError]=import_react.useState('');if(props.kind==='review')return jH(octFeedback,props);return jH('section',{className:'j-section'},xTitle('COMMUNITY · HELP US IMPROVE','Report an issue','Tell us the section, what you tried and what happened. Reports are private.'),jH('form',{className:'feedback-form',onSubmit:async e=>{e.preventDefault();setBusy(true);setError('');setStatus('');try{const r=await fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind:'issue',name,message})});const d=await r.json();if(!r.ok||!d.saved)throw Error(d.error||'Your report could not be saved.');setMessage('');setStatus(d.emailed?'Thank you. Your report is saved privately and forwarded to the owner.':'Thank you. Your report is saved privately for the owner. Email delivery is pending.')}catch(e){setError(e.message||'Connection failed. Your message is still here.')}finally{setBusy(false)}}},xInput('Name (optional)',{value:name,maxLength:100,onChange:e=>setName(e.target.value)}),jH('label',null,'What happened?',jH('textarea',{value:message,onChange:e=>setMessage(e.target.value),required:true,minLength:5,maxLength:4000,rows:6})),jH('p',{className:'small-note'},'Avoid passwords, health details and other sensitive information.'),error&&jH('p',{role:'alert',className:'error'},error),status&&jH('p',{role:'status',className:'success'},status),jH('button',{className:'primary',disabled:busy},busy?'Saving report…':'Submit report')));};
+Feedback=function(props){const [name,setName]=import_react.useState(''),[message,setMessage]=import_react.useState(''),[busy,setBusy]=import_react.useState(false),[status,setStatus]=import_react.useState(''),[error,setError]=import_react.useState('');if(props.kind==='review')return jH(octFeedback,props);return jH('section',{className:'j-section'},xTitle('COMMUNITY · HELP US IMPROVE','Report an issue','Tell us the section, what you tried and what happened. Reports are private.'),jH('form',{className:'feedback-form',onSubmit:async e=>{e.preventDefault();setBusy(true);setError('');setStatus('');try{const r=await fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind:'issue',name,message})});const d=await readJsonResponse(r,"The service could not load. Your message is still here; please retry.");if(!r.ok||!d.saved)throw Error(d.error||'Your report could not be saved.');setMessage('');setStatus(d.message||(d.emailed?'Your report was accepted for email delivery.':'Your report is saved privately; email forwarding is pending.'))}catch(e){setError(e.message||'Connection failed. Your message is still here.')}finally{setBusy(false)}}},xInput('Name (optional)',{value:name,maxLength:100,onChange:e=>setName(e.target.value)}),jH('label',null,'What happened?',jH('textarea',{value:message,onChange:e=>setMessage(e.target.value),required:true,minLength:5,maxLength:4000,rows:6})),jH('p',{className:'small-note'},'Avoid passwords, health details and other sensitive information.'),error&&jH('p',{role:'alert',className:'error'},error),status&&jH('p',{role:'status',className:'success'},status),jH('button',{className:'primary',disabled:busy},busy?'Saving report…':'Submit report')));};
 const octChurch=ChurchDirectory;
-ChurchDirectory=function(){const featured=churches_default.filter(c=>c.id.startsWith('featured-'));const [selected,setSelected]=import_react.useState(featured[0]);const positions={Auckland:[251,125],Hamilton:[267,156],'Palmerston North':[272,233],Wellington:[264,258],Christchurch:[188,320],Dunedin:[137,391]};return jH(import_react.Fragment,null,jH('section',{className:'oct-church-map'},jH('div',null,jH('h2',null,'Explore cathedral locations'),jH('p',null,'Choose a pin to see church details and the listed Mass timetable. Use the directory below for more parishes.'),jH('svg',{viewBox:'0 0 360 450',role:'group','aria-label':'New Zealand cathedral location map'},jH('rect',{width:360,height:450,fill:'#e8f3f7',rx:20}),jH('path',{d:'M243 67L259 105L278 135L302 160L288 192L282 222L270 253L252 270L242 251L257 228L246 204L257 177L240 150L247 119L232 83Z M240 266L221 291L206 319L182 341L164 370L149 401L120 421L106 410L122 380L150 348L173 321L194 299L215 276Z',fill:'#aac9a6',stroke:'#6c9378'}),featured.map(c=>{const [x,y]=positions[c.diocese]||[200,200];return jH('g',{key:c.id,role:'button',tabIndex:0,'aria-label':c.diocese+' cathedral',onClick:()=>setSelected(c),onKeyDown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setSelected(c)}}},jH('circle',{cx:x,cy:y,r:selected.id===c.id?10:7,fill:selected.id===c.id?'#b35b32':'#174d40',stroke:'#fff',strokeWidth:3}),jH('text',{x:x+13,y:y+4,fontSize:11,fill:'#17352e'},c.diocese))})),jH('p',{className:'small-note'},'Schematic map: pins show city locations, not precise street coordinates.')),jH('article',{className:'j-card','aria-live':'polite'},jH('h2',null,selected.name),jH('p',null,selected.address),jH('h3',null,'Listed Mass times'),jH('p',null,selected.schedule),jH('p',{className:'small-note'},'Confirm times with the parish, especially on holy days.'),jH('a',{className:'primary',href:selected.source,target:'_blank',rel:'noopener noreferrer'},'Confirm official Mass times'),jH('a',{className:'secondary',href:selected.map,target:'_blank',rel:'noopener noreferrer'},'Open street map'))),jH(octChurch));};
+ChurchDirectory=function(){const featured=churches_default.filter(c=>c.id.startsWith('featured-'));const [selected,setSelected]=import_react.useState(featured[0]);const positions={Auckland:[251,125],Hamilton:[267,156],'Palmerston North':[272,233],Wellington:[264,258],Christchurch:[188,320],Dunedin:[137,391]};return jH(import_react.Fragment,null,jH('section',{className:'oct-church-map'},jH('div',null,jH('h2',null,'Explore cathedral locations'),jH('p',null,'Choose a pin to see church details and the listed Mass timetable. Use the directory below for more parishes.'),jH('svg',{viewBox:'0 0 360 450',role:'group','aria-label':'New Zealand cathedral location map'},jH('rect',{width:360,height:450,fill:'#e8f3f7',rx:20}),jH('path',{d:'M243 67L259 105L278 135L302 160L288 192L282 222L270 253L252 270L242 251L257 228L246 204L257 177L240 150L247 119L232 83Z M240 266L221 291L206 319L182 341L164 370L149 401L120 421L106 410L122 380L150 348L173 321L194 299L215 276Z',fill:'#aac9a6',stroke:'#6c9378'}),featured.map(c=>{const [x,y]=positions[c.diocese]||[200,200];return jH('g',{key:c.id,role:'button',tabIndex:0,'aria-label':c.diocese+' cathedral',onClick:()=>setSelected(c),onKeyDown:e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();setSelected(c)}}},jH('circle',{cx:x,cy:y,r:selected.id===c.id?10:7,fill:selected.id===c.id?'#b35b32':'#174d40',stroke:'#fff',strokeWidth:3}),jH('text',{x:x+13,y:y+4,fontSize:11,fill:'#17352e'},c.diocese))})),jH('p',{className:'small-note'},'Schematic map: pins show city locations, not precise street coordinates.')),jH('article',{className:'j-card','aria-live':'polite'},jH('h2',null,selected.name),jH('p',null,selected.address),jH('h3',null,'Listed Mass times'),jH('p',null,selected.schedule),jH(hChurchShare,{church:selected}),jH('p',{className:'small-note'},'Confirm times with the parish, especially on holy days.'),jH('a',{className:'primary',href:selected.source,target:'_blank',rel:'noopener noreferrer'},'Confirm official Mass times'),jH('a',{className:'secondary',href:selected.map,target:'_blank',rel:'noopener noreferrer'},'Open street map'))),jH(octChurch));};
 
 var octCountryGroups={
 english:['New Zealand','Australia','United Kingdom','United States','Canada','Ireland','Jamaica','Barbados','Bahamas','Belize','Guyana','Trinidad and Tobago','Antigua and Barbuda','Dominica','Grenada','Saint Lucia','Saint Kitts and Nevis','Saint Vincent and the Grenadines','South Africa','Nigeria','Ghana','Kenya','Uganda','Zambia','Zimbabwe','Botswana','Namibia','Malawi','Liberia','Sierra Leone','Gambia','Mauritius','Seychelles','Fiji','Papua New Guinea','Solomon Islands','Vanuatu','Kiribati','Tuvalu','Nauru','Palau','Marshall Islands','Micronesia'],
@@ -44322,7 +44326,8 @@ var cOriginalDevotions=ExtraDevotions;
 ExtraDevotions=function(){const [chosen,setChosen]=import_react.useState(cCommonPrayers[0].name),speech=useSpeech('motherly','Slow'),p=cCommonPrayers.find(p=>p.name===chosen);return jH(import_react.Fragment,null,jH(cOriginalDevotions),jH('section',{className:'j-section common-prayers'},jH('h2',null,'Everyday prayers'),jH('p',null,'Choose a prayer for a quiet moment in your day.'),jH('div',{className:'filters'},cCommonPrayers.map(pr=>jH('button',{key:pr.name,className:chosen===pr.name?'selected':'','aria-pressed':chosen===pr.name,onClick:()=>{speech.stop();setChosen(pr.name);}},pr.name))),jH('article',{className:'j-card'},jH('h3',null,p.name),jH('p',{style:{whiteSpace:'pre-line',fontSize:'1.12rem',lineHeight:1.8}},p.text),jH('p',{className:'small-note'},p.note),p.source&&jH('a',{href:p.source,target:'_blank',rel:'noopener noreferrer'},'Hour of Mercy guidance'),jH('div',{className:'button-row'},jH('button',{onClick:()=>speech.read([p.text])},'Read prayer aloud'),jH('button',{className:'secondary',onClick:()=>speech.stop()},'Stop')),jH(PhotoShare,{label:'Share or download prayer',post:{title:p.name,text:p.text,background:xAsset('life-photos-2'),credit:p.source?'Hour of Mercy · traditional short prayer':'Traditional prayer',filename:'prayer-'+chosen.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'.png'}}))));};
 
 const octOwnerFeedback=Feedback; Feedback=function(props){return jH(import_react.Fragment,null,jH(octOwnerFeedback,props),props.kind==="issue"&&props.canEdit&&jH(OctOwnerInbox));};
-function OctOwnerInbox(){const [items,setItems]=import_react.useState([]),[error,setError]=import_react.useState("");async function load(){try{const r=await fetch("/api/feedback?kind=issue");const d=await r.json();if(!r.ok)throw Error(d.error);setItems(d.items);setError("")}catch(e){setError(e.message)}}import_react.useEffect(()=>{load()},[]);return jH("section",{className:"j-section"},jH("h2",null,"Private owner inbox"),jH("button",{onClick:load},"Refresh reports"),error&&jH("p",{role:"alert"},error),items.map(x=>jH("article",{className:"j-card",key:x.id},jH("h3",null,x.name),jH("p",null,new Date(x.created).toLocaleString("en-NZ")),jH("p",null,x.message))));}
+function OctOwnerInbox(){const [items,setItems]=import_react.useState([]),[error,setError]=import_react.useState("");async function load(){try{const r=await fetch("/api/feedback?kind=issue");const d=await readJsonResponse(r,"The service could not load. Your message is still here; please retry.");if(!r.ok)throw Error(d.error);setItems(d.items);
+            if(d.notice)setError(d.notice);setError("")}catch(e){setError(e.message)}}import_react.useEffect(()=>{load()},[]);return jH("section",{className:"j-section"},jH("h2",null,"Private owner inbox"),jH("button",{onClick:load},"Refresh reports"),error&&jH("p",{role:"alert"},error),items.map(x=>jH("article",{className:"j-card",key:x.id},jH("h3",null,x.name),jH("p",null,new Date(x.created).toLocaleString("en-NZ")),jH("p",null,x.message))));}
 
 const octFamilyNames=new Set(["NZ bucket lists"]);const octFaithNames=new Set(["Lives that inspire","Speaking & leadership"]);const allNav=navGroups.flatMap(g=>g.items);navGroups.forEach(g=>g.items=g.items.filter(x=>!octFamilyNames.has(x.name)&&!octFaithNames.has(x.name)));navGroups[1].items.push(...allNav.filter(x=>octFamilyNames.has(x.name)));navGroups[2].items.push(...allNav.filter(x=>octFaithNames.has(x.name)));
 
@@ -46640,7 +46645,7 @@ function q7ChecklistShare({checklist:c,checked=[]}){const done=c.items.filter((_
 const q7OriginalFeeding=Breastfeeding;
 function q7FeedingQuotes(){return jH('section',{className:'j-section'},jH('h2',null,'Encouragement for your feeding journey'),jH('p',null,'Gentle original words alongside the practical support above.'),jH('div',{className:'j-grid'},xFamilyQuotes.Breastfeeding.map((text,i)=>jH('article',{className:'j-card',key:text},jH(PhotoCard,{title:'One feed at a time',text,credit:'',background:xAsset('care-photos-1'),filename:'james-breastfeeding-quote-'+i})))));}
 Breastfeeding=function(){const [view,setView]=import_react.useState('Tips & support');return jH('section',{className:'j-section'},xTitle('FAMILY & LEARNING · CARE FOR MUM & PĒPI','Breastfeeding quotes & tips','Practical help and gentle encouragement together. Choose what you need today.'),jH('div',{className:'filters'},['Tips & support','Quotes'].map(v=>jH('button',{key:v,className:view===v?'selected':'','aria-pressed':view===v,onClick:()=>setView(v)},v))),view==='Tips & support'?jH(q7OriginalFeeding):jH(q7FeedingQuotes));};
-function q7Skills({topic}){const [view,setView]=import_react.useState('Tips'),[answers,setAnswers]=import_react.useState({}),[checked,setChecked]=import_react.useState(false);const d=xSkills[topic],score=d.quiz.reduce((n,q,i)=>n+(answers[i]===q.answer?1:0),0);const tools=topic==='Speaking'?[['A one-minute message','Opening: my main point is…\nExample: one situation that shows this is…\nNext step: you can try…'],['Story planner','Where were you? What challenge arose? What did you try? What changed? What can your listener take away?'],['Rehearsal checklist','Read aloud. Check one clear point, a helpful example, pauses, eye contact, and a closing invitation.'],['Listening notes','I heard you say…\nDid I understand correctly?\nWhat would help next?']]:[['Meeting plan','Decision needed: …\nPeople to hear from: …\nOwner of the next step: …\nReview date: …'],['Kind feedback','Specific action I noticed: …\nIts effect: …\nYour view: …\nNext step we agree: …'],['Team check-in','What is going well? What is blocked? What support would help? What can we simplify?'],['Reflection journal','One contribution to thank. One decision to review. One mistake to acknowledge. One practical improvement.']];const quotes=cSkillQuotes.filter((_,i)=>topic==='Speaking'?i<4:i>=4);return jH('section',{className:'j-section'},xTitle('FAMILY & LEARNING · PRACTISE A LITTLE',topic+' practice',topic==='Speaking'?'Build a clear message, practise listening and speak with confidence.':'Lead with clarity, care, humility and practical next steps.'),jH('div',{className:'filters'},['Tips','Practice tools','Quiz','Quotes'].map(v=>jH('button',{key:v,className:view===v?'selected':'','aria-pressed':view===v,onClick:()=>setView(v)},v))),view==='Tips'&&jH('div',{className:'j-grid'},d.tips.map((text,i)=>jH('article',{className:'j-card',key:text},jH('p',{className:'eyebrow'},'TIP '+(i+1)),jH('p',null,text),jH(PhotoShare,{label:'Share tip with QR',post:{title:topic+' · a little practice',text,credit:'',background:xAsset('life-photos-2'),filename:'james-'+topic.toLowerCase()+'-tip-'+i}})))),view==='Practice tools'&&jH('div',{className:'j-grid'},tools.map(([title,text])=>jH('article',{className:'j-card',key:title},jH('h2',null,title),jH('p',{style:{whiteSpace:'pre-line'}},text),jH('button',{className:'secondary',onClick:()=>jDownloadHTML('james-'+topic.toLowerCase()+'-worksheet',title,'<section><p style="white-space:pre-line">'+jEscape(text)+'</p><p>My notes:</p>'+('<p>________________________________________________</p>'.repeat(8))+'</section>')},'Download worksheet with QR')))),view==='Quotes'&&jH('div',{className:'j-grid'},quotes.map((text,i)=>jH(PhotoCard,{key:text,title:topic,text,credit:'',background:xAsset('life-photos-2'),filename:'james-'+topic.toLowerCase()+'-quote-'+i}))),view==='Quiz'&&jH('section',{className:'j-card'},d.quiz.map((q,i)=>jH('fieldset',{className:'x-quiz',key:q.q},jH('legend',null,(i+1)+'. '+q.q),jH('div',{className:'answers'},q.options.map((v,n)=>jH('button',{key:v,type:'button',disabled:checked,'aria-pressed':answers[i]===n,className:checked&&n===q.answer?'correct':answers[i]===n?'selected':'',onClick:()=>setAnswers(a=>({...a,[i]:n}))},v))),checked&&jH('p',null,q.why))),jH('button',{disabled:!checked&&Object.keys(answers).length<d.quiz.length,onClick:()=>{if(checked){setAnswers({});setChecked(false)}else setChecked(true)}},checked?'Try again':'Check answers'),checked&&jH(import_react.Fragment,null,jH('p',{role:'status'},score+' of '+d.quiz.length+' correct. Keep practising.'),jH(PhotoShare,{label:'Share quiz result with QR',post:{title:topic+' practice',text:'I scored '+score+' / '+d.quiz.length+'. Every attempt helps me learn.',credit:'',background:xAsset('life-photos-2'),filename:'james-'+topic.toLowerCase()+'-quiz'}}))));}
+function q7Skills({topic}){const [view,setView]=import_react.useState('Tips'),[answers,setAnswers]=import_react.useState({}),[checked,setChecked]=import_react.useState(false);const d=xSkills[topic],score=d.quiz.reduce((n,q,i)=>n+(answers[i]===q.answer?1:0),0);const tools=topic==='Speaking'?[['A one-minute message','Opening: my main point is…\nExample: one situation that shows this is…\nNext step: you can try…'],['Story planner','Where were you? What challenge arose? What did you try? What changed? What can your listener take away?'],['Rehearsal checklist','Read aloud. Check one clear point, a helpful example, pauses, eye contact, and a closing invitation.'],['Listening notes','I heard you say…\nDid I understand correctly?\nWhat would help next?']]:[['Meeting plan','Decision needed: …\nPeople to hear from: …\nOwner of the next step: …\nReview date: …'],['Kind feedback','Specific action I noticed: …\nIts effect: …\nYour view: …\nNext step we agree: …'],['Team check-in','What is going well? What is blocked? What support would help? What can we simplify?'],['Reflection journal','One contribution to thank. One decision to review. One mistake to acknowledge. One practical improvement.']];const quotes=cSkillQuotes.filter((_,i)=>topic==='Speaking'?i<4:i>=4);return jH('section',{className:'j-section'},xTitle('FAMILY & LEARNING · PRACTISE A LITTLE',topic+' practice',topic==='Speaking'?'Build a clear message, practise listening and speak with confidence.':'Lead with clarity, care, humility and practical next steps.'),jH('div',{className:'filters'},['Tips','Practice tools','Quiz','Quotes',...(topic==='Speaking'?['Toastmasters learnings']:[])].map(v=>jH('button',{key:v,className:view===v?'selected':'','aria-pressed':view===v,onClick:()=>setView(v)},v))),topic==='Speaking'&&view==='Toastmasters learnings'&&jH(hToastmastersPractice),view==='Tips'&&jH('div',{className:'j-grid'},d.tips.map((text,i)=>jH('article',{className:'j-card',key:text},jH('p',{className:'eyebrow'},'TIP '+(i+1)),jH('p',null,text),jH(PhotoShare,{label:'Share tip with QR',post:{title:topic+' · a little practice',text,credit:'',background:xAsset('life-photos-2'),filename:'james-'+topic.toLowerCase()+'-tip-'+i}})))),view==='Practice tools'&&jH('div',{className:'j-grid'},tools.map(([title,text])=>jH('article',{className:'j-card',key:title},jH('h2',null,title),jH('p',{style:{whiteSpace:'pre-line'}},text),jH('button',{className:'secondary',onClick:()=>jDownloadHTML('james-'+topic.toLowerCase()+'-worksheet',title,'<section><p style="white-space:pre-line">'+jEscape(text)+'</p><p>My notes:</p>'+('<p>________________________________________________</p>'.repeat(8))+'</section>')},'Download worksheet with QR')))),view==='Quotes'&&jH('div',{className:'j-grid'},quotes.map((text,i)=>jH(PhotoCard,{key:text,title:topic,text,credit:'',background:xAsset('life-photos-2'),filename:'james-'+topic.toLowerCase()+'-quote-'+i}))),view==='Quiz'&&jH('section',{className:'j-card'},d.quiz.map((q,i)=>jH('fieldset',{className:'x-quiz',key:q.q},jH('legend',null,(i+1)+'. '+q.q),jH('div',{className:'answers'},q.options.map((v,n)=>jH('button',{key:v,type:'button',disabled:checked,'aria-pressed':answers[i]===n,className:checked&&n===q.answer?'correct':answers[i]===n?'selected':'',onClick:()=>setAnswers(a=>({...a,[i]:n}))},v))),checked&&jH('p',null,q.why))),jH('button',{disabled:!checked&&Object.keys(answers).length<d.quiz.length,onClick:()=>{if(checked){setAnswers({});setChecked(false)}else setChecked(true)}},checked?'Try again':'Check answers'),checked&&jH(import_react.Fragment,null,jH('p',{role:'status'},score+' of '+d.quiz.length+' correct. Keep practising.'),jH(PhotoShare,{label:'Share quiz result with QR',post:{title:topic+' practice',text:'I scored '+score+' / '+d.quiz.length+'. Every attempt helps me learn.',credit:'',background:xAsset('life-photos-2'),filename:'james-'+topic.toLowerCase()+'-quiz'}}))));}
 function q7PregnancyURL(week){return 'https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/'+(week<=12?'1st':week<=27?'2nd':'3rd')+'-trimester/week-'+week+'/'}
 // Sizes are sourced weekly analogies, not individual measurements.
 var q7SizeData={"4": {"name": "poppy seed", "length": "Approximate weekly comparison", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/1st-trimester/week-4/"}, "5": {"name": "sesame seed", "length": "Approximate weekly comparison", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/1st-trimester/week-5/"}, "7": {"name": "grape", "length": "Approximate weekly comparison", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/1st-trimester/week-7/"}, "9": {"name": "strawberry", "length": "About 22mm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/1st-trimester/week-9/"}, "10": {"name": "small apricot", "length": "About 30mm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/1st-trimester/week-10/"}, "11": {"name": "fig", "length": "About 41mm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/1st-trimester/week-11/"}, "12": {"name": "plum", "length": "About 5.4cm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/1st-trimester/week-12/"}, "13": {"name": "peach", "length": "About 7.4cm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-13/"}, "14": {"name": "kiwi fruit", "length": "About 8.5cm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-14/"}, "15": {"name": "apple", "length": "About 10.1cm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-15/"}, "16": {"name": "avocado", "length": "About 11.6cm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-16/"}, "17": {"name": "pomegranate", "length": "About 12cm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-17/"}, "18": {"name": "bell pepper", "length": "About 14.2cm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-18/"}, "19": {"name": "beef tomato", "length": "About 15.3cm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-19/"}, "20": {"name": "banana", "length": "About 25.6cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-20/"}, "21": {"name": "carrot", "length": "About 26.7cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-21/"}, "22": {"name": "sweet potato", "length": "About 27.8cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-22/"}, "23": {"name": "large mango", "length": "About 28.9cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-23/"}, "24": {"name": "corn on the cob", "length": "About 30cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-24/"}, "25": {"name": "courgette", "length": "About 34.6cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-25/"}, "26": {"name": "cucumber", "length": "About 35.6cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-26/"}, "27": {"name": "head of cauliflower", "length": "About 36.6cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/2nd-trimester/week-27/"}, "28": {"name": "aubergine", "length": "About 37.6cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-28/"}, "29": {"name": "butternut squash", "length": "About 38.6cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-29/"}, "30": {"name": "cabbage", "length": "About 39.9cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-30/"}, "31": {"name": "coconut", "length": "About 41.1cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-31/"}, "32": {"name": "bunch of celery", "length": "About 42.4cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-32/"}, "33": {"name": "pineapple", "length": "About 43.7cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-33/"}, "34": {"name": "cantaloupe melon", "length": "About 45cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-34/"}, "35": {"name": "honeydew melon", "length": "About 46.2cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-35/"}, "36": {"name": "romaine lettuce", "length": "About 47.4cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-36/"}, "37": {"name": "leek", "length": "About 48.6cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-37/"}, "38": {"name": "stick of rhubarb", "length": "About 49.8cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-38/"}, "39": {"name": "watermelon", "length": "About 50.7cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-39/"}, "40": {"name": "pumpkin", "length": "About 51.2cm · head to heel", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/3rd-trimester/week-40/"}, "6": {"name": "pea", "length": "About 6mm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/1st-trimester/week-6/"}, "8": {"name": "raspberry", "length": "About 16mm · head to bottom", "url": "https://www.nhs.uk/best-start-in-life/pregnancy/week-by-week-guide-to-pregnancy/1st-trimester/week-8/"}};
@@ -46713,7 +46718,7 @@ KidsLearning=function(){return o7ReplaceSightPanel(o7OriginalKidsLearning());};
 /* Bible retellings reuse the Reading Nook StoryReader, including page turns, pictures,
    reading controls, word reading, quiz and full illustrated book export. */
 BibleBooks=function(){
- const [selected,setSelected]=import_react.useState(null),[search,setSearch]=import_react.useState('');
+ const [selected,setSelected]=import_react.useState(()=>rRestoreStory('bible',null)),[search,setSearch]=import_react.useState('');
  const books=jBibleData.filter(b=>Number.isInteger(b.index)&&stories[b.index]&&Array.isArray(stories[b.index].paragraphs));
  if(selected!==null)return jH(StoryReader,{key:'bible-book-'+selected,index:selected,onBack:()=>setSelected(null)});
  const found=books.filter(b=>(b.title+' '+b.reference).toLowerCase().includes(search.trim().toLowerCase()));
@@ -46756,7 +46761,7 @@ function octCountryPictureTree(node){
  }
  if(node.type==='article'&&node.props.className==='language-panel'){
   const children=import_react.Children.toArray(node.props.children),heading=children.find(c=>import_react.isValidElement(c)&&c.type==='h2'),country=heading?.props.children;
-  return import_react.cloneElement(node,{},children.map(octCountryPictureTree),octCountryPicture(country,false),jH(PhotoShare,{label:'Share this country picture',post:{title:country+' · a world of welcome',text:octCountryPictures[country]?.theme+'\nRegional clothing example · ask local families about their own traditions.',credit:'Illustration · TheJamesNZ.com',background:jAsset(octCountryPictures[country].path),filename:'james-country-'+country.toLowerCase().replace(/[^a-z0-9]+/g,'-')}}));
+  return import_react.cloneElement(node,{},children.map(octCountryPictureTree),octCountryPicture(country,false),jH(PhotoShare,{label:'Share this country picture',post:{title:octCountryPictures[country]?.flag+' '+country,text:octCountryPictures[country]?.theme,credit:'',background:jAsset(octCountryPictures[country].path),filename:'james-country-'+country.toLowerCase().replace(/[^a-z0-9]+/g,'-')}}));
  }
  return import_react.cloneElement(node,{},octCountryPictureTree(node.props.children));
 }
@@ -46809,7 +46814,7 @@ import_react.useEffect(()=>{halt(true);},[selected,transpose,tempo]);
 async function play(){setNotice('');try{const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio){setNotice('This browser does not support the guitar player. Lyrics and downloads still work.');return;}if(!engine.current){const context=new Audio(),gain=context.createGain();gain.gain.value=volume;gain.connect(context.destination);engine.current={context,gain,timer:null,sources:new Set(),buffers:{},step:0};}const e=engine.current;await e.context.resume();if(e.timer)return;e.next=e.context.currentTime+0.08;if(state==='Finished')e.step=0;const interval=60/tempo/2;const progression=chords.slice(),totalSteps=song.verses.length*progression.length*8;function schedule(){while(e.step<totalSteps&&e.next<e.context.currentTime+0.3){const bar=Math.floor(e.step/8)%progression.length,pattern=[0,1,2,3,0,2,1,3],midi=oct7bChordNotes(progression[bar])[pattern[e.step%8]];if(!e.buffers[midi])e.buffers[midi]=oct7bGuitarBuffer(e.context,midi);const source=e.context.createBufferSource();source.buffer=e.buffers[midi];source.connect(e.gain);e.sources.add(source);source.onended=()=>e.sources.delete(source);source.start(e.next);e.next+=interval;e.step++;}if(e.step>=totalSteps&&e.context.currentTime>=e.next+3.5){if(e.timer)clearInterval(e.timer);e.timer=null;setState('Finished');}}schedule();e.timer=setInterval(schedule,60);setState('Playing');}catch(err){halt(true);setNotice('The guitar player could not start. Try Play again or use another browser.');}}
 function changeSong(id){halt(true);setSelected(id);setTranspose(0);setTempo((oct7bSongs.find(s=>s.id===id)||song).tempo);}
 function download(){const body='<p>'+jEscape(song.theme)+' · Key '+jEscape(oct7bTranspose(song.key,transpose))+' · Suggested tempo '+tempo+' BPM</p><p>Fingerstyle accompaniment: one chord per bar, repeat the four-bar progression for each verse.</p>'+song.verses.map((verse,i)=>'<section><h2>Verse '+(i+1)+'</h2>'+verse.map((line,n)=>'<p><strong>'+jEscape(chords[n%chords.length])+'</strong><br>'+jEscape(line)+'</p>').join('')+'</section>').join('')+'<p>Devotional lyrics written for The James NZ. You may sing, print and share these original texts. Accompaniment is a synthesized guitar instrumental, not a vocal recording or official liturgical setting.</p>';jDownloadHTML('the-james-nz-song-'+song.id,song.title,body);}
-return jH('section',{className:'j-section'},xTitle('FAITH & INSPIRATION · MUSIC & PRAYER','Catholic songs & gentle guitar','Eight original devotional songs for family prayer and quiet reflection. Open the words, choose a comfortable key and play a gentle fingerstyle accompaniment.'),jH('p',{className:'small-note'},'These songs were written for The James NZ; they are not recordings of familiar hymns. The player uses synthesized acoustic guitar and does not sing the lyrics. For Mass, follow the parish’s approved music.'),jH('label',null,'Find a song',jH('input',{value:search,onChange:e=>setSearch(e.target.value),placeholder:'Search title or prayer theme'})),jH('div',{className:'filters'},shown.map(s=>jH('button',{key:s.id,className:selected===s.id?'active':'','aria-pressed':selected===s.id,onClick:()=>changeSong(s.id)},s.title))),!shown.length&&jH('p',null,'No songs match. Try a different word.'),jH('article',{className:'j-card'},jH('p',{className:'eyebrow'},song.theme),jH('h2',null,song.title),jH('div',{className:'j-actions'},jH('label',null,'Transpose',jH('select',{value:transpose,onChange:e=>setTranspose(Number(e.target.value))},Array.from({length:13},(_,i)=>i-6).map(n=>jH('option',{key:n,value:n},(n>0?'+':'')+n+' semitones · '+oct7bTranspose(song.key,n))))),jH('label',null,'Gentle tempo: '+tempo+' BPM',jH('input',{type:'range',min:50,max:96,step:1,value:tempo,onChange:e=>setTempo(Number(e.target.value))})),jH('label',null,'Volume',jH('input',{type:'range',min:0,max:0.8,step:0.01,value:volume,onChange:e=>setVolume(Number(e.target.value))}))),jH('p',null,'Key '+oct7bTranspose(song.key,transpose)+' · Chord progression: '+chords.join(' → ')),jH('div',{className:'j-actions'},jH('button',{className:'primary',disabled:state==='Playing',onClick:play},state==='Paused'?'Resume guitar':state==='Finished'?'Play again':'Play guitar'),jH('button',{className:'secondary',disabled:state!=='Playing',onClick:()=>halt(false)},'Pause'),jH('button',{className:'secondary',disabled:state==='Stopped',onClick:()=>halt(true)},'Stop')),jH('p',{role:'status'},notice||state+' · Instrumental guitar accompaniment plays all three verses and finishes.'),jH('details',{open:true},jH('summary',null,'Lyrics & guitar chords'),song.verses.map((verse,i)=>jH('section',{key:i,style:{padding:'14px 0',borderBottom:'1px solid #e5e9e5'}},jH('h3',null,'Verse '+(i+1)),verse.map((line,n)=>jH('p',{key:n,style:{margin:'12px 0'}},jH('strong',{style:{display:'block',color:'#27654c',fontFamily:'monospace'}},chords[n%chords.length]),line))))),jH('div',{className:'j-actions'},jH('button',{onClick:download},'Download lyrics & chords'),jH(PhotoShare,{label:'Share song with QR code',post:{title:song.title,text:song.verses.map((v,i)=>'Verse '+(i+1)+'\n'+v.join('\n')).join('\n\n')+'\n\nGuitar chords: '+chords.join(' · '),credit:'Devotional words for The James NZ · sing, print and share',background:stories[3].image,filename:'james-song-'+song.id}}))),jH('details',null,jH('summary',null,'Beginner guitar chord guide'),jH('p',null,'Six characters show frets from the thickest low E string to the thinnest high E string. x = do not play; 0 = open string. F uses a barre; practise gently and stop if your hand hurts.'),jH('div',{className:'j-grid'},Object.entries(oct7bShapes).map(([name,shape])=>jH('article',{className:'j-card',key:name},jH('h3',null,name),jH('code',null,shape)))),jH('p',null,'These shapes are for the original C and G keys. Transposing changes chord names and the instrument’s pitch; it does not change these reference diagrams. A capo can also help you choose a comfortable singing range.')),jH('p',{className:'small-note'},'Original devotional words authored for this website. Permission is given to sing, print and share them. The computer-generated accompaniment is an original instrumental pattern. No commercial song recordings are included.'));
+return jH('section',{className:'j-section'},xTitle('FAITH & INSPIRATION · MUSIC & PRAYER','Catholic songs & gentle guitar','Eight original devotional songs for family prayer and quiet reflection. Open the words, choose a comfortable key and play a gentle fingerstyle accompaniment.'),jH('p',{className:'small-note'},'These songs were written for The James NZ; they are not recordings of familiar hymns. The player uses synthesized acoustic guitar and does not sing the lyrics. For Mass, follow the parish’s approved music.'),jH('label',null,'Find a song',jH('input',{value:search,onChange:e=>setSearch(e.target.value),placeholder:'Search title or prayer theme'})),jH('div',{className:'filters'},shown.map(s=>jH('button',{key:s.id,className:selected===s.id?'active':'','aria-pressed':selected===s.id,onClick:()=>changeSong(s.id)},s.title))),!shown.length&&jH('p',null,'No songs match. Try a different word.'),jH('article',{className:'j-card'},jH('p',{className:'eyebrow'},song.theme),jH('h2',null,song.title),jH('div',{className:'j-actions'},jH('label',null,'Transpose',jH('select',{value:transpose,onChange:e=>setTranspose(Number(e.target.value))},Array.from({length:13},(_,i)=>i-6).map(n=>jH('option',{key:n,value:n},(n>0?'+':'')+n+' semitones · '+oct7bTranspose(song.key,n))))),jH('label',null,'Gentle tempo: '+tempo+' BPM',jH('input',{type:'range',min:50,max:96,step:1,value:tempo,onChange:e=>setTempo(Number(e.target.value))})),jH('label',null,'Volume',jH('input',{type:'range',min:0,max:0.8,step:0.01,value:volume,onChange:e=>setVolume(Number(e.target.value))}))),jH('p',null,'Key '+oct7bTranspose(song.key,transpose)+' · Chord progression: '+chords.join(' → ')),jH('div',{className:'j-actions'},jH('button',{className:'primary',disabled:state==='Playing',onClick:play},state==='Paused'?'Resume melody':state==='Finished'?'Play again':'Play melody'),jH('button',{className:'secondary',disabled:state!=='Playing',onClick:()=>halt(false)},'Pause'),jH('button',{className:'secondary',disabled:state==='Stopped',onClick:()=>halt(true)},'Stop')),jH('p',{role:'status'},notice||state+' · Instrumental guitar accompaniment plays all three verses and finishes.'),jH('details',{open:true},jH('summary',null,'Full lyrics & guitar chords'),song.verses.map((verse,i)=>jH('section',{key:i,style:{padding:'14px 0',borderBottom:'1px solid #e5e9e5'}},jH('h3',null,'Verse '+(i+1)),verse.map((line,n)=>jH('p',{key:n,style:{margin:'12px 0'}},jH('strong',{style:{display:'block',color:'#27654c',fontFamily:'monospace'}},chords[n%chords.length]),line))))),jH('div',{className:'j-actions'},jH('button',{onClick:download},'Download lyrics & chords'),jH(PhotoShare,{label:'Share song with QR code',post:{title:song.title,text:song.verses.map((v,i)=>'Verse '+(i+1)+'\n'+v.join('\n')).join('\n\n')+'\n\nGuitar chords: '+chords.join(' · '),credit:'Devotional words for The James NZ · sing, print and share',background:stories[3].image,filename:'james-song-'+song.id}}))),jH('details',null,jH('summary',null,'Beginner guitar chord guide'),jH('p',null,'Six characters show frets from the thickest low E string to the thinnest high E string. x = do not play; 0 = open string. F uses a barre; practise gently and stop if your hand hurts.'),jH('div',{className:'j-grid'},Object.entries(oct7bShapes).map(([name,shape])=>jH('article',{className:'j-card',key:name},jH('h3',null,name),jH('code',null,shape)))),jH('p',null,'These shapes are for the original C and G keys. Transposing changes chord names and the instrument’s pitch; it does not change these reference diagrams. A capo can also help you choose a comfortable singing range.')),jH('p',{className:'small-note'},'Original devotional words authored for this website. Permission is given to sing, print and share them. The computer-generated accompaniment is an original instrumental pattern. No commercial song recordings are included.'));
 }
 
 /* Forty-four original child-friendly retellings; existing six books remain unchanged. */
@@ -47158,16 +47163,17 @@ function eFullSongNotes(song){const verses=Array.isArray(song.verses)&&song.vers
 function eSongTimeline(song,tempo){return o7cMakeTimeline(eFullSongNotes(song),tempo);}
 function eVerseNumber(song,tempo,progress){const base=o7cMakeTimeline(song.notes,tempo).seconds,gap=1.5*60/tempo;return Math.min(song.verseCount||1,1+Math.floor(eSongTimeline(song,tempo).seconds*progress/100/(base+gap)));}
 function TraditionalHymnPlayer(){
- const tunes=o7cNormaliseTunes(typeof oct7cTunes==='undefined'?[]:oct7cTunes);
+ const tunes=[...o7cNormaliseTunes(typeof oct7cTunes==='undefined'?[]:oct7cTunes).map(t=>({...t,collection:'Traditional hymns'})),...hRegionalSongs()];
+ const [collection,setCollection]=import_react.useState('All collections');
  const [search,setSearch]=import_react.useState(''),[category,setCategory]=import_react.useState('All'),[page,setPage]=import_react.useState(0),[selected,setSelected]=import_react.useState(tunes[0]?.id||''),[tempo,setTempo]=import_react.useState(tunes[0]?.tempo||76),[volume,setVolume]=import_react.useState(.45),[phase,setPhase]=import_react.useState('Stopped'),[progress,setProgress]=import_react.useState(0),[notice,setNotice]=import_react.useState('');
- const engine=import_react.useRef(null),operation=import_react.useRef(0),song=tunes.find(t=>t.id===selected)||tunes[0];
+ const pendingPlay=import_react.useRef(null),engine=import_react.useRef(null),operation=import_react.useRef(0),song=tunes.find(t=>t.id===selected)||tunes[0];
  function stop(){operation.current++;o7cClearAudio(engine.current);setPhase('Stopped');setProgress(0);}
  function dispose(){operation.current++;const e=engine.current;o7cClearAudio(e);if(e){e.context.close().catch(()=>{});engine.current=null;}}
  import_react.useEffect(()=>()=>dispose(),[]);
  import_react.useEffect(()=>{if(engine.current)engine.current.gain.gain.setTargetAtTime(volume,engine.current.context.currentTime,.04);},[volume]);
- import_react.useEffect(()=>{stop();},[selected,tempo]);
+ import_react.useEffect(()=>{stop();if(pendingPlay.current===selected){pendingPlay.current=null;play()}},[selected,tempo]);
  async function play(){
-  if(!song)return;setNotice('');const token=++operation.current;
+  if(!song||song.regional)return;setNotice('');const token=++operation.current;
   try{
    const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio){setNotice('This browser cannot play the instrumental. The hymnbook source links remain available.');return;}
    if(!engine.current){const context=new Audio(),gain=context.createGain();gain.gain.value=volume;gain.connect(context.destination);engine.current={context,gain,sources:new Set(),buffers:{},timer:null,running:false,cursor:0,timeline:null,started:0};}
@@ -47181,19 +47187,21 @@ function TraditionalHymnPlayer(){
   try{await e.context.suspend();if(token===operation.current)setPhase('Paused');}catch{if(token!==operation.current)return;stop();setNotice('Pausing was unavailable. Playback has stopped.');}
  }
  function chooseSong(id){stop();setNotice('');setSelected(id);const next=tunes.find(t=>t.id===id);if(next)setTempo(Math.min(160,Math.max(40,next.tempo)));}
- const categories=['All',...new Set(tunes.map(t=>t.category))],filtered=tunes.filter(t=>(category==='All'||t.category===category)&&(t.title+' '+t.category+' '+(t.tuneName||'')+' '+(t.aliases||[]).join(' ')).toLowerCase().includes(search.trim().toLowerCase())),pages=Math.max(1,Math.ceil(filtered.length/12)),safePage=Math.min(page,pages-1),shown=filtered.slice(safePage*12,safePage*12+12);
- const seconds=song?eSongTimeline(song,tempo).seconds:0;
+ async function playFromCard(t){if(t.regional){window.open(t.listenURL||t.source,'_blank','noopener,noreferrer');return;}if(t.id===selected){await play();return;}try{const Audio=window.AudioContext||window.webkitAudioContext;if(Audio&&!engine.current){const context=new Audio(),gain=context.createGain();gain.gain.value=volume;gain.connect(context.destination);engine.current={context,gain,sources:new Set(),buffers:{},timer:null,running:false,cursor:0,timeline:null,started:0};}if(engine.current)await engine.current.context.resume();}catch{}pendingPlay.current=t.id;chooseSong(t.id);}
+ const categories=['All',...new Set(tunes.map(t=>t.category))],filtered=tunes.filter(t=>(collection==='All collections'||t.collection===collection)&&(category==='All'||t.category===category)&&(t.title+' '+t.category+' '+(t.tuneName||'')+' '+(t.aliases||[]).join(' ')).toLowerCase().includes(search.trim().toLowerCase())),pages=Math.max(1,Math.ceil(filtered.length/12)),safePage=Math.min(page,pages-1),shown=filtered.slice(safePage*12,safePage*12+12);
+ const seconds=song&&!song.regional?eSongTimeline(song,tempo).seconds:0;
  function clock(s){return Math.floor(s/60)+':'+String(Math.floor(s%60)).padStart(2,'0');}
- return jH('section',{className:'traditional-hymn-library'},jH('h2',null,'English hymns · acoustic guitar melodies'),
- jH('p',null,tunes.length+' English hymns with complete lyrics from the credited edition. Choose a title and play the guitar through every verse. The instrument plays the tune; all English verses are shown below.'),
- jH('p',{className:'small-note'},'Catholic-used hymns and shared traditional Christian devotional hymns are grouped in this English collection. Each card identifies its source and repertoire. Your parish can advise which songs suit a particular Mass.'),
- song&&jH('article',{className:'j-card hymn-player',style:{margin:'20px 0'}},jH('p',{className:'eyebrow'},song.category),jH('h3',null,song.title),song.tuneName&&jH('p',null,'Tune: '+song.tuneName),song.aliases?.length>0&&jH('p',{className:'small-note'},'Also known as: '+song.aliases.join(' · ')),jH('div',{className:'j-form-grid'},jH('label',null,'Tempo · '+tempo+' BPM',jH('input',{type:'range',min:40,max:160,step:1,value:tempo,onChange:e=>{setTempo(Number(e.target.value));setNotice('Tempo changed. Press Play to begin at the new pace.');}})),jH('label',null,'Volume · '+Math.round(volume*100)+'%',jH('input',{type:'range',min:0,max:.8,step:.01,value:volume,onChange:e=>setVolume(Number(e.target.value))}))),
+ return jH('section',{className:'traditional-hymn-library'},jH('h2',null,'English hymns & regional Catholic music'),
+ jH('p',{className:'small-note'},'100 guitar melodies · 100 Philippine English song pages · 16 verified Indian English Mass tracks.'),
+ jH('div',{className:'filters','aria-label':'Song collection'},['All collections','Traditional hymns','Philippines','India'].map(c=>jH('button',{key:c,'aria-pressed':collection===c,className:collection===c?'selected':'',onClick:()=>{setCollection(c);setCategory('All');setPage(0)}},c))),
+ song?.regional&&jH(hRegionalSelectedSong,{song}),
+ song&&!song.regional&&jH('article',{className:'j-card hymn-player',style:{margin:'20px 0'}},jH('p',{className:'eyebrow'},song.category),jH('h3',null,song.title),song.tuneName&&jH('p',null,'Tune: '+song.tuneName),song.aliases?.length>0&&jH('p',{className:'small-note'},'Also known as: '+song.aliases.join(' · ')),jH('div',{className:'j-form-grid'},jH('label',null,'Tempo · '+tempo+' BPM',jH('input',{type:'range',min:40,max:160,step:1,value:tempo,onChange:e=>{setTempo(Number(e.target.value));setNotice('Tempo changed. Press Play to begin at the new pace.');}})),jH('label',null,'Volume · '+Math.round(volume*100)+'%',jH('input',{type:'range',min:0,max:.8,step:.01,value:volume,onChange:e=>setVolume(Number(e.target.value))}))),
  jH('div',{className:'j-actions'},jH('button',{disabled:phase==='Playing',onClick:play},phase==='Paused'?'Resume melody':phase==='Finished'?'Play again':'Play melody'),jH('button',{className:'secondary',disabled:phase!=='Playing',onClick:pause},'Pause'),jH('button',{className:'secondary',disabled:phase==='Stopped',onClick:stop},'Stop')),
  jH('progress',{value:progress,max:100,style:{width:'100%'},'aria-label':'Melody playback progress'}),jH('p',{role:'status'},notice||phase+' · '+clock(seconds*progress/100)+' / '+clock(seconds)+' · verse '+eVerseNumber(song,tempo,progress)+' of '+(song.verseCount||1)),
  song.rhythmNote&&jH('p',{className:'small-note'},song.rhythmNote),jH('p',{className:'small-note'},song.attribution),jH('p',{className:'small-note'},'Reuse: '+song.license),song.source&&jH('a',{href:song.source,target:'_blank',rel:'noopener noreferrer'},'Open hymnbook / melody source'),song.lyrics&&jH('section',{className:'english-hymn-words'},jH('h3',null,'Full English lyrics & guitar guide'),jH('p',{className:'small-note'},(song.verseCount||1)+' verses · complete words in the credited source edition. Other hymnbooks may use different verses or wording.'),song.key&&jH('p',null,'Key: '+song.key),song.suggestedChords&&jH('p',null,'Suggested practice chords: '+(Array.isArray(song.suggestedChords)?song.suggestedChords.join(' · '):song.suggestedChords)),song.chordNote&&jH('p',{className:'small-note'},song.chordNote),jH('div',{className:'full-hymn-verses'},(song.verses||[{number:1,text:song.lyrics}]).map((verse,i)=>jH('article',{key:verse.number||i,className:'hymn-verse'+(phase==='Playing'&&eVerseNumber(song,tempo,progress)===i+1?' current-verse':''),style:{padding:'16px 20px',margin:'12px 0',border:'1px solid #dce5df',borderRadius:14,background:phase==='Playing'&&eVerseNumber(song,tempo,progress)===i+1?'#edf5ee':'#fff'}},jH('h4',null,'Verse '+verse.number),jH('p',{style:{whiteSpace:'pre-line',fontSize:'1.1rem',lineHeight:1.8}},verse.text)))),jH('div',{className:'button-row'},jH(PhotoShare,{post:{title:song.title,text:song.lyrics,credit:song.attribution,background:xAsset('life-photos-2'),filename:'james-english-hymn-'+song.id}}),jH('button',{className:'secondary',onClick:()=>jDownloadHTML('james-full-hymn-'+song.id,song.title,'<section><p>'+jEscape(song.key?'Key: '+song.key:'')+'</p><p>'+jEscape(song.suggestedChords?'Practice chord palette: '+song.suggestedChords:'')+'</p><p style="white-space:pre-line">'+jEscape(song.lyrics)+'</p><p>'+jEscape(song.attribution)+'</p><p>'+jEscape(song.sourceURL)+'</p></section>')},'Download full lyrics'))),song.repertoire&&jH('p',{className:'small-note'},song.repertoire),song.catholicReferenceURL&&jH('a',{href:song.catholicReferenceURL,target:'_blank',rel:'noopener noreferrer'},'Catholic hymn collection reference'),song.notes.length&&jH('p',{className:'small-note'},song.notes.filter(n=>n.midi!==null).length+' melody notes · '+song.notes.filter(n=>n.midi===null).length+' rests per verse · plays all '+(song.verseCount||1)+' verses, then finishes.')),
- jH('div',{className:'j-form-grid'},jH('label',null,'Find an English hymn',jH('input',{type:'search',value:search,onChange:e=>{setSearch(e.target.value);setPage(0);},placeholder:'Title or tune name'})),jH('label',null,'Music category',jH('select',{value:category,onChange:e=>{setCategory(e.target.value);setPage(0);}},categories.map(c=>jH('option',{key:c,value:c},c))))),
- jH('p',{role:'status'},filtered.length+' melodies found · page '+(safePage+1)+' of '+pages),
- jH('div',{className:'j-grid hymn-song-grid'},shown.map(t=>jH('article',{className:'j-card',key:t.id},jH('p',{className:'eyebrow'},t.category),jH('h3',null,t.title),t.tuneName&&jH('p',null,t.tuneName),jH('p',{className:'small-note'},t.notes.filter(n=>n.midi!==null).length+' melody notes'),jH('button',{className:t.id===song?.id?'selected':'secondary','aria-pressed':t.id===song?.id,onClick:()=>chooseSong(t.id)},t.id===song?.id?'Selected melody':'Choose melody'),t.source&&jH('a',{href:t.source,target:'_blank',rel:'noopener noreferrer',style:{display:'block',marginTop:10}},'Source & hymn information')))),
+ jH('div',{className:'j-form-grid'},jH('label',null,'Find a hymn or regional song',jH('input',{type:'search',value:search,onChange:e=>{setSearch(e.target.value);setPage(0);},placeholder:'Title or tune name'})),jH('label',null,'Music category',jH('select',{value:category,onChange:e=>{setCategory(e.target.value);setPage(0);}},categories.map(c=>jH('option',{key:c,value:c},c))))),
+ jH('p',{role:'status'},filtered.length+' songs found · page '+(safePage+1)+' of '+pages),
+ jH('div',{className:'j-grid hymn-song-grid'},shown.map(t=>jH('article',{className:'j-card',key:t.id},jH('p',{className:'eyebrow'},t.category),jH('h3',null,t.title),t.tuneName&&jH('p',null,t.tuneName),jH('p',{className:'small-note'},t.regional?'Official recording / song page':t.notes.filter(n=>n.midi!==null).length+' melody notes'),jH('div',{className:'button-row'},jH('button',{onClick:()=>playFromCard(t)},'Play melody'),t.regional?jH('a',{className:'secondary',href:t.source,target:'_blank',rel:'noopener noreferrer'},'Full lyrics'):jH('button',{className:'secondary',onClick:()=>{if(t.id!==selected)chooseSong(t.id);iShowLyrics()}},'Full lyrics')),t.regional&&jH('p',{className:'small-note'},'Opens publisher’s recording / song resources.'),t.source&&jH('a',{href:t.source,target:'_blank',rel:'noopener noreferrer',style:{display:'block',marginTop:10}},'Source & hymn information')))),
  !filtered.length&&jH('p',null,'No melodies match. Try another title or category.'),jH('div',{className:'j-actions'},jH('button',{className:'secondary',disabled:safePage===0,onClick:()=>setPage(p=>Math.max(0,p-1))},'Previous 12'),jH('button',{className:'secondary',disabled:safePage>=pages-1,onClick:()=>setPage(p=>p+1)},'Next 12')),
  !tunes.length&&jH('p',{role:'status'},'The melody collection is unavailable. Please reload the page; the original prayer songs are in the other tab.'));
 }
@@ -47318,6 +47326,1852 @@ navGroups[2].items.splice(navGroups[2].items.findIndex(i=>i.name==='Breastfeedin
 function fPageShareURL(){let current=new URL(window.location.href);try{if(window.parent!==window){const parent=new URL(window.parent.location.href);if(parent.origin===current.origin&&/^https?:$/.test(parent.protocol))current=parent}}catch{}current.search='';current.hash='';return current.href;}
 async function fShareWebsite(url,nav=navigator){const data={title:'The James NZ',text:'Faith, family, learning and everyday inspiration from The James NZ.',url};if(typeof nav.share==='function'){try{await nav.share(data);return {kind:'shared',message:'Sharing menu opened.'}}catch(error){if(error?.name==='AbortError')return {kind:'cancelled',message:''}}}if(nav.clipboard&&typeof nav.clipboard.writeText==='function'){try{await nav.clipboard.writeText(url);return {kind:'copied',message:'Page link copied. Paste it into your message.'}}catch{}}return {kind:'manual',message:'Select and copy this page link to share it.'};}
 function PageShare(){const [busy,setBusy]=import_react.useState(false),[result,setResult]=import_react.useState(null),url=fPageShareURL();async function share(){if(busy)return;setBusy(true);setResult(null);try{setResult(await fShareWebsite(url))}finally{setBusy(false)}}return jH('div',{className:'page-share-control'},jH('button',{type:'button',className:'page-share-button',disabled:busy,onClick:share,'aria-label':'Share The James NZ page','aria-busy':busy},jH(Share2,{size:17,'aria-hidden':true}),busy?'Sharing…':'Share page'),result&&result.kind!=='cancelled'&&jH('div',{className:'page-share-feedback'},jH('p',{role:'status','aria-live':'polite'},result.message),result.kind==='manual'&&jH('label',null,'Page link',jH('input',{type:'url',readOnly:true,value:url,onFocus:e=>e.target.select(),onClick:e=>e.target.select()})),jH('button',{type:'button',className:'secondary',onClick:()=>setResult(null),'aria-label':'Dismiss sharing message'},'Close')));}
+
+// Independent original home content; research references are in nz-coffee-speaking-sources.txt.
+var oct7KiwiRecipes = [
+  {
+    "id": "kiwi-pikelets",
+    "name": "Kiwi weekend pikelets",
+    "category": "Kiwi / New Zealand",
+    "minutes": 25,
+    "serves": 4,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "1 cup plain flour",
+      "1 tsp baking powder",
+      "1 tbsp sugar",
+      "1 egg",
+      "¾ cup milk",
+      "1 tbsp melted butter",
+      "Oil for the pan"
+    ],
+    "steps": [
+      "Whisk flour, baking powder and sugar together. Beat egg, milk and melted butter separately.",
+      "Stir wet ingredients into dry just until combined.",
+      "Heat a lightly oiled frying pan over medium heat. Drop tablespoon portions with space between them.",
+      "Turn when bubbles appear and edges set; cook the other side until golden and the centre is cooked. Serve with berries."
+    ],
+    "allergens": "Wheat, egg, milk",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Vegetarian",
+      "Kids-friendly"
+    ],
+    "tip": "Do not press the batter flat. Makes about 16 small pikelets."
+  },
+  {
+    "id": "kiwi-scones",
+    "name": "Cheddar & chive scones",
+    "category": "Kiwi / New Zealand",
+    "minutes": 30,
+    "serves": 8,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "2 cups plain flour",
+      "3 tsp baking powder",
+      "40 g cold butter, diced",
+      "1 cup grated cheddar",
+      "2 tbsp chopped chives",
+      "¾ cup milk, plus a little if needed"
+    ],
+    "steps": [
+      "Heat oven to 220°C conventional; line a tray.",
+      "Mix flour and baking powder, rub in butter, then add cheese and chives.",
+      "Stir in milk to make a soft dough. Pat to 2 cm thick and cut into eight pieces.",
+      "Bake 12–15 minutes until risen and golden; cool a little before serving."
+    ],
+    "allergens": "Wheat, milk",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Vegetarian"
+    ],
+    "tip": "Handle the dough lightly and avoid kneading it like bread."
+  },
+  {
+    "id": "kiwi-kumara-soup",
+    "name": "Kūmara & carrot soup",
+    "category": "Kiwi / New Zealand",
+    "minutes": 40,
+    "serves": 4,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "600 g kūmara, peeled and diced",
+      "2 carrots, diced",
+      "1 onion, chopped",
+      "1 tbsp olive oil",
+      "1 tsp ground cumin",
+      "1 litre vegetable stock"
+    ],
+    "steps": [
+      "Soften onion in oil over medium heat for about 5 minutes.",
+      "Add cumin, kūmara, carrots and stock. Bring to a simmer.",
+      "Cook 20–25 minutes until the vegetables mash easily.",
+      "Cool slightly and blend following the blender instructions, or mash for a chunky texture."
+    ],
+    "allergens": "Check stock for celery, wheat or other allergens",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Vegetarian",
+      "Dairy-free ingredients"
+    ],
+    "tip": "Use stock labelled gluten-free if required; thin with water to your preferred consistency."
+  },
+  {
+    "id": "kiwi-kumara-wedges",
+    "name": "Oven kūmara wedges",
+    "category": "Kiwi / New Zealand",
+    "minutes": 45,
+    "serves": 4,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "800 g kūmara, scrubbed",
+      "2 tbsp olive oil",
+      "1 tsp paprika",
+      "½ tsp dried thyme",
+      "Black pepper"
+    ],
+    "steps": [
+      "Heat oven to 210°C conventional. Cut kūmara into similar-sized wedges.",
+      "Toss with oil, paprika, thyme and pepper.",
+      "Spread on a lined tray with gaps between pieces.",
+      "Roast 30–35 minutes, turning halfway, until tender and lightly browned."
+    ],
+    "allergens": "No common priority allergens in listed ingredients; check spice labels",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Vegetarian",
+      "Dairy-free ingredients",
+      "Gluten-free ingredients"
+    ],
+    "tip": "Try with yoghurt dip; adding yoghurt introduces milk."
+  },
+  {
+    "id": "kiwi-leek-soup",
+    "name": "Leek & potato lunch soup",
+    "category": "Kiwi / New Zealand",
+    "minutes": 35,
+    "serves": 4,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "2 leeks, washed and sliced",
+      "500 g potatoes, peeled and diced",
+      "1 tbsp olive oil",
+      "900 ml vegetable stock",
+      "2 tbsp chopped parsley"
+    ],
+    "steps": [
+      "Cook leeks gently in oil for 5–7 minutes without browning.",
+      "Add potatoes and stock. Simmer 20 minutes until potatoes are tender.",
+      "Mash part of the soup to thicken it and stir in parsley.",
+      "Serve hot, with bread if desired."
+    ],
+    "allergens": "Check stock; bread adds wheat unless a suitable alternative is used",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Vegetarian",
+      "Dairy-free ingredients"
+    ],
+    "tip": "Rinse between leek layers to remove soil."
+  },
+  {
+    "id": "kiwi-corn-fritters",
+    "name": "Sweetcorn & courgette fritters",
+    "category": "Kiwi / New Zealand",
+    "minutes": 30,
+    "serves": 4,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "1 cup corn kernels",
+      "1 small courgette, grated",
+      "2 eggs",
+      "½ cup plain flour",
+      "½ tsp baking powder",
+      "2 tbsp milk",
+      "1 tbsp oil"
+    ],
+    "steps": [
+      "Squeeze excess water from courgette.",
+      "Combine vegetables, eggs, flour, baking powder and milk into a spoonable batter.",
+      "Warm a little oil over medium heat. Spoon in small portions.",
+      "Cook about 3 minutes per side, adjusting heat so the centres cook before the outside darkens."
+    ],
+    "allergens": "Wheat, egg, milk",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Vegetarian",
+      "Kids-friendly"
+    ],
+    "tip": "Serve with tomato salad. The batter should be thick enough to hold its shape."
+  },
+  {
+    "id": "kiwi-feijoa-crumble",
+    "name": "Feijoa & apple crumble",
+    "category": "Kiwi / New Zealand",
+    "minutes": 50,
+    "serves": 6,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "1½ cups scooped feijoa flesh",
+      "3 apples, peeled and sliced",
+      "1 tbsp lemon juice",
+      "¾ cup rolled oats",
+      "½ cup plain flour",
+      "¼ cup brown sugar",
+      "60 g butter, diced",
+      "½ tsp cinnamon"
+    ],
+    "steps": [
+      "Heat oven to 180°C conventional.",
+      "Put fruit and lemon juice in a baking dish.",
+      "Rub butter into flour, oats, sugar and cinnamon, then scatter over fruit.",
+      "Bake 30–35 minutes until topping is golden and fruit is soft and bubbling."
+    ],
+    "allergens": "Wheat, oats, milk",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Vegetarian"
+    ],
+    "tip": "Taste the fruit first; add a little sugar to the fruit only if needed. Allow 10 minutes to cool before serving."
+  },
+  {
+    "id": "kiwi-mini-pavlovas",
+    "name": "Berry mini pavlovas",
+    "category": "Kiwi / New Zealand",
+    "minutes": 150,
+    "serves": 6,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "3 egg whites",
+      "¾ cup caster sugar",
+      "1 tsp cornflour",
+      "1 tsp white vinegar",
+      "½ tsp vanilla",
+      "150 ml whipping cream",
+      "1 cup washed berries"
+    ],
+    "steps": [
+      "Heat oven to 120°C conventional and line a tray.",
+      "Beat whites to soft peaks. Add sugar gradually and beat until thick and glossy; fold in cornflour, vinegar and vanilla.",
+      "Spoon six mounds onto the tray, making a small hollow in each. Bake about 60 minutes.",
+      "Turn oven off and cool inside for about 60 minutes. Top with whipped cream and berries just before serving."
+    ],
+    "allergens": "Egg, milk; check cornflour labels",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Vegetarian"
+    ],
+    "tip": "Total time includes cooling. Use a clean, grease-free bowl; keep cream refrigerated until serving."
+  },
+  {
+    "id": "kiwi-anzac",
+    "name": "Oat & coconut Anzac-style biscuits",
+    "category": "Kiwi / New Zealand",
+    "minutes": 35,
+    "serves": 18,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "1 cup rolled oats",
+      "¾ cup plain flour",
+      "½ cup desiccated coconut",
+      "⅓ cup brown sugar",
+      "80 g butter",
+      "2 tbsp golden syrup",
+      "½ tsp baking soda",
+      "1 tbsp hot water"
+    ],
+    "steps": [
+      "Heat oven to 170°C conventional and line two trays.",
+      "Combine oats, flour, coconut and sugar. Melt butter with syrup gently.",
+      "Dissolve baking soda in hot water and mix into the melted mixture, then combine with dry ingredients.",
+      "Form 18 small flattened portions. Bake 12–15 minutes until golden; cool on trays before moving."
+    ],
+    "allergens": "Wheat, oats, milk; coconut",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Vegetarian"
+    ],
+    "tip": "Leave space for spreading. These biscuits are a shared New Zealand and Australian tradition."
+  },
+  {
+    "id": "kiwi-afghan",
+    "name": "Chocolate cornflake biscuits",
+    "category": "Kiwi / New Zealand",
+    "minutes": 40,
+    "serves": 16,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "150 g softened butter",
+      "⅓ cup sugar",
+      "1 cup plain flour",
+      "3 tbsp cocoa",
+      "1½ cups plain cornflakes",
+      "¾ cup icing sugar",
+      "1 tbsp cocoa for icing",
+      "1–2 tbsp warm water"
+    ],
+    "steps": [
+      "Heat oven to 180°C conventional and line a tray.",
+      "Cream butter and sugar. Stir in flour and cocoa, then fold in cornflakes.",
+      "Shape 16 small biscuits and flatten gently. Bake 12–15 minutes, then cool fully.",
+      "Mix icing sugar, extra cocoa and enough water for a thick icing; spread a little on each biscuit."
+    ],
+    "allergens": "Wheat, milk; cornflakes may contain barley/gluten",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Vegetarian"
+    ],
+    "tip": "This home version omits the traditional walnut topping. If adding walnuts, declare tree nuts."
+  },
+  {
+    "id": "kiwi-mince-pies",
+    "name": "Mini mince & vegetable pies",
+    "category": "Kiwi / New Zealand",
+    "minutes": 55,
+    "serves": 6,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "300 g beef mince",
+      "1 small onion, diced",
+      "1 carrot, finely diced",
+      "1 tbsp oil",
+      "1 tbsp plain flour",
+      "1 tbsp tomato paste",
+      "200 ml beef stock",
+      "2 sheets ready-rolled puff pastry",
+      "1 egg, beaten"
+    ],
+    "steps": [
+      "Cook onion and carrot in oil for 5 minutes. Add mince and cook until browned, breaking up lumps.",
+      "Stir in flour and tomato paste. Add stock and simmer 10 minutes until thick; cool before filling.",
+      "Heat oven to 200°C conventional. Line six muffin wells with pastry, add filling and cover with pastry lids.",
+      "Seal edges, make a steam hole and brush with egg. Bake 20–25 minutes until pastry is golden and filling piping hot."
+    ],
+    "allergens": "Wheat, egg; pastry may contain milk; check stock",
+    "tags": [
+      "Kiwi / New Zealand",
+      "Kids-friendly"
+    ],
+    "tip": "Cool the filling before assembling. Serve with vegetables; refrigerate leftovers promptly."
+  },
+  {
+    "id": "kiwi-fish-cakes",
+    "name": "Potato & smoked-fish cakes",
+    "category": "Kiwi / New Zealand",
+    "minutes": 35,
+    "serves": 4,
+    "description": "A home-kitchen version of a New Zealand family favourite.",
+    "ingredients": [
+      "500 g cooked mashed potato, cooled",
+      "200 g cooked smoked fish, skin and bones removed",
+      "1 egg",
+      "2 tbsp chopped parsley",
+      "½ cup breadcrumbs",
+      "1 tbsp oil",
+      "Lemon wedges"
+    ],
+    "steps": [
+      "Flake fish carefully, checking for bones.",
+      "Mix potato, fish, egg and parsley. Shape eight small cakes and coat with breadcrumbs.",
+      "Cook in a lightly oiled pan over medium heat about 4–5 minutes each side until golden and thoroughly hot.",
+      "Serve with lemon and a green salad."
+    ],
+    "allergens": "Fish, egg, wheat; mashed potato may contain milk",
+    "tags": [
+      "Kiwi / New Zealand"
+    ],
+    "tip": "Timing assumes the potatoes are already cooked. Choose fully cooked smoked fish and follow its storage label."
+  }
+];
+var oct7CoffeeArt = [
+  {
+    "id": "texture",
+    "title": "Start with smooth microfoam",
+    "level": "Foundation",
+    "tools": "Milk pitcher; espresso; steam wand",
+    "steps": [
+      "Start with cold milk and follow the machine instructions.",
+      "Introduce air briefly, then position the tip to circulate the milk.",
+      "Stop before overheating; tap gently and swirl so milk and fine foam stay combined."
+    ],
+    "tip": "Aim for a glossy surface; large stiff bubbles make pouring harder.",
+    "sourceURL": "https://assets.breville.com/BES985/BES985_USCM_SG3_F23_FA.pdf",
+    "sourceLabel": "Breville milk-texturing guide"
+  },
+  {
+    "id": "dot",
+    "title": "A simple white dot",
+    "level": "Beginner",
+    "tools": "Espresso; smooth steamed milk; pitcher",
+    "steps": [
+      "Tilt the cup and pour a thin stream from a little higher up.",
+      "When the cup is partly filled, bring the spout close to the surface.",
+      "Pour steadily in one place to make a round white patch."
+    ],
+    "tip": "Practise cup position and flow before trying detailed patterns.",
+    "sourceURL": "https://www.breville.com/inspiration/en-nz/tutorials/the-barista-pro/latte-art/how-to-create-latte-art-the-dot",
+    "sourceLabel": "Breville latte-art tutorial"
+  },
+  {
+    "id": "heart",
+    "title": "The everyday heart",
+    "level": "Beginner",
+    "tools": "Espresso; smooth steamed milk; pitcher",
+    "steps": [
+      "Build a milk-and-coffee base with a thin stream.",
+      "Lower the spout near the surface and pour a white circle.",
+      "Lift the jug, reduce the stream and cut through the circle toward the far edge."
+    ],
+    "tip": "A controlled final line makes the heart point.",
+    "sourceURL": "https://www.breville.com/inspiration/en-au/tutorials/the-bambino-plus/latte-art/how-to-create-latte-art-the-heart",
+    "sourceLabel": "Breville latte-art tutorial"
+  },
+  {
+    "id": "tulip",
+    "title": "A stacked tulip",
+    "level": "Intermediate",
+    "tools": "Espresso; smooth steamed milk; pitcher",
+    "steps": [
+      "Create a base, then lower the spout to pour a small white bulb.",
+      "Stop briefly and pour a second bulb behind it, pushing the first forward.",
+      "Add another bulb, then lift and draw a fine line through the stack."
+    ],
+    "tip": "Use small pours; too much milk leaves no room for the final cut.",
+    "sourceURL": "https://www.breville.com/inspiration/en-us/tutorials/the-barista-pro/latte-art/how-to-create-latte-art-the-tulip-rosetta",
+    "sourceLabel": "Breville latte-art tutorial"
+  },
+  {
+    "id": "rosetta",
+    "title": "Fern-like rosetta",
+    "level": "Intermediate",
+    "tools": "Espresso; smooth steamed milk; pitcher",
+    "steps": [
+      "Build the base and bring the spout low.",
+      "Use a small side-to-side motion while moving the jug gradually backward.",
+      "Lift and pull a thin stream through the leaves."
+    ],
+    "tip": "Keep the motion small and regular rather than shaking the whole cup.",
+    "sourceURL": "https://www.breville.com/inspiration/en-us/tutorials/the-barista-pro/latte-art/how-to-create-latte-art-the-tulip-rosetta",
+    "sourceLabel": "Breville latte-art tutorial"
+  },
+  {
+    "id": "stencil",
+    "title": "Cocoa stencil",
+    "level": "Beginner",
+    "tools": "Cappuccino foam; food-safe stencil; cocoa; small sieve",
+    "steps": [
+      "Make a level foam surface.",
+      "Hold the stencil just above the cup without touching the drink.",
+      "Dust a thin layer of cocoa, then lift the stencil vertically."
+    ],
+    "tip": "A little cocoa keeps edges sharper than a heavy coating.",
+    "sourceURL": null,
+    "sourceLabel": "The James NZ home practice idea"
+  },
+  {
+    "id": "moon",
+    "title": "Crescent moon",
+    "level": "Beginner",
+    "tools": "Foamy coffee; cocoa; paper or food-safe stencil",
+    "steps": [
+      "Use a clean food-safe stencil with a crescent opening.",
+      "Hold it above the foam and dust lightly.",
+      "Lift straight up and serve promptly."
+    ],
+    "tip": "Keep paper dry and out of the drink; never use glitter or craft materials.",
+    "sourceURL": null,
+    "sourceLabel": "The James NZ home practice idea"
+  },
+  {
+    "id": "flower",
+    "title": "Chocolate flower",
+    "level": "Beginner",
+    "tools": "Foamy coffee; chocolate sauce; clean food-safe skewer",
+    "steps": [
+      "Draw two thin chocolate circles on the foam.",
+      "Drag the skewer outward across the rings at equal intervals.",
+      "Wipe the skewer between lines."
+    ],
+    "tip": "Make sauce lines thin so they remain on the surface.",
+    "sourceURL": null,
+    "sourceLabel": "The James NZ home practice idea"
+  },
+  {
+    "id": "web",
+    "title": "Chocolate spiderweb",
+    "level": "Beginner",
+    "tools": "Foamy coffee; chocolate sauce; food-safe skewer",
+    "steps": [
+      "Draw three nested chocolate circles.",
+      "Pull short strokes from the centre outward, wiping the tool each time.",
+      "Add a tiny centre dot if desired."
+    ],
+    "tip": "This is surface etching, so it also works on a hot chocolate.",
+    "sourceURL": null,
+    "sourceLabel": "The James NZ home practice idea"
+  },
+  {
+    "id": "bear",
+    "title": "A friendly bear face",
+    "level": "Beginner",
+    "tools": "Foamy coffee; cocoa or chocolate sauce; teaspoon",
+    "steps": [
+      "Place a rounded spoonful of foam for the face and two small dabs for ears.",
+      "Add tiny chocolate eyes and a nose using a clean food-safe tool.",
+      "Serve before the foam settles."
+    ],
+    "tip": "Keep designs flat and simple rather than piling unstable foam high.",
+    "sourceURL": null,
+    "sourceLabel": "The James NZ home practice idea"
+  },
+  {
+    "id": "initial",
+    "title": "A name or initial",
+    "level": "Beginner",
+    "tools": "Foamy coffee; small squeeze bottle of chocolate sauce",
+    "steps": [
+      "Practise a short initial on a plate first.",
+      "Draw one thin letter on smooth foam.",
+      "Add a small dot or heart without overfilling the surface."
+    ],
+    "tip": "Use food ingredients only, and note milk or other allergens in toppings.",
+    "sourceURL": null,
+    "sourceLabel": "The James NZ home practice idea"
+  },
+  {
+    "id": "practice",
+    "title": "A five-cup practice routine",
+    "level": "Practice",
+    "tools": "Pitcher; cup; coffee and milk; notebook",
+    "steps": [
+      "Choose one pattern and keep cup and milk quantity consistent.",
+      "Change only one detail, such as spout height, on the next attempt.",
+      "Note what changed; photograph the result before drinking."
+    ],
+    "tip": "Start with dots and hearts. Home results vary with milk, equipment and technique.",
+    "sourceURL": null,
+    "sourceLabel": "The James NZ home practice idea"
+  }
+];
+var oct7SpeakingLessons = [
+  {
+    "id": "one-minute",
+    "title": "Give a one-minute answer",
+    "skill": "Impromptu speaking",
+    "lesson": "Choose a clear response, explain it briefly and finish within your planned time.",
+    "practice": "Set a 60-second timer: What small habit improved your week? Answer, give an example, then close.",
+    "sourceURL": "https://www.toastmasters.org/membership/club-meeting-roles/table-topics-speaker",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "pause",
+    "title": "Take a thinking pause",
+    "skill": "Impromptu speaking",
+    "lesson": "A brief pause gives you room to settle and choose a direction.",
+    "practice": "Hear a question, take one comfortable breath, then start with your answer.",
+    "sourceURL": "https://www.toastmasters.org/magazine/magazine-issues/2017/july2017/tabletopics",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "answer-first",
+    "title": "State your answer early",
+    "skill": "Clarity",
+    "lesson": "Let listeners know your position before supporting it.",
+    "practice": "Start a response with your main view, then add one reason and a real example.",
+    "sourceURL": "https://www.toastmasters.org/magazine/magazine-issues/2017/july2017/tabletopics",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "three",
+    "title": "Use a simple three-part shape",
+    "skill": "Organization",
+    "lesson": "A small number of points helps listeners follow your thinking.",
+    "practice": "Describe a community event through its purpose, one highlight and what you learned.",
+    "sourceURL": "https://www.toastmasters.org/magazine/magazine-issues/2017/july2017/tabletopics",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "experience",
+    "title": "Tell one true small story",
+    "skill": "Storytelling",
+    "lesson": "An experience can make an idea concrete and personal.",
+    "practice": "Describe a moment you learned patience: setting, action, result. Avoid private details about others.",
+    "sourceURL": "https://www.toastmasters.org/magazine/magazine-issues/2017/july2017/tabletopics",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "finish",
+    "title": "End with the main message",
+    "skill": "Closing",
+    "lesson": "A short conclusion helps your answer land cleanly.",
+    "practice": "After your example, restate the takeaway in one sentence and stop.",
+    "sourceURL": "https://www.toastmasters.org/magazine/magazine-issues/2017/july2017/tabletopics",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "variety",
+    "title": "Let your voice show meaning",
+    "skill": "Delivery",
+    "lesson": "Changes in pace, emphasis and tone can help an audience notice important ideas.",
+    "practice": "Read three sentences twice. On the second reading, emphasize one key word in each.",
+    "sourceURL": "https://toastmasters.org/magazine/magazine-issues/2020/sept/toolbox-why-vocal-variety-is-so-valuable",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "eye-contact",
+    "title": "Include your listeners",
+    "skill": "Body language",
+    "lesson": "Comfortable eye contact and purposeful gestures support connection.",
+    "practice": "Practise to two friendly listeners, giving each a natural glance while explaining an idea.",
+    "sourceURL": "https://www.toastmasters.org/resources/public-speaking-tips/gestures-and-body-language",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "listen",
+    "title": "Listen before planning a reply",
+    "skill": "Listening",
+    "lesson": "Attention to the speaker helps you understand the message and their perspective.",
+    "practice": "Let someone finish, summarize the main idea, then ask if you understood correctly.",
+    "sourceURL": "https://www.toastmasters.org/magazine/magazine-issues/2022/july/listening-tips",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "goal",
+    "title": "Ask what feedback is wanted",
+    "skill": "Feedback",
+    "lesson": "Feedback is more useful when it addresses the speaker’s chosen goal.",
+    "practice": "Before practice, ask whether your partner wants help with clarity, pace or structure.",
+    "sourceURL": "https://toastmasters.org/Magazine/Magazine%20Issues/2018/July2018/Sidebars/Evaluate%20Effectively",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "specific",
+    "title": "Give a specific observation",
+    "skill": "Feedback",
+    "lesson": "Describe what you noticed in the speech and how it affected you.",
+    "practice": "Mention one exact moment that worked and one change the speaker could try next.",
+    "sourceURL": "https://toastmasters.org/Magazine/Magazine%20Issues/2018/July2018/Sidebars/Evaluate%20Effectively",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  },
+  {
+    "id": "encourage",
+    "title": "Leave a useful next step",
+    "skill": "Feedback",
+    "lesson": "Support improvement with respectful language and encouragement.",
+    "practice": "End your evaluation with one manageable practice suggestion and a sincere strength.",
+    "sourceURL": "https://toastmasters.org/Magazine/Magazine%20Issues/2018/July2018/Sidebars/Evaluate%20Effectively",
+    "sourceLabel": "Toastmasters International",
+    "credit": "Paraphrased learning with an original home-practice exercise. Independent resource; not affiliated with Toastmasters International."
+  }
+];
+
+var oct7RegionalMusic={
+  "philippines": [
+    {
+      "title": "A Christmas Praise",
+      "url": "https://bukaspalad.com/songs/christmas_praise",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "A New Song",
+      "url": "https://bukaspalad.com/songs/new_song",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "A Time for Everything",
+      "url": "https://bukaspalad.com/songs/time_everything",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "All Shall Be Well",
+      "url": "https://bukaspalad.com/songs/all_shall_be_well",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Alleluia",
+      "url": "https://bukaspalad.com/songs/alleluia",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Alleluia! Mercy is God's Name",
+      "url": "https://bukaspalad.com/songs/alleluia_mercy_gods_name",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Anima Christi",
+      "url": "https://bukaspalad.com/songs/anima_christi",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Arms of Love",
+      "url": "https://bukaspalad.com/songs/arms_love",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "At the Cross Her Station Keeping (Stabat Mater Dolorosa)",
+      "url": "https://bukaspalad.com/songs/cross_her_station_keeping_stabat_mater_dolorosa",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Behold the Wood",
+      "url": "https://bukaspalad.com/songs/behold_wood",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Bless Our Darkness",
+      "url": "https://bukaspalad.com/songs/bless_our_darkness",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Blessed Are You",
+      "url": "https://bukaspalad.com/songs/blessed_are_you",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Bread of Life",
+      "url": "https://bukaspalad.com/songs/bread_life",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Breath of God",
+      "url": "https://bukaspalad.com/songs/breath_god",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Bring Us Back to You",
+      "url": "https://bukaspalad.com/songs/bring_us_back_you",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Child",
+      "url": "https://bukaspalad.com/songs/child",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Children of Easter Morn",
+      "url": "https://bukaspalad.com/songs/children_easter_morn",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Christ Be Magnified",
+      "url": "https://bukaspalad.com/songs/christ_be_magnified",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Christify",
+      "url": "https://bukaspalad.com/songs/christify",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Come and See",
+      "url": "https://bukaspalad.com/songs/come_and_see",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Come Be Our Light",
+      "url": "https://bukaspalad.com/songs/come_be_our_light",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Come Lord and Save Us",
+      "url": "https://bukaspalad.com/songs/come_lord_and_save_us",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Come To Me",
+      "url": "https://bukaspalad.com/songs/come_me",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Come to My Aid",
+      "url": "https://bukaspalad.com/songs/come_my_aid",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "David's Praises",
+      "url": "https://bukaspalad.com/songs/davids_praises",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Doxology of the Eucharistic Prayer and Great Amen",
+      "url": "https://bukaspalad.com/songs/doxology_eucharistic_prayer_and_great_amen",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Draw Us to God's Heart",
+      "url": "https://bukaspalad.com/songs/draw_us_gods_heart",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Earthkeeper",
+      "url": "https://bukaspalad.com/songs/earthkeeper",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Empty Space",
+      "url": "https://bukaspalad.com/songs/empty_space",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "First Companions",
+      "url": "https://bukaspalad.com/songs/first_companions",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Found By Grace",
+      "url": "https://bukaspalad.com/songs/found_grace",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Free",
+      "url": "https://bukaspalad.com/songs/free",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Gather Me (Prayer to the Good Shepherd)",
+      "url": "https://bukaspalad.com/songs/gather_me_prayer_good_shepherd",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Gifted to Give, Loved to Give Love",
+      "url": "https://bukaspalad.com/songs/gifted_give_loved_give_love",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Give Thanks to the Lord (Psalm 118)",
+      "url": "https://bukaspalad.com/songs/give_thanks_lord_psalm_118",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Give the Lord Glory",
+      "url": "https://bukaspalad.com/songs/give_lord_glory",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Glory to God",
+      "url": "https://bukaspalad.com/songs/glory_god",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Good it is to Give Thanks",
+      "url": "https://bukaspalad.com/songs/good_it_give_thanks",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Great Are Your Works  (Psalm 98)",
+      "url": "https://bukaspalad.com/songs/great_are_your_works_psalm_98",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Great Is Our God",
+      "url": "https://bukaspalad.com/songs/great_our_god",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Have Mercy",
+      "url": "https://bukaspalad.com/songs/have_mercy",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Heart of Jesus, Hear (Prayer to the Sacred Heart)",
+      "url": "https://bukaspalad.com/songs/heart_jesus_hear_prayer_sacred_heart",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Higher",
+      "url": "https://bukaspalad.com/songs/higher",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Hold Me",
+      "url": "https://bukaspalad.com/songs/hold_me",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Holy",
+      "url": "https://bukaspalad.com/songs/holy",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Holy Three-in-One",
+      "url": "https://bukaspalad.com/songs/holy_threeinone",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Hosanna! Our King is Here!",
+      "url": "https://bukaspalad.com/songs/hosanna_our_king_here",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "How Lovely is Your Dwelling Place",
+      "url": "https://bukaspalad.com/songs/how_lovely_your_dwelling_place",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "I Have a Plan",
+      "url": "https://bukaspalad.com/songs/i_have_plan",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "I Hear My Name",
+      "url": "https://bukaspalad.com/songs/i_hear_my_name",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "I Love the Lord",
+      "url": "https://bukaspalad.com/songs/i_love_lord",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "I Seek You for I Thirst",
+      "url": "https://bukaspalad.com/songs/i_seek_you_i_thirst",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "I Will Be With You",
+      "url": "https://bukaspalad.com/songs/i_will_be_you",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "I Will Sing Forever",
+      "url": "https://bukaspalad.com/songs/i_will_sing_forever",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "I Will Wash Your Feet",
+      "url": "https://bukaspalad.com/songs/i_will_wash_your_feet",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "If I Could Touch You",
+      "url": "https://bukaspalad.com/songs/if_i_could_touch_you",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "In Him Alone",
+      "url": "https://bukaspalad.com/songs/him_alone",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "In My Heart",
+      "url": "https://bukaspalad.com/songs/my_heart",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Isaiah's Prophecy",
+      "url": "https://bukaspalad.com/songs/isaiahs_prophecy",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Jesus' Birth",
+      "url": "https://bukaspalad.com/songs/jesus_birth",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Joseph's Dream",
+      "url": "https://bukaspalad.com/songs/josephs_dream",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Lamb of God",
+      "url": "https://bukaspalad.com/songs/lamb_god",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Let Love Be Born Today",
+      "url": "https://bukaspalad.com/songs/let_love_be_born_today",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Let My Spirit Sing",
+      "url": "https://bukaspalad.com/songs/let_my_spirit_sing",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Let Your Praises Be Heard!",
+      "url": "https://bukaspalad.com/songs/let_your_praises_be_heard",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Life Forevermore",
+      "url": "https://bukaspalad.com/songs/life_forevermore",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Lord of Salvation",
+      "url": "https://bukaspalad.com/songs/lord_salvation",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Lord, Come and Save Us (Psalm 146)",
+      "url": "https://bukaspalad.com/songs/lord_come_and_save_us_psalm_146",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Lord, Have Mercy",
+      "url": "https://bukaspalad.com/songs/lord_have_mercy",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Lord, Have Mercy (Kyrie, Eleison)",
+      "url": "https://bukaspalad.com/songs/lord_have_mercy_kyrie_eleison",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Lord, to Whom Shall We Go?",
+      "url": "https://bukaspalad.com/songs/lord_whom_shall_we_go",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Love and Truth Will Meet",
+      "url": "https://bukaspalad.com/songs/love_and_truth_will_meet",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Love Like Rain",
+      "url": "https://bukaspalad.com/songs/love_rain",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Magnificat",
+      "url": "https://bukaspalad.com/songs/magnificat",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Magnificat (Mary's Canticle)",
+      "url": "https://bukaspalad.com/songs/magnificat_marys_canticle",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "My Only Treasure",
+      "url": "https://bukaspalad.com/songs/my_only_treasure",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "My Soul Longs for You (Psalm 42)",
+      "url": "https://bukaspalad.com/songs/my_soul_longs_you_psalm_42",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "My Way to You",
+      "url": "https://bukaspalad.com/songs/my_way_you",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "No Greater Love than Yours",
+      "url": "https://bukaspalad.com/songs/no_greater_love_yours",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "O Sacred Head, Surrounded",
+      "url": "https://bukaspalad.com/songs/o_sacred_head_surrounded",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Our Father, Embolism, and Doxology",
+      "url": "https://bukaspalad.com/songs/our_father_embolism_and_doxology",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Pastorale",
+      "url": "https://bukaspalad.com/songs/pastorale",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Pilgrim's Theme",
+      "url": "https://bukaspalad.com/songs/pilgrims_theme",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Praise the Lord Who Heals",
+      "url": "https://bukaspalad.com/songs/praise_lord_who_heals",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Prayer for Generosity",
+      "url": "https://bukaspalad.com/songs/prayer_generosity",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Prayer of Rupert Mayer",
+      "url": "https://bukaspalad.com/songs/prayer_rupert_mayer",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Preface Dialogue",
+      "url": "https://bukaspalad.com/songs/preface_dialogue",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Psalm 92",
+      "url": "https://bukaspalad.com/songs/psalm_92",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Teach My Heart",
+      "url": "https://bukaspalad.com/songs/teach_my_heart",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "The Angels' Song of Glory",
+      "url": "https://bukaspalad.com/songs/angels_song_glory",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "The Annunciation",
+      "url": "https://bukaspalad.com/songs/annunciation",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "The Christ Child",
+      "url": "https://bukaspalad.com/songs/christ_child",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "The Face of God",
+      "url": "https://bukaspalad.com/songs/face_god",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "The Flight to Egypt",
+      "url": "https://bukaspalad.com/songs/flight_egypt",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "The Hands That First Held Mary's Child",
+      "url": "https://bukaspalad.com/songs/hands_first_held_marys_child",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "The Lord of All",
+      "url": "https://bukaspalad.com/songs/lord_all",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "The Love of God Endures Forevermore",
+      "url": "https://bukaspalad.com/songs/love_god_endures_forevermore",
+      "country": "Philippines",
+      "language": "English",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Your Heart Today",
+      "url": "https://bukaspalad.com/songs/your_heart_today",
+      "country": "Philippines",
+      "language": "English catalogue",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "We Give Thanks",
+      "url": "https://bukaspalad.com/songs/we_give_thanks",
+      "country": "Philippines",
+      "language": "English catalogue",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    },
+    {
+      "title": "Take and Receive",
+      "url": "https://bukaspalad.com/songs/take_and_receive",
+      "country": "Philippines",
+      "language": "English catalogue",
+      "source": "Bukas Palad Music Ministry",
+      "availability": "Official source page",
+      "rights": "Lyrics, scores and recordings remain with their rights holders."
+    }
+  ],
+  "india": [
+    {
+      "title": "Glory to God",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=PqMruQADf0M",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Our Father",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=po2UNKmzAa8",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Psalms",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=io68COXDx_4",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Resurrection Hymn",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=AliRO8iiJCA",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Trisagion",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=z6L3OooDMCw",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Suraya",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=86fQbfkFZIg",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Alleluia Hymn",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=IuOqKdwsGjI",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Gospel Acclamation",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=ujUjGpr-jL4",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Anthem of the Mysteries",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=9xXcDNLgkv8",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Commemoration Hymn",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=j4ZYp1U3fkM",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Salutation and Dialogue",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=suEJZ6LncIM",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Holy, Holy, Holy",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=jjx7-Vm2xmA",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Penitential Psalm",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=Iq87twb4wy8",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "I am the Living Bread",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=BGMoipUR068",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "Final Blessing",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=C4peOQw54Hg",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    },
+    {
+      "title": "As our Lord Commanded",
+      "country": "India",
+      "language": "English",
+      "source": "Christian Musicological Society of India / Syro-Malabar Church",
+      "collection": "Solemn High Mass in English",
+      "url": "https://www.thecmsindia.in/releases/audio/solemn-high-mass-in-english",
+      "listenURL": "https://www.youtube.com/watch?v=Eq8LNGl0tIs",
+      "composer": "Joseph J. Palackal and George Thaila",
+      "availability": "Official archive link",
+      "rights": "Music © 2007 Joseph J. Palackal and George Thaila. Source recordings and lyrics remain with rights holders."
+    }
+  ],
+  "collections": [
+    {
+      "country": "India",
+      "title": "Rexband official music",
+      "url": "https://www.rexband.org/copy-of-our-music"
+    },
+    {
+      "country": "India",
+      "title": "Rexband official videos",
+      "url": "https://www.rexband.org/copy-of-our-music-1"
+    },
+    {
+      "country": "India",
+      "title": "Syro-Malabar Commission for Liturgy",
+      "url": "https://www.syromalabarliturgy.org/"
+    }
+  ]
+}
+;
+// Official regional song catalogues: link to rights-holder-hosted recordings and lyrics.
+// oct7RegionalMusic must be assigned from oct7-regional-music.json before this module.
+function Oct7RegionalMusic(){
+  const [country,setCountry]=import_react.useState('Philippines');
+  const [search,setSearch]=import_react.useState('');
+  const [page,setPage]=import_react.useState(0);
+  const entries=(country==='Philippines'?oct7RegionalMusic.philippines:oct7RegionalMusic.india);
+  const filtered=entries.filter(song=>song.title.toLowerCase().includes(search.trim().toLowerCase()));
+  const pages=Math.max(1,Math.ceil(filtered.length/12));
+  const current=Math.min(page,pages-1);
+  return jH('section',{className:'panel regional-music-library'},
+    jH('h2',null,'Catholic music from the Philippines & India'),
+    jH('p',null,'Explore English-language songs through official ministry and church sources. Open a song to listen or read lyrics on the source website.'),
+    jH('div',{className:'button-row'},['Philippines','India'].map(name=>jH('button',{key:name,type:'button',className:country===name?'primary':'secondary','aria-pressed':country===name,onClick:()=>{setCountry(name);setPage(0);setSearch('');}},name))),
+    jH('label',null,'Find a song',jH('input',{type:'search',value:search,placeholder:'Search song titles',onChange:e=>{setSearch(e.target.value);setPage(0);}})),
+    jH('p',{className:'muted'},country==='Philippines'?'100 songs from the official Bukas Palad English catalogue.':'16 verified English Mass tracks from the Syro-Malabar tradition. More Indian ministry collections are linked below.'),
+    jH('div',{className:'regional-song-grid'},filtered.slice(current*12,current*12+12).map(song=>jH('article',{key:song.url+song.title,className:'panel'},jH('h3',null,song.title),jH('p',{className:'muted'},song.source),jH('div',{className:'button-row'},jH('a',{className:'button secondary',href:song.url,target:'_blank',rel:'noopener noreferrer'},'Official song page'),song.listenURL&&jH('a',{className:'button secondary',href:song.listenURL,target:'_blank',rel:'noopener noreferrer'},'Listen at source'))))),
+    !filtered.length&&jH('p',null,'No matching songs. Try another title.'),
+    jH('div',{className:'button-row'},jH('button',{type:'button',className:'secondary',disabled:current===0,onClick:()=>setPage(current-1)},'Previous'),jH('span',{role:'status'},'Page '+(current+1)+' of '+pages),jH('button',{type:'button',className:'secondary',disabled:current>=pages-1,onClick:()=>setPage(current+1)},'Next')),
+    country==='India'&&jH('div',null,jH('h3',null,'More official Indian Catholic music'),oct7RegionalMusic.collections.map(x=>jH('p',{key:x.url},jH('a',{href:x.url,target:'_blank',rel:'noopener noreferrer'},x.title)))),
+    jH('p',{className:'muted'},'These regional recordings, lyrics and scores stay on their official source sites. The guitar player above is the separate traditional English hymn collection.')
+  );
+}
+var oct7RegionalStyle=document.createElement('style');oct7RegionalStyle.textContent='.regional-music-library{margin-top:1.5rem}.regional-song-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:1rem;margin:1rem 0}.regional-song-grid .panel{margin:0;padding:1rem}.regional-song-grid h3{font-size:1.1rem}.regional-music-library input[type=search]{display:block;width:100%;max-width:32rem;margin:.4rem 0 1rem}';document.head.appendChild(oct7RegionalStyle);
+
+// October 7 fixes: compact readers, useful learning, regional sources and sharing.
+faqs=faqs.filter(([q])=>q!=='Do I need to sign in?');
+recipes.push(...oct7KiwiRecipes);
+var rRecipeCuisine=recipeCuisine;recipeCuisine=function(r){return r.tags?.includes('Kiwi / New Zealand')?'Kiwi / New Zealand':rRecipeCuisine(r)};
+var rRecipePhoto=recipePhoto;recipePhoto=function(r){return r.tags?.includes('Kiwi / New Zealand')?rRecipePhoto(r):rRecipePhoto(r)};
+var rInitial=cInitialSection;cInitialSection=function(){const prayer=rInitial();if(prayer!=='Home')return prayer;try{const hash=cLocationHash(),params=new URLSearchParams(hash.slice(1)),section=params.get('section'),stored=sessionStorage.getItem('james-active-section')||localStorage.getItem('james-active-section'),valid=['Home',...navGroups.flatMap(g=>g.items.map(x=>x.name))];return valid.includes(section)?section:valid.includes(stored)?stored:'Home'}catch{return 'Home'}};
+function rRememberSection(section){try{sessionStorage.setItem('james-active-section',section);localStorage.setItem('james-active-section',section);const target=window.parent.location.origin===location.origin?window.parent:window;target.history.replaceState(null,'','#section='+encodeURIComponent(section));if(target!==window)window.history.replaceState(null,'','#section='+encodeURIComponent(section));}catch{}}
+function rTransform(node,visit){if(Array.isArray(node))return node.map(x=>rTransform(x,visit));if(!import_react.isValidElement(node))return node;const children=rTransform(node.props.children,visit);return visit(import_react.cloneElement(node,{},children));}
+var rSiteNav=SiteNavigation;SiteNavigation=function(props){return rSiteNav({...props,onNavigate:section=>{rRememberSection(section);props.onNavigate(section)}})};
+function rRememberStory(index){try{sessionStorage.setItem('james-story-'+(jBibleData.some(b=>b.index===index)?'bible':'reading'),String(index))}catch{}}
+function rRestoreStory(group,fallback){try{const raw=sessionStorage.getItem('james-story-'+group);if(raw===null)return fallback;const n=Number(raw);if(stories[n]&&jBibleData.some(b=>b.index===n)===(group==='bible'))return n}catch{}return fallback}
+function rForgetStory(group){try{sessionStorage.removeItem('james-story-'+group)}catch{}}
+var rReading=Reading;Reading=function(props){return rReading({...props,initialStory:props?.initialStory??rRestoreStory('reading',null)})};
+var rBibleBooks=BibleBooks;BibleBooks=function(){return rBibleBooks()};
+var rStoryReader=StoryReader;StoryReader=function(props){const [index,setIndex]=import_react.useState(props.index);import_react.useEffect(()=>{setIndex(props.index)},[props.index]);const bible=jBibleData.some(b=>b.index===index),indexes=stories.map((_,i)=>i).filter(i=>jBibleData.some(b=>b.index===i)===bible),pos=indexes.indexOf(index),next=indexes[(pos+1)%indexes.length];import_react.useEffect(()=>{rRememberStory(index)},[index]);return jH('section',{className:'r-compact-reader'},jH('div',{className:'r-story-navigation'},jH('span',null,(bible?'Bible story ':'Family story ')+(pos+1)+' of '+indexes.length),jH('button',{type:'button',className:'secondary',onClick:()=>{window.speechSynthesis?.cancel();setIndex(next)}},'Next story →')),jH(rStoryReader,{key:index,index,onBack:()=>{rForgetStory(bible?'bible':'reading');props.onBack()}}))};
+var rCoffee=CoffeeCorner;CoffeeCorner=function(){return rTransform(rCoffee(),node=>{if(node.type==='article'&&node.props.className==='quote-card'){const heading=import_react.Children.toArray(node.props.children).find(x=>import_react.isValidElement(x)&&x.type==='h2'),fact=coffeeFacts.find(f=>f.title===heading?.props.children);if(fact)return jH('article',{className:'quote-card r-coffee-fact',key:fact.title},jH(PhotoCard,{title:fact.title,text:fact.text,credit:'National Coffee Association',background:coffeeBackground(coffeeFacts.indexOf(fact)),filename:'james-coffee-fact-'+coffeeFacts.indexOf(fact)}),jH('a',{href:fact.source,target:'_blank',rel:'noopener noreferrer'},'Read the source'))}return node})};
+var rCoffeeGuide=CoffeeGuide;CoffeeGuide=function(){return jH(import_react.Fragment,null,rCoffeeGuide(),jH('details',{className:'x-guide-details r-latte-guide'},jH('summary',null,'Coffee art · ideas & techniques'),jH('p',null,'Start with a clean cup and smooth milk texture. Practise safely with your own equipment; estimates and artwork vary.'),jH('div',{className:'j-grid'},oct7CoffeeArt.map((a,i)=>jH('article',{className:'j-card',key:a.title},jH('header',{className:'x-photo-heading',style:{backgroundImage:'linear-gradient(#08131866,#081318dd),url("'+coffeeBackground(i)+'")'}},jH('p',{className:'eyebrow'},a.level),jH('h2',null,a.title)),jH('p',null,a.tools),jH('ol',null,a.steps.map(t=>jH('li',{key:t},t))),jH('p',null,a.tip),jH('a',{href:a.sourceURL,target:'_blank',rel:'noopener noreferrer'},'Breville technique guide'),jH(PhotoShare,{post:{title:a.title,text:a.steps.join('\n')+'\n'+a.tip,background:coffeeBackground(i),credit:'Home practice · guidance linked to Breville',filename:'james-coffee-art-'+i}}))))))};
+function rSmallSteps(){const [level,setLevel]=import_react.useState(1),[answers,setAnswers]=import_react.useState({}),[show,setShow]=import_react.useState(false),[round,setRound]=import_react.useState(0);const exercises=Array.from({length:8},(_,i)=>{const a=(i+round)% (level<3?6:11),b=level<2?1:(i*3+round)%6;return {question:level===1?a+' + 1':level===2?a+' + '+b:level===3?(a+b)+' − '+b:a+' × '+b,answer:level===3?a:level===4?a*b:a+b}}),score=exercises.filter((q,i)=>Number(answers[i])===q.answer&&answers[i]!=='').length;return jH('section',{className:'j-card r-small-steps'},jH('h2',null,'Small steps · independent practice'),jH('p',null,'Inspired by the general Kumon principles of gradual steps and self-learning. These are our original activities; this website is independent of Kumon.'),jH('p',null,'Try eight questions at your own pace. Check, correct gently, then repeat before moving up. A grown-up can help choose a comfortable level.'),jH('label',null,'Choose a step',jH('select',{value:level,onChange:e=>{setLevel(Number(e.target.value));setAnswers({});setShow(false)}},['Add one','Add within 15','Subtract within 15','Multiply small numbers'].map((l,i)=>jH('option',{key:l,value:i+1},l)))),jH('div',{className:'r-practice-grid'},exercises.map((q,i)=>jH('label',{key:i},q.question+' =',jH('input',{type:'number',inputMode:'numeric',value:answers[i]??'',onChange:e=>setAnswers({...answers,[i]:e.target.value}),'aria-label':'Answer to '+q.question}),show&&jH('span',null,Number(answers[i])===q.answer&&answers[i]!==''?'✓ Well done':'Try again · '+q.answer)))),jH('div',{className:'button-row'},jH('button',{onClick:()=>setShow(true)},'Check my work'),jH('button',{className:'secondary',onClick:()=>{setAnswers({});setShow(false);setRound(round+1)}},'Practise again')),show&&jH('p',{role:'status'},score+' of 8 correct. A small improvement is a good next step.'),jH('a',{href:'https://kumongroup.com/eng/about-kumon/method/self-learning/',target:'_blank',rel:'noopener noreferrer'},'Read about Kumon’s learning principles'))}
+var rKids=KidsLearning;
+var rSkills=q7Skills;
+var rChurch=ChurchDirectory;
+var rChecklists=FamilyChecklists;FamilyChecklists=function(){return jH(import_react.Fragment,null,jH('p',{className:'small-note'},'Checklist ticks use your signed-in account when connected. On a static or disconnected copy, progress stays in this browser and does not sync.'),rChecklists())};
+var rMusic=CatholicMusic;CatholicMusic=function(){return jH(import_react.Fragment,null,jH(rMusic),jH(Oct7RegionalMusic))};
+function rGospelReflection(){const [reading,setReading]=import_react.useState(null),[date,setDate]=import_react.useState(nzDate());import_react.useEffect(()=>{const timer=setInterval(()=>setDate(nzDate()),60000);return()=>clearInterval(timer)},[]);import_react.useEffect(()=>{let live=true;fetch('/api/gospel?date='+date).then(r=>readJsonResponse(r,'The daily reading could not load.')).then(d=>{if(live)setReading(d)}).catch(()=>{if(live)setReading(window.JAMESNZ_GOSPEL_FALLBACK?.(date)||null)});return()=>{live=false}},[date]);const known=date==='2026-10-07'&&reading?.reference==='Luke 11:1-4',prompt=known?'Jesus teaches us to address God as Father, ask for our daily bread, and seek forgiveness. Which small need can you entrust to God today? Whom could you forgive or ask to forgive you?':'Read today’s Gospel, pause over one word or action of Jesus, and choose one small way to live it today.',prayer=known?'Father, teach us to pray with trust. Give us what we need for today, help us forgive, and guide our family in your love. Amen.':'Jesus, help me listen to your word today. Show me one act of love I can put into practice. Amen.';return jH('article',{className:'j-card r-gospel-reflection'},jH('p',{className:'eyebrow'},'TODAY’S GOSPEL · '+date),jH('h3',null,reading?.reference||'Read, reflect, respond'),reading?.verses?.[0]&&jH('p',null,reading.verses[0].text),jH('p',null,prompt),jH('p',null,prayer),jH('a',{href:reading?.url||'https://www.vaticannews.va/en/word-of-the-day.html',target:'_blank',rel:'noopener noreferrer'},'Open the official Gospel reading'),jH(PhotoShare,{post:{title:'Faith for the everyday · '+date,text:(reading?.reference?reading.reference+'\n':'')+prompt+'\n\n'+prayer,credit:'Original reflection · confirm local liturgical readings',background:prayerBackground,filename:'james-gospel-reflection-'+date}}))}
+var rPrayer=PrayerLibrary;PrayerLibrary=function(){return jH(import_react.Fragment,null,jH(rGospelReflection),rPrayer())};
+
+
+function rHourlyForecast({location,refresh}){const [rows,setRows]=import_react.useState([]),[loading,setLoading]=import_react.useState(true);import_react.useEffect(()=>{const c=new AbortController();setLoading(true);setRows([]);fetch('/api/weather?location='+encodeURIComponent(location),{signal:c.signal}).then(r=>readJsonResponse(r,'Hourly weather could not load.')).then(d=>{if(!c.signal.aborted)setRows(Array.isArray(d.hourly)?d.hourly:[])}).catch(()=>{}).finally(()=>{if(!c.signal.aborted)setLoading(false)});return()=>c.abort()},[location,refresh]);return jH('details',{className:'r-hourly-weather'},jH('summary',null,'Hourly forecast · next 12 hours'),loading?jH('p',{role:'status'},'Loading live hourly weather…'):rows.length?jH('div',{className:'r-hourly-scroll'},jH('table',null,jH('caption',null,'MET Norway · forecast values, not observations'),jH('thead',null,jH('tr',null,['NZ time','Temperature','Rain','Wind'].map(t=>jH('th',{key:t,scope:'col'},t)))),jH('tbody',null,rows.map(row=>jH('tr',{key:row.time},jH('th',{scope:'row'},new Date(row.time).toLocaleTimeString('en-NZ',{timeZone:'Pacific/Auckland',hour:'numeric',minute:'2-digit'})),jH('td',null,Number.isFinite(row.temperature)?Math.round(row.temperature)+' °C':'—'),jH('td',null,Number.isFinite(row.rain)?row.rain.toFixed(1)+' mm':'Not supplied'),jH('td',null,Number.isFinite(row.wind)?Math.round(row.wind)+' km/h':'—')))))):jH('p',null,'The hourly feed is unavailable here. Open the official MetService hourly forecast above.'))}
+var rMetService=MetServiceWeather;MetServiceWeather=function(props){return jH(import_react.Fragment,null,rMetService(props),jH(rHourlyForecast,props))};
+
+// Original small-step English activities. No Kumon worksheets or proprietary resources.
+function hIndependentLearning(){const [subject,setSubject]=import_react.useState('English'),[level,setLevel]=import_react.useState(0),[answer,setAnswer]=import_react.useState(''),[checked,setChecked]=import_react.useState(false),[question,setQuestion]=import_react.useState(0);const tasks=[{name:'Letter sounds',items:[['Write the first letter of apple.','a'],['Write the first letter of ball.','b'],['Write the first letter of sun.','s'],['Write the first letter of map.','m']]},{name:'Build a word',items:[['Complete c _ t.','a'],['Complete s _ n.','u'],['Complete d _ g.','o'],['Complete p _ n.','e']]},{name:'Read a sentence',items:[['Rae has a red bag. What colour is the bag?','red'],['Sue feeds the hen. What animal does Sue feed?','hen'],['Mateo sits by the door. Where does Mateo sit?','door'],['Mye holds a toy. What does Mye hold?','toy']]},{name:'Grammar',items:[['Complete: I ___ happy.','am'],['Complete: She ___ kind.','is'],['Complete: We ___ ready.','are'],['Choose the correct plural: one cat, two ___.','cats']]}],task=tasks[level].items[question%tasks[level].items.length];return jH('section',{className:'h-independent-learning'},jH('h2',null,'Kumon-inspired learnings · English & Maths'),jH('p',{className:'h-original-notice'},'These English and Maths activities were independently written for The James NZ. They are not taken from Kumon resources, books, worksheets or courses. This website is not affiliated with or endorsed by Kumon.'),jH('p',null,'Practise in small steps: begin comfortably, try independently, check your work, correct gently and repeat before moving up.'),jH('div',{className:'filters','aria-label':'Practice subject'},['English','Maths'].map(s=>jH('button',{key:s,'aria-pressed':subject===s,className:subject===s?'selected':'',onClick:()=>{setSubject(s);setChecked(false);setAnswer('')}},s))),subject==='Maths'?jH(rSmallSteps):jH('article',{className:'j-card h-english-practice'},jH('label',null,'English step',jH('select',{value:level,onChange:e=>{setLevel(Number(e.target.value));setQuestion(0);setAnswer('');setChecked(false)}},tasks.map((t,i)=>jH('option',{key:t.name,value:i},t.name)))),jH('p',{className:'eyebrow'},'QUESTION '+(question%4+1)+' OF 4'),jH('h3',null,task[0]),jH('label',null,'My answer',jH('input',{value:answer,onChange:e=>{setAnswer(e.target.value);setChecked(false)},autoComplete:'off'})),jH('div',{className:'button-row'},jH('button',{disabled:!answer.trim(),onClick:()=>setChecked(true)},'Check my work'),jH('button',{className:'secondary',onClick:()=>{setQuestion(question+1);setAnswer('');setChecked(false)}},'Next question')),checked&&jH('p',{role:'status'},answer.trim().toLowerCase().replace(/[.!?]+$/,'')===task[1]?'✓ Well done. Read it once more.':'Try again. The answer is '+task[1]+'. Say it, then write it yourself.'),jH('p',{className:'small-note'},'A grown-up can model a sound, listen and offer encouragement. Take a break whenever you need one.')))}
+function hToastmastersPractice(){return jH('section',{className:'h-toastmasters-tab'},jH('h2',null,'Learnings from Toastmasters · try a short practice'),jH('p',{className:'small-note'},'Independently written practice based on general speaking principles in official Toastmasters guidance. No affiliation or certification.'),jH('div',{className:'j-grid'},oct7SpeakingLessons.map((l,i)=>jH('article',{className:'j-card',key:l.title},jH('p',{className:'eyebrow'},l.skill),jH('h3',null,l.title),jH('p',null,l.lesson),jH('strong',null,'Try this'),jH('p',null,l.practice),jH('a',{href:l.sourceURL,target:'_blank',rel:'noopener noreferrer'},'Toastmasters guidance'),jH(PhotoShare,{post:{title:l.title,text:l.lesson+'\n\nTry this: '+l.practice,credit:'Independent practice · source guidance linked',background:xAsset('life-photos-2'),filename:'james-speaking-learning-'+i}})))))}
+function hChurchShare({church}){return jH(PhotoShare,{post:{title:church.name,text:(church.address||'See the official parish for the address.')+'\n'+church.schedule+'\nConfirm current Mass times: '+church.source,credit:church.diocese+' · New Zealand',background:prayerBackground,filename:'james-church-'+church.id}})}
+function hRegionalSongs(){return ['Philippines','India'].flatMap(country=>(country==='Philippines'?oct7RegionalMusic.philippines:oct7RegionalMusic.india).map((s,i)=>({id:'regional-'+country.toLowerCase()+'-'+i,title:s.title,category:country+' · English',collection:country,regional:true,notes:[],tempo:76,verseCount:0,source:s.url,sourceURL:s.url,listenURL:s.listenURL,attribution:s.source,license:'Recordings, lyrics and scores remain on the official rights-holder site.'})))}
+function hRegionalSelectedSong({song}){return jH('article',{className:'j-card hymn-player h-regional-player'},jH('p',{className:'eyebrow'},song.category),jH('h3',null,song.title),jH('p',null,'English Catholic music · '+song.collection),jH('div',{className:'button-row'},jH('a',{className:'primary',href:song.listenURL||song.source,target:'_blank',rel:'noopener noreferrer'},'Listen at official source'),jH('a',{className:'secondary',href:song.source,target:'_blank',rel:'noopener noreferrer'},'Official song page')),jH('p',{className:'small-note'},'The regional collection uses official recordings and song pages. A local guitar arrangement and full lyrics are included only when we have a reusable score.'),jH('details',null,jH('summary',null,'Source & reuse information'),jH('p',null,song.attribution),jH('p',null,song.license)),jH(PhotoShare,{post:{title:song.title,text:'English Catholic music from '+song.collection+'\nOfficial recording / song information: '+(song.listenURL||song.source),credit:song.attribution,background:prayerBackground,filename:song.id}}))}
+// One compact song browser retains the original finite guitar player and all full verses.
+var hOriginalPlayer=TraditionalHymnPlayer;TraditionalHymnPlayer=function(){return rTransform(hOriginalPlayer(),node=>{if(node.props.className==='traditional-hymn-library'){const children=import_react.Children.toArray(node.props.children),search=children.find(c=>c.props?.className==='j-form-grid');if(search){const remaining=children.filter(c=>c!==search);remaining.splice(3,0,search);return import_react.cloneElement(node,{},remaining)}}if(node.props.className==='english-hymn-words'){const children=import_react.Children.toArray(node.props.children);return jH('details',{className:'english-hymn-words h-song-details'},jH('summary',null,'Full lyrics & guitar guide'),children.filter(c=>c.type!=='h3'))}if(node.props.className==='j-card hymn-player'){const children=import_react.Children.toArray(node.props.children),metadata=[],main=[];for(const child of children){if(child.props?.className==='small-note'||child.type==='a')metadata.push(child);else main.push(child)}return jH('article',{className:'j-card hymn-player h-compact-player'},main,jH('details',{className:'h-song-details'},jH('summary',null,'Source & arrangement information'),metadata))}return node})};
+CatholicMusic=function(){const [view,setView]=import_react.useState('Song library');return jH('section',{className:'j-section h-music-page'},xTitle('FAITH & INSPIRATION · MUSIC & PRAYER','Catholic music & guitar','One searchable list of traditional English hymns and official English Catholic music from the Philippines and India.'),jH('div',{className:'filters','aria-label':'Music section'},['Song library','Original prayer songs'].map(v=>jH('button',{key:v,'aria-pressed':view===v,className:view===v?'selected':'',onClick:()=>setView(v)},v))),view==='Song library'?jH(TraditionalHymnPlayer):jH(o7cOriginalCatholicMusic))};
+// Smaller reading toolbar with advanced voice guidance folded away.
+var hReader=rStoryReader;rStoryReader=function(props){return rTransform(hReader(props),node=>{if(node.props.className!=='story-audio')return node;const children=import_react.Children.toArray(node.props.children),voice=children.filter(c=>c.type===VoicePicker),notes=children.filter(c=>c.type==='p'&&c.props.className==='small-note'&&!c.props.role),main=children.filter(c=>!voice.includes(c)&&!notes.includes(c));return jH('section',{className:'story-audio h-reading-toolbar','aria-label':'Read-aloud controls'},main,jH('details',{className:'h-reading-settings'},jH('summary',null,'Voice & reading help'),voice,notes))})};
+var hPhotoPost=createPhotoPost;createPhotoPost=async function(post){if(!post.filename?.startsWith('james-country-'))return hPhotoPost(post);const img=new Image();img.decoding='async';await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=()=>reject(Error('The country picture could not load. Please retry.'));img.src=post.background});const canvas=document.createElement('canvas');canvas.width=canvas.height=1080;const ctx=canvas.getContext('2d');if(!ctx)throw Error('Your browser cannot prepare the image.');ctx.fillStyle='#faf6ee';ctx.fillRect(0,0,1080,1080);const scale=Math.min(1080/img.naturalWidth,780/img.naturalHeight),w=img.naturalWidth*scale,h=img.naturalHeight*scale;ctx.drawImage(img,(1080-w)/2,260+(780-h)/2,w,h);ctx.fillStyle='#17352e';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 40px Arial, sans-serif';const titleLines=wrapPostText(post.title,v=>ctx.measureText(v).width,930).slice(0,2);titleLines.forEach((line,i)=>ctx.fillText(line,540,55+i*45));ctx.font='30px Arial, sans-serif';const textY=titleLines.length>1?155:125;wrapPostText(post.text,v=>ctx.measureText(v).width,930).slice(0,3).forEach((line,i)=>ctx.fillText(line,540,textY+i*34));ctx.font='21px Arial, sans-serif';ctx.textAlign='left';ctx.fillText('TheJamesNZ.com',32,1055);await q7DrawPostQR(ctx,880,880,176,post);const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(Error('The photo could not be prepared.')),'image/png'));return new File([blob],post.filename+'.png',{type:'image/png'})};
+
+// Alphabet photos belong to the letter cards, never to a family banner.
+var iOriginalKids=KidsLearning;KidsLearning=function(){return rTransform(iOriginalKids(),node=>{
+ if(node.props.className==='r-phonics-photo')return null;
+ if(node.props.className==='x-learning-card'&&node.type==='button'){
+  const children=import_react.Children.toArray(node.props.children),letter=String(children.find(c=>c.type==='strong')?.props.children||'').slice(0,1).toLowerCase();
+  if(!/^[a-z]$/.test(letter))return node;
+  const word=xPhonics.find(([l])=>l===letter)?.[1]||letter;
+  return import_react.cloneElement(node,{},jH('img',{className:'i-letter-photo',src:jAsset('./phonics-photos/'+letter+'.webp'),alt:word+' · photo for letter '+letter.toUpperCase(),loading:'lazy',width:240,height:180}),children);
+ }return node;
+})};
+function iShowLyrics(){setTimeout(()=>{const section=document.querySelector('.english-hymn-words');if(section){section.open=true;section.scrollIntoView({behavior:'smooth',block:'nearest'})}},80)}
+hRegionalSelectedSong=function({song}){return jH('article',{className:'j-card hymn-player h-regional-player'},jH('p',{className:'eyebrow'},song.category),jH('h3',null,song.title),jH('div',{className:'button-row'},jH('a',{className:'primary',href:song.listenURL||song.source,target:'_blank',rel:'noopener noreferrer'},'Play melody'),jH('a',{className:'secondary',href:song.source,target:'_blank',rel:'noopener noreferrer'},'Full lyrics')),jH('p',{className:'small-note'},'These controls open the publisher’s recording and song resources in a new tab. Regional recordings are not local acoustic guitar arrangements. Lyrics and score availability depend on the publisher.'),jH('details',null,jH('summary',null,'Source & reuse information'),jH('p',null,song.attribution),jH('p',null,song.license)),jH(PhotoShare,{post:{title:song.title,text:'English Catholic music from '+song.collection+'\nPublisher’s recording and song resources: '+(song.listenURL||song.source),credit:song.attribution,background:prayerBackground,filename:song.id}}))};
+OctOwnerInbox=function(){const [items,setItems]=import_react.useState([]),[notice,setNotice]=import_react.useState(''),[error,setError]=import_react.useState(''),[busy,setBusy]=import_react.useState('');async function load(){try{const response=await fetch('/api/feedback?kind=issue');const data=await readJsonResponse(response,'The private inbox could not load.');if(!response.ok)throw Error(data.error);setItems(data.items||[]);setNotice(data.mailNotice||'');setError('')}catch(e){setError(e.message)}}async function retry(id){setBusy(id);setError('');try{const response=await fetch('/api/feedback',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({operation:'retry-issue',id})});const data=await readJsonResponse(response,'Email forwarding could not connect.');if(!response.ok)throw Error(data.error);await load();setNotice(data.message)}catch(e){setError(e.message)}finally{setBusy('')}}import_react.useEffect(()=>{load()},[]);return jH('section',{className:'j-section'},jH('h2',null,'Private owner inbox'),jH('button',{onClick:load},'Refresh reports'),notice&&jH('p',{className:'small-note',role:'status'},notice),error&&jH('p',{role:'alert'},error),items.map(x=>jH('article',{className:'j-card',key:x.id},jH('h3',null,x.name),jH('p',null,new Date(x.created).toLocaleString('en-NZ')),jH('p',null,x.message),jH('p',{className:'small-note'},'Email status: '+(x.delivery||'pending')),!['accepted','submitted'].includes(x.delivery)&&jH('button',{disabled:!!busy,onClick:()=>retry(x.id)},busy===x.id?'Retrying…':'Retry email forwarding'))))};
 
 //#region .sites-runtime/github-export/entry.tsx
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Q7Entry, { canEdit: new URLSearchParams(location.search).get("editor")==="1" }));
