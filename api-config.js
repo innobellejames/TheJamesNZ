@@ -40,7 +40,7 @@ JAMES_SAINTS['10-08']={title:'Saint Pelagia, martyr of Antioch',story:'The Vatic
 // A self-contained adapter: static GitHub pages never parse HTML as API JSON.
 (function(){
 'use strict';
-if(window.JAMESNZ_API_VERSION==='20261008k')return;
+if(window.JAMESNZ_API_VERSION==='20261008n')return;
 const nativeFetch=window.fetch.bind(window),memory={},hosted=/\.chatgpt\.site$/.test(location.hostname);
 const defaultBase='https://the-james-nz-connections.auckland-4469.chatgpt.site';
 window.JAMESNZ_API_BASE=window.JAMESNZ_API_BASE||(hosted?'':defaultBase);
@@ -75,5 +75,5 @@ if(url.pathname==='/api/feedback'&&endpoint){target=new URL(endpoint);target.sea
 try{const r=await nativeFetch(target,options),d=await decode(r);if(d){if(r.ok){if(url.pathname==='/api/saint'&&(!d.stories?.length||d.status==='unavailable'))return json(saint(url.searchParams.get('date')||dateNZ()));if(url.pathname==='/api/weather'&&(d.date!==dateNZ()||![d.current?.temperature_2m,d.current?.wind_speed_10m,d.current?.precipitation,d.daily?.high,d.daily?.low].every(Number.isFinite)))return fallback(url,method,init);if(url.pathname==='/api/content'&&!Array.isArray(d.quotes))return fallback(url,method,init);if(url.pathname==='/api/feedback'&&method==='POST'&&d.saved!==true)return json({error:'The service did not confirm that your submission was saved. Your text remains in the form.'},503);if(url.pathname==='/api/content'&&Array.isArray(d.quotes))save('james-saved-content-v2',d);if(url.pathname==='/api/feedback'&&method==='GET'&&Array.isArray(d.items)&&url.searchParams.get('kind')!=='issue')save('james-cached-reviews-v2',d.items);if(url.pathname==='/api/weather')cacheWeather(d);if(url.pathname==='/api/gospel'&&d.book&&d.chapter&&d.range&&!d.verses?.length){const numbers=d.range.split(/[,;.]/).flatMap(part=>{const[a,b]=part.trim().split(/[-–]/).map(Number);return a>0&&Number.isInteger(a)?b>=a&&b-a<100?Array.from({length:b-a+1},(_,i)=>a+i):[a]:[]});d.verses=JAMES_BIBLE.filter(v=>v.book===d.book&&v.chapter===d.chapter&&numbers.includes(v.verse));return json(d)}return json(d,r.status)}if(method!=='GET'||r.status===400||r.status===429||url.pathname==='/api/feedback'&&url.searchParams.get('kind')==='issue')return json(d,r.status)}}catch(e){if(init?.signal?.aborted)throw e}
 return fallback(url,method,init);
 };
-window.JAMESNZ_WEATHER_FALLBACK=async(name,signal)=>{const response=await fallback(new URL('/api/weather?location='+encodeURIComponent(name),location.href),'GET',{signal});const data=await response.json();if(!response.ok)throw Error(data.error);return data};window.JAMESNZ_GOSPEL_FALLBACK=gospel;window.JAMESNZ_API_VERSION='20261008k';
+window.JAMESNZ_WEATHER_FALLBACK=async(name,signal)=>{const response=await fallback(new URL('/api/weather?location='+encodeURIComponent(name),location.href),'GET',{signal});const data=await response.json();if(!response.ok)throw Error(data.error);return data};window.JAMESNZ_GOSPEL_FALLBACK=gospel;window.JAMESNZ_API_VERSION='20261008n';
 })();
