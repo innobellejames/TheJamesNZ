@@ -115,3 +115,21 @@ html[data-reading-theme="dark"] :focus-visible{outline:3px solid #ffd57a!importa
 .v-kids-voice-tools{display:flex;gap:16px;flex-wrap:wrap;align-items:start;padding:12px 0;}
 .v-kids-voice-tools select{max-width:100%;padding:8px;border:1px solid #b9ceca;border-radius:8px;}
 @media(max-width:700px){.reading-feature{grid-template-columns:1fr!important;}.reading-feature>img{max-height:none!important;width:100%!important;height:auto!important;}.v-kids-voice-tools{flex-direction:column;}}
+/* October 14: edge-to-edge discovery photographs and legible photo captions. */
+.collection-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:20px!important;}
+.collection-grid .collection-card{position:relative!important;display:flex!important;align-items:flex-end!important;padding:0!important;min-height:320px!important;aspect-ratio:4/3;overflow:hidden!important;isolation:isolate;border-radius:18px!important;background:#152d37!important;}
+.collection-grid .collection-card>img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;max-height:none!important;object-fit:cover!important;object-position:center!important;z-index:-2;display:block!important;}
+.collection-grid .collection-card:after{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(8,20,28,.08) 15%,rgba(8,20,28,.35) 40%,rgba(8,20,28,.94) 100%);}
+.collection-grid .collection-card>span{background:transparent!important;position:relative;width:100%;box-sizing:border-box;padding:24px!important;}
+.collection-grid .collection-card strong,.collection-grid .collection-card small{color:#fff!important;text-shadow:0 1px 3px #000!important;}
+.collection-grid .collection-card strong{font-size:1.65rem!important;line-height:1.2!important;display:block;margin-bottom:10px;}
+.collection-grid .collection-card small{font-size:.95rem!important;line-height:1.5!important;display:block;}
+.bookstore-header .header-links button,.bookstore-category-nav .category-trigger{color:inherit!important;}
+html[data-reading-theme=dark] .bookstore-header .header-links button,html[data-reading-theme=dark] .bookstore-category-nav .category-trigger{color:#edf5f3!important;}
+.w-shared-photo .photo-text-card{min-height:380px;padding:28px;box-sizing:border-box;background-size:cover;background-position:center;border-radius:18px;}
+.w-shared-photo .photo-text-card blockquote{white-space:pre-line;overflow-wrap:anywhere;font-size:clamp(18px,2.8vw,25px);line-height:1.7;color:#fff!important;}
+.w-shared-photo .photo-text-card h3,.w-shared-photo .photo-text-card figcaption{color:#fff!important;}
+@media(max-width:1050px){.collection-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;}.collection-grid .collection-card{min-height:290px!important;}}
+@media(max-width:600px){.collection-grid{grid-template-columns:1fr!important;gap:16px!important;}.collection-grid .collection-card{min-height:300px!important;aspect-ratio:5/4;}.collection-grid .collection-card>span{padding:22px!important;}}
+html[data-reading-theme=dark] .bookstore-header button:not(.j-mateo-shortcut):not(.page-share-button):not(.u-theme-toggle):not(.brand){color:#edf5f3!important;}
+html[data-reading-theme=dark] .bookstore-header .j-mateo-shortcut{color:#18333b!important;}
