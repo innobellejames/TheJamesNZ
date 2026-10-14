@@ -322,3 +322,36 @@ html[data-reading-theme=dark] .bookstore-layout .m-chat-error{background:#4b292a
 .bookstore-layout .m-chat .m-chat-identity h1{font-size:1.6rem!important;margin-bottom:5px!important;}
 .m-chat-identity p{font-size:.98rem;line-height:1.4;}
 @media(max-width:639px){.m-chat-header{padding:14px;gap:13px;}.m-mateo-avatar{width:68px;height:68px;}.bookstore-layout .m-chat .m-chat-identity h1{font-size:1.45rem!important;}.m-chat-identity p{font-size:.9rem;}}
+
+/* A single, more prominent Mateo introduction. */
+.m-chat-header{padding:20px 24px;align-items:center;}
+.m-mateo-intro{display:flex;align-items:center;gap:22px;flex:1;min-width:0;}
+.m-mateo-intro .m-mateo-avatar{width:128px;height:128px;flex:none;}
+.m-mateo-intro .m-chat-identity{min-width:0;}
+.bookstore-layout .m-chat .m-mateo-intro .m-chat-identity h1{font-size:2rem!important;margin-bottom:7px!important;}
+.m-mateo-intro .m-chat-identity p{font-size:1.05rem;line-height:1.4;}
+/* Keep the controls in separate grid cells instead of shrinking a nowrap flex row. */
+@media(max-width:1023px){
+ .bookstore-header.header{display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;align-items:center!important;gap:14px!important;}
+ .bookstore-header .brand{grid-column:1/-1;width:100%;min-width:0!important;justify-self:start;}
+ .bookstore-header .u-header-actions{grid-column:1;display:flex;gap:10px!important;width:100%;min-width:0;margin:0!important;justify-self:start;}
+ .bookstore-header .page-share-control{min-width:0;position:relative;}
+ .bookstore-header .page-share-button{max-width:100%;}
+ .bookstore-header .mobile-menu-button{grid-column:2;position:static!important;inset:auto!important;transform:none!important;margin:0!important;min-height:44px;flex:none;justify-self:end;}
+}
+@media(max-width:639px){
+ .bookstore-header.header{grid-template-columns:minmax(0,1fr)!important;padding:16px!important;gap:12px!important;}
+ .bookstore-header .brand{grid-column:1;width:100%;}
+ .bookstore-header .u-header-actions{grid-column:1;display:grid!important;grid-template-columns:auto minmax(0,1fr);gap:10px!important;align-items:start;}
+ .bookstore-header .page-share-control{width:100%;}
+ .bookstore-header .page-share-button{width:100%;min-height:44px;position:static!important;margin:0!important;padding:10px 12px!important;white-space:normal!important;font-size:.85rem;line-height:1.35;}
+ .bookstore-header .u-theme-toggle{min-height:44px;margin:0!important;padding:10px 12px;}
+ .bookstore-header .mobile-menu-button{grid-column:1;justify-self:stretch;width:100%;min-width:0;justify-content:center;min-height:44px;}
+ .bookstore-header .z-share-status{position:static;width:100%;max-width:none;margin:8px 0 0;}
+ .m-chat-header{padding:16px;}
+ .m-mateo-intro{gap:16px;}
+ .m-mateo-intro .m-mateo-avatar{width:104px;height:104px;}
+ .bookstore-layout .m-chat .m-mateo-intro .m-chat-identity h1{font-size:1.75rem!important;}
+ .m-mateo-intro .m-chat-identity p{font-size:1rem;}
+}
+@media(max-width:359px){.m-chat-header{padding:14px 12px;}.m-mateo-intro{gap:12px;}.m-mateo-intro .m-mateo-avatar{width:96px;height:96px;}.m-mateo-intro .m-chat-identity p{font-size:.9rem;}}
