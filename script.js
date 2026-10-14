@@ -25375,140 +25375,22 @@ var apps = [
 		icon: MessageCircle
 	}
 ];
-function PhotoShare({ post, label = "Share" }) {
-	const [open, setOpen] = (0, import_react.useState)(false), [file, setFile] = (0, import_react.useState)(null), [preview, setPreview] = (0, import_react.useState)(""), [busy, setBusy] = (0, import_react.useState)(false), [preparing, setPreparing] = (0, import_react.useState)(false), [message, setMessage] = (0, import_react.useState)(""), [app, setApp] = (0, import_react.useState)("");
-	const generation = (0, import_react.useRef)(0), previewURL = (0, import_react.useRef)("");
-	(0, import_react.useEffect)(() => () => {
-		generation.current++;
-		if (previewURL.current) URL.revokeObjectURL(previewURL.current);
-	}, []);
-	async function prepare() {
-		const current = ++generation.current;
-		setOpen(true);
-		setFile(null);
-		setApp("");
-		setMessage("");
-		setPreparing(true);
-		try {
-			const result = await createPhotoPost(post);
-			if (current !== generation.current) return;
-			if (previewURL.current) URL.revokeObjectURL(previewURL.current);
-			previewURL.current = URL.createObjectURL(result);
-			setPreview(previewURL.current);
-			setFile(result);
-		} catch (e) {
-			if (current === generation.current) setMessage(e.message);
-		} finally {
-			if (current === generation.current) setPreparing(false);
-		}
-	}
-	async function share() {
-		if (!file || busy) return;
-		setBusy(true);
-		setMessage("");
-		try {
-			const result = await sharePhotoFile(file, post.title || "The James NZ");
-			setMessage(result.message);
-		} catch (e) {
-			setMessage(e.name === "AbortError" ? "Sharing cancelled. Your photo is still ready." : e.message);
-		} finally {
-			setBusy(false);
-		}
-	}
-	const canShare = file ? supportsPhotoShare(file) : false;
-	const selected = apps.find((a) => a.name === app);
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-		className: "secondary photo-share-trigger",
- "aria-label": "Share "+(post.title||"this card"),
-		onClick: prepare,
-		children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Share2, { size: 17 }), label]
-	}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(Dialog, {
-		open,
-		onOpenChange: (v) => {
-			if (!busy) {
-				setOpen(v);
-				if (!v) {
-					generation.current++;
-					setPreparing(false);
-				}
-			}
-		},
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DialogContent, {
-			className: "photo-share-dialog",
-			children: [
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogTitle, { children: "Share your photo post" }),
-				/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DialogDescription, { children: "Preview your square photo, then choose how to share it." }),
-				preparing ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					role: "status",
-					children: "Preparing your photo…"
-				}) : file ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("img", {
-						className: "photo-share-preview",
-						src: preview,
-						alt: "Preview of your photo post with its complete text"
-					}),
- jH(BShareOptions,{post}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-						className: "primary",
-						disabled: busy,
-						onClick: share,
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Share2, { size: 17 }), busy ? "Opening sharing…" : canShare ? "Share picture" : "Save picture"]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						className: "small-note",
-						children: canShare ? "Choose Facebook, Instagram, WhatsApp or another available app in your device’s share sheet. Apps shown depend on your device." : "This browser cannot share image files directly. Save the photo below, then upload it in your chosen app."
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-						className: "share-app-options",
-						"aria-label": "Help sharing to a platform",
-						children: apps.map((a) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-							className: app === a.name ? "secondary selected" : "secondary",
-							"aria-pressed": app === a.name,
-							onClick: () => setApp(a.name),
-							children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(a.icon, { size: 17 }), a.name]
-						}, a.name))
-					}),
-					selected && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "share-app-help",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", { children: [
-							"For ",
-							selected.name,
-							", save the photo, open ",
-							selected.name,
-							", and attach it to a new ",
-							selected.name === "WhatsApp" ? "message or status" : "post or story",
-							". You choose the audience and finish posting in the app."
-						] }), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("a", {
-							className: "secondary",
-							href: selected.url,
-							target: "_blank",
-							rel: "noopener noreferrer",
-							children: ["Open ", selected.name]
-						})]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-						className: "secondary",
-						onClick: () => {
-							savePhotoFile(file);
-							setMessage("Photo saved. It is ready to upload to your chosen app.");
-						},
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Download, { size: 17 }), "Save photo for posting"]
-					})
-				] }) : null,
-				message && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-					role: "status",
-					className: "small-note",
-					children: message
-				}),
-				!preparing && !file && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-					className: "secondary",
-					onClick: prepare,
-					children: "Try again"
-				})
-			]
-		})
-	})] });
+function PhotoShare({post}) {
+ const [open,setOpen]=import_react.useState(false),[file,setFile]=import_react.useState(null),[preview,setPreview]=import_react.useState(''),[busy,setBusy]=import_react.useState(false),[preparing,setPreparing]=import_react.useState(false),[message,setMessage]=import_react.useState('');
+ const generation=import_react.useRef(0),previewURL=import_react.useRef('');
+ import_react.useEffect(()=>()=>{generation.current++;if(previewURL.current)URL.revokeObjectURL(previewURL.current)},[]);
+ async function prepare(){const current=++generation.current;setOpen(true);setFile(null);setPreview('');setMessage('');setPreparing(true);try{const result=await createPhotoPost(post);if(current!==generation.current)return;if(previewURL.current)URL.revokeObjectURL(previewURL.current);previewURL.current=URL.createObjectURL(result);setPreview(previewURL.current);setFile(result)}catch(error){if(current===generation.current)setMessage(error.message||'The photo could not be prepared. Please try again.')}finally{if(current===generation.current)setPreparing(false)}}
+ async function share(){if(!file||busy)return;setBusy(true);setMessage('');try{const result=await sharePhotoFile(file);if(result?.kind==='shared')setOpen(false);else if(result?.kind!=='cancelled')setMessage(result?.message||'Photo shared.')}catch(error){if(error.name!=='AbortError')setMessage(error.message||'The photo could not be shared. Please try again.')}finally{setBusy(false)}}
+ return jH(import_react.Fragment,null,
+  jH('button',{type:'button',className:'secondary photo-share-trigger',disabled:busy,onClick:prepare,'aria-label':'Share this photo: '+(post.title||'The James NZ')},jH(Share2,{size:17,'aria-hidden':true}),'Share this photo'),
+  jH(Dialog,{open,onOpenChange:value=>{if(busy)return;setOpen(value);if(!value){generation.current++;setPreparing(false)}}},
+   jH(DialogContent,{className:'photo-share-dialog m-simple-photo-share'},
+    jH(DialogTitle,{className:'m-visually-hidden'},'Share this photo'),jH(DialogDescription,{className:'m-visually-hidden'},'Preview of your photo with its text.'),
+    preparing?jH('p',{role:'status'},'Preparing your photo…'):file&&jH('img',{className:'photo-share-preview',src:preview,alt:'Photo preview with the complete text and embedded sharing QR code'}),
+    jH('button',{type:'button',className:'primary',disabled:busy||preparing,onClick:file?share:prepare,'aria-busy':busy||preparing},jH(Share2,{size:17,'aria-hidden':true}),'Share this photo'),
+    message&&jH('p',{role:'status','aria-live':'polite',className:'small-note'},message))));
 }
+
 //#endregion
 //#region app/voice-picker.tsx
 function VoicePicker({ profile, onChange }) {
@@ -27679,12 +27561,12 @@ function SiteNavigation({ tab, onNavigate }) {
 								defaultValue: navGroups.filter((g) => g.items.some((t) => t.name === tab)).map((g) => g.label),
 								children: navGroups.map((group, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AccordionItem, {
 									value: group.label,
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionTrigger, { children: titles[i] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionContent, { children: group.items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionTrigger, { children: titles[i] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionContent, { children: group.items.flatMap((item) => [item.menuHeading && jH("p",{className:"v-menu-heading",key:item.name+"-heading"},item.menuHeading), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
 										className: "mobile-section-link",
 										"aria-current": tab === item.name ? "page" : void 0,
 										onClick: () => go(item.name),
 										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(item.icon, { size: 18 }), item.displayName||item.name]
-									}, item.name)) })]
+									}, item.name)]) })]
 								}, group.label))
 							})]
 						})]
@@ -27715,12 +27597,12 @@ function SiteNavigation({ tab, onNavigate }) {
 				collisionPadding: 16,
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DropdownMenuLabel, { children: titles[i] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "mega-menu-items",
-					children: group.items.map((item) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DropdownMenuItem, {
+					children: group.items.flatMap((item) => [item.menuHeading && jH(DropdownMenuLabel,{className:"v-menu-heading",key:item.name+"-heading"},item.menuHeading), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DropdownMenuItem, {
 						onSelect: () => go(item.name),
 						className: "mega-menu-link",
 						"aria-current": tab === item.name ? "page" : void 0,
 						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(item.icon, { size: 21 }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: item.displayName||item.name })]
-					}, item.name))
+					}, item.name)])
 				})]
 			})] }, group.label))] })
 		})
@@ -31294,7 +31176,7 @@ function mateoLocalReply(text, mode, index = 0, now = /* @__PURE__ */ new Date()
 	};
 	if (/what (can you do|do you do)|how (can|do) (you|i) (help|use)|help me use/i.test(text)) return {
 		kind: "chat",
-		content: "You can ask me for an inspirational quote, a short prayer, a coffee fact, or the time in New Zealand. Tap Talk to Mateo, say your question, and I will reply. You can type your message too."
+		content: "You can ask me for an inspirational quote, a short prayer, a coffee fact, or the time in New Zealand. Type your message below and I will reply. You can also choose an idea and make it your own."
 	};
 	if (/\bcoffee\b/.test(normalized) && /fact|did you know|learn|tell me about/.test(normalized)) {
 		const f = coffeeFacts[index % coffeeFacts.length];
@@ -31341,10 +31223,8 @@ function AIFriend({ canEdit }) {
 		window.speechSynthesis.addEventListener("voiceschanged", load);
 		return () => window.speechSynthesis.removeEventListener("voiceschanged", load);
 	}, []);
-	const voice = useVoiceInput((value) => {
-		setText(value);
-		send(void 0, value);
-	});
+	const voice={stop(){},supported:false,listening:false,message:''};
+	const composeInput=(0,import_react.useRef)(null);
 	function speakReply(value) {
 		speech.read(value.replace(/The James NZ · original (prayer|quote)/g, "").split(/(?<=[.!?])\s+|\n\s*\n/).filter((v) => v.trim()));
 	}
@@ -31355,10 +31235,8 @@ function AIFriend({ canEdit }) {
 		fetch("/api/friend").then((r) => readJsonResponse(r, "")).then((d) => setEnabled(d.enabled === true)).catch(() => setEnabled(false));
 	}, []);
 	(0, import_react.useEffect)(() => {
-		end.current?.scrollIntoView({
-			block: "nearest",
-			behavior: "smooth"
-		});
+		const log=end.current?.parentElement;
+		if(log)log.scrollTo({top:log.scrollHeight,behavior:window.matchMedia?.("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});
 	}, [messages, busy]);
 	async function send(e, heard) {
 		e?.preventDefault();
@@ -31383,6 +31261,8 @@ function AIFriend({ canEdit }) {
 			return;
 		}
 		setBusy(true);
+		setMessages(next);
+		setText("");
 		try {
 			const d = await readJsonResponse(await fetch("/api/friend", {
 				method: "POST",
@@ -31402,214 +31282,42 @@ function AIFriend({ canEdit }) {
 			setText("");
 			replyAloud(d.reply);
 		} catch (e) {
+			setMessages(messages);
+			setText(question);
 			setError(e.message);
 		} finally {
 			setBusy(false);
 		}
 	}
-	return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-		className: "title-row",
-		children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-				className: "eyebrow",
-				children: "A LITTLE ENCOURAGEMENT"
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h1", { children: "Meet Mateo, your digital friend." }),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "A friendly voice, a little inspiration, a moment of prayer." })
-		] })
-	}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("section", {
-		className: "friend-panel mateo-calm",
-		children: [
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "friend-heading",
-				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-					className: "mateo-avatar mateo-sprite smile" + (moving ? " moving" : " paused"),
-					role: "img",
-					"aria-label": "Mateo the Labrador smiling"
-				}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { children: "Hi, I’m Mateo." }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Tell me what is on your mind." }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-						type: "button",
-						className: "primary mateo-talk",
-						disabled: busy || !voice.supported && !voice.listening && speech.state.status !== "reading",
-						onClick: () => {
-							if (voice.listening || speech.state.status === "reading" || speech.state.status === "paused") {
-								voice.stop();
-								speech.stop();
-							} else {
-								speech.stop();
-								voice.start();
-							}
-						},
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Mic, { size: 18 }), voice.listening ? "Stop listening" : speech.state.status === "reading" || speech.state.status === "paused" ? "Stop speaking" : "Talk to Mateo"]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						role: "status",
-						className: "small-note",
-						children: voice.supported === false ? "Please type below; voice input is unavailable here." : voice.listening ? voice.message : speech.state.status === "reading" ? "Mateo is speaking…" : voice.message
-					})
-				] })]
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-				className: "chat-log",
-				role: "log",
-				"aria-label": "Conversation with Mateo",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "chat-bubble assistant",
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: "Mateo" }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Hello! Ask me for a quote, a prayer, a coffee fact or the New Zealand time." })]
-					}),
-					messages.map((m, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "chat-bubble " + m.role,
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("strong", { children: m.role === "user" ? "You" : "Mateo" }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: m.content }),
-							m.role === "assistant" && i === messages.length - 1 && /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-								type: "button",
-								className: "mateo-replay",
-								disabled: !speech.supported || voice.listening,
-								onClick: () => speakReply(m.content),
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Volume2, { size: 15 }), "Listen again"]
-							})
-						]
-					}, i)),
-					busy && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						role: "status",
-						children: "Mateo is thinking…"
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", { ref: end })
-				]
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("form", {
-				className: "mateo-compose",
-				onSubmit: send,
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { children: ["Your message", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("textarea", {
-						value: text,
-						onChange: (e) => setText(e.target.value),
-						rows: 2,
-						maxLength: 2e3,
-						placeholder: "A prayer for my family, please…"
-					})] }),
-					error && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
-						className: "error",
-						role: "alert",
-						children: error
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-						className: "primary",
-						disabled: busy || !text.trim(),
-						children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Send, { size: 16 }), busy ? "Sending…" : "Send"]
-					})
-				]
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("details", {
-				className: "mateo-settings",
-				children: [
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("summary", { children: "Voice & chat settings" }),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
-						className: "mateo-settings-grid",
-						children: [
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { children: ["Reply style", /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", {
-								value: mode,
-								disabled: busy,
-								onChange: (e) => {
-									setMode(e.target.value);
-									setError("");
-								},
-								children: [
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-										value: "Automatic",
-										children: "Choose for me"
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-										value: "Quote",
-										children: "Inspirational quote"
-									}),
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-										value: "Prayer",
-										children: "Short prayer"
-									}),
-									enabled && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-										value: "AI conversation",
-										children: "AI conversation"
-									})
-								]
-							})] }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { children: ["Mateo’s voice", /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("select", {
-								value: voiceChoice,
-								onChange: (e) => {
-									setVoiceChoice(e.target.value);
-									speech.setVoice(e.target.value);
-								},
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("option", {
-									value: "",
-									children: "Automatic · youthful boy style"
-								}), voices.map((v) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("option", {
-									value: v.voiceURI,
-									children: [
-										v.name,
-										" · ",
-										v.lang
-									]
-								}, v.voiceURI))]
-							})] }),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", {
-								className: "mateo-setting-check",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
-									type: "checkbox",
-									checked: spoken,
-									onChange: (e) => {
-										setSpoken(e.target.checked);
-										if (!e.target.checked) speech.stop();
-									}
-								}), "Speak replies aloud"]
-							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", {
-								className: "mateo-setting-check",
-								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
-									type: "checkbox",
-									checked: moving,
-									onChange: (e) => setMoving(e.target.checked)
-								}), "Animate Mateo’s smile"]
-							})
-						]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-						className: "small-note",
-						children: ["Mateo uses a higher, playful pitch for a young-boy style. An actual child voice may not be available on your device; choose the voice you prefer. ", speech.supported === false && "Audio is unavailable in this browser."]
-					}),
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-						className: "secondary",
-						disabled: busy || !messages.length,
-						onClick: () => {
-							voice.stop();
-							speech.stop();
-							setMessages([]);
-							setError("");
-						},
-						children: "Start a new chat"
-					})
-				]
-			}),
-			/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
-				className: "small-note",
-				children: [
-					"Listening starts only when you tap. Your browser may send audio to its speech-recognition provider. Quotes and prayers come from our original collection. Young visitors can chat with a grown-up; refreshing clears this conversation. ",
-					mode === "AI conversation" && "Generated replies can make mistakes; messages in this mode go to OpenAI. ",
-					"For urgent help in New Zealand call 111; ",
-					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
-						href: "https://1737.org.nz",
-						target: "_blank",
-						rel: "noopener noreferrer",
-						children: "1737"
-					}),
-					" offers support."
-				]
-			})
-		]
-	})] });
+	return jH('section',{className:'m-chat','aria-label':'Chat with Mateo'},
+ jH('header',{className:'m-chat-header'},
+  jH('div',{className:'m-mateo-avatar'+(moving?' moving':' paused'),role:'img','aria-label':'Mateo the Labrador smiling and blinking',style:{backgroundImage:'url("'+jAsset('./mateo-smile-clean.webp')+'")'}}),
+  jH('div',{className:'m-chat-identity'},jH('h1',null,'Mateo'),jH('p',null,jH('span',{className:'m-status-dot','aria-hidden':true}),'Your digital friend')),
+  jH('span',{className:'m-header-note'},'A little kindness, one message at a time.')),
+ jH('div',{className:'m-chat-log',role:'log','aria-live':'polite','aria-relevant':'additions','aria-label':'Conversation with Mateo'},
+  jH('p',{className:'m-conversation-date'},'A little chat with Mateo'),
+  jH('div',{className:'m-message assistant'},jH('span',{className:'m-message-name'},'Mateo'),jH('div',{className:'m-bubble'},jH('p',null,'Kia ora! I’m glad you’re here. What would make this moment a little brighter?'))),
+  messages.map((message,index)=>jH('div',{className:'m-message '+message.role,key:index},
+   jH('span',{className:'m-message-name'},message.role==='user'?'You':'Mateo'),
+   jH('div',{className:'m-bubble'},jH('p',null,message.content)),
+   message.role==='assistant'&&index===messages.length-1&&jH('button',{type:'button',className:'m-listen',disabled:!speech.supported,onClick:()=>speakReply(message.content),'aria-label':'Listen to Mateo’s latest reply'},jH(Volume2,{size:14,'aria-hidden':true}),'Listen'))),
+  busy&&jH('div',{className:'m-message assistant m-thinking',role:'status'},jH('span',{className:'m-visually-hidden'},'Mateo is thinking…'),jH('div',{className:'m-bubble','aria-hidden':true},jH('i'),jH('i'),jH('i'))),
+  jH('div',{ref:end})),
+ error&&jH('p',{className:'m-chat-error',role:'alert'},error),
+ jH('div',{className:'m-chat-prompts','aria-label':'Ideas to type to Mateo'},[['A little hope','Please share an encouraging quote for today.'],['A quiet prayer','A prayer for my family, please.'],['Feeling overwhelmed','I am feeling overwhelmed. Please share a gentle thought.'],['Coffee break','Tell me a coffee fact.']].map(([label,value])=>jH('button',{type:'button',key:label,disabled:busy,onClick:()=>{setText(value);composeInput.current?.focus()}},label))),
+ jH('form',{className:'m-chat-compose',onSubmit:send},
+  jH('label',{className:'m-visually-hidden',htmlFor:'mateo-message'},'Message Mateo'),
+  jH('textarea',{id:'mateo-message',ref:composeInput,value:text,disabled:busy,rows:1,maxLength:2000,placeholder:'Message Mateo…',onChange:e=>setText(e.target.value),onKeyDown:e=>{if(e.key==='Enter'&&!e.shiftKey&&!e.nativeEvent?.isComposing&&!e.isComposing){e.preventDefault();send(e)}}}),
+  jH('button',{type:'submit',className:'m-chat-send',disabled:busy||!text.trim(),'aria-label':busy?'Sending message':'Send message',title:'Send message'},jH(Send,{size:22,'aria-hidden':true}))),
+ jH('details',{className:'m-chat-settings'},jH('summary',null,'Chat settings'),
+  jH('div',{className:'m-settings-grid'},
+   jH('label',null,'Reply style',jH('select',{value:mode,disabled:busy,onChange:e=>{setMode(e.target.value);setError('')}},jH('option',{value:'Automatic'},'Choose for me'),jH('option',{value:'Quote'},'Inspirational quote'),jH('option',{value:'Prayer'},'Short prayer'),enabled&&jH('option',{value:'AI conversation'},'AI conversation'))),
+   jH('label',null,'Mateo’s voice',jH('select',{value:voiceChoice,onChange:e=>{setVoiceChoice(e.target.value);speech.setVoice(e.target.value)}},jH('option',{value:''},'Automatic · youthful boy style'),voices.map(v=>jH('option',{key:v.voiceURI,value:v.voiceURI},v.name+' · '+v.lang)))),
+   jH('label',{className:'m-setting-check'},jH('input',{type:'checkbox',checked:spoken,disabled:!speech.supported,onChange:e=>{setSpoken(e.target.checked);if(!e.target.checked)speech.stop()}}),'Speak replies aloud'),
+   jH('label',{className:'m-setting-check'},jH('input',{type:'checkbox',checked:moving,onChange:e=>setMoving(e.target.checked)}),'Mateo’s smiling animation')),
+  jH('button',{type:'button',className:'m-new-chat',disabled:busy||!messages.length,onClick:()=>{voice.stop();speech.stop();setMessages([]);setError('');setText('');composeInput.current?.focus()}},'Start a new chat'),
+  jH('p',{className:'m-settings-note'},'Quotes and prayers come from our collection. Refreshing clears this conversation. '+(mode==='AI conversation'?'Messages in this mode go to OpenAI; generated replies can make mistakes. ':'')+(speech.supported?'Available voices depend on your device.':'Audio is unavailable in this browser.'))));
+
 }
 //#endregion
 //#region app/coming-soon-business.tsx
@@ -43287,7 +42995,7 @@ function Home({ canEdit }) {
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "/" }),
 									navGroups.find((g) => g.items.some((t) => t.name === tab))?.label,
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "/" }),
-									tab
+									vTopicLabels[tab] || tab
 								]
 							}),
 							tab === "Grocery list" && jH(GroceryList),
@@ -47201,7 +46909,7 @@ BibleBooks=function(){
 
 // One clear Share trigger per card. QR export/link controls live in its dialog.
 PhotoShare=function({post}){return jH(q7BasePhotoShare,{post,label:'Share'});};
-function BShareOptions({post}){const [message,setMessage]=import_react.useState('');return jH('div',{className:'b-share-tools'},jH('div',{className:'button-row'},jH('button',{className:'secondary',onClick:async()=>{try{await navigator.clipboard.writeText(q7ShareURL(post));setMessage('Share link copied.')}catch{setMessage('Select and copy the link below.')}}},'Copy share link'),jH('button',{className:'secondary',onClick:()=>savePhotoFile(new File([q7QrSvg(post)],(post.filename||'james-share').replace(/\.png$/,'')+'-qr.svg',{type:'image/svg+xml'}))},'Download QR code')),message&&jH('p',{role:'status'},message),message==='Select and copy the link below.'&&jH('input',{readOnly:true,value:q7ShareURL(post),'aria-label':'Share link',onFocus:e=>e.target.select()}));}
+function BShareOptions(){return null;}
 // Restore the previous full family portrait.
 About=octAboutBeforeIllustration;
 OctViews=function(){return null};
@@ -49524,6 +49232,39 @@ const wPrayerLibrary=PrayerLibrary;
 PrayerLibrary=function FreshPrayerLibrary(){return jH(wPrayerLibrary)};
 
 starters.push(...[{"id": "sample-faith-hope-1", "text": "You can place an unfinished day in God’s care without pretending it was easy.", "author": "The James NZ", "category": "Positivity"}, {"id": "sample-faith-hope-2", "text": "A changed path can still hold a faithful next step.", "author": "The James NZ", "category": "Positivity"}, {"id": "sample-faith-hope-3", "text": "Let faith make room for honest questions and willing hands.", "author": "The James NZ", "category": "Positivity"}, {"id": "sample-faith-hope-4", "text": "Grace can meet you before you have found the words to explain what hurts.", "author": "The James NZ", "category": "Positivity"}, {"id": "sample-faith-hope-5", "text": "When you cannot carry the whole day, accept the kindness offered for this moment.", "author": "The James NZ", "category": "Positivity"}, {"id": "sample-faith-hope-6", "text": "Hope can begin quietly: a prayer, a conversation, a little help accepted.", "author": "The James NZ", "category": "Positivity"}, {"id": "sample-faith-hope-7", "text": "God’s love is not a prize for keeping everything together.", "author": "The James NZ", "category": "Positivity"}, {"id": "sample-faith-hope-8", "text": "You are allowed to rest while the next chapter is still unwritten.", "author": "The James NZ", "category": "Positivity"}, {"id": "sample-faith-hope-9", "text": "A small act of mercy can make the world around you feel less lonely.", "author": "The James NZ", "category": "Positivity"}, {"id": "sample-faith-hope-10", "text": "Keep faith with the good you can do today; you do not need to see the whole road.", "author": "The James NZ", "category": "Positivity"}]);
+// October 14 evening: a calmer full-width home, one-action sharing and typing-only Mateo.
+const zPreviousNav=SiteNavigation;
+SiteNavigation=function SimpleMateoNavigation(props){return rTransform(zPreviousNav(props),node=>{if(node.type==='button'&&node.props.className==='j-mateo-shortcut')return null;if(node.type==='button'&&node.props.className==='j-mateo-nav')return import_react.cloneElement(node,{'aria-label':'Ask Mateo, your digital friend'},'Ask Mateo');return node})};
+PageShare=function OneActionPageShare(){const [busy,setBusy]=import_react.useState(false),[message,setMessage]=import_react.useState('');async function share(){if(busy)return;setBusy(true);setMessage('');try{const result=await wSendImage(lGetPageBannerFile());if(result.kind!=='cancelled')setMessage(result.message)}catch{setMessage('The page could not be shared. Please try again.')}finally{setBusy(false)}}return jH('div',{className:'u-header-actions z-single-share'},jH(uThemeToggle),jH('div',{className:'page-share-control'},jH('button',{type:'button',className:'page-share-button',disabled:busy,onClick:share,'aria-label':'Share this page','aria-busy':busy},jH(Share2,{size:17,'aria-hidden':true}),busy?'Sharing…':'Share this page'),message&&jH('p',{role:'status','aria-live':'polite',className:'z-share-status'},message)));};
+const zHomeCopy=[['Make a little','room for joy.','Coffee, simple meals and everyday ideas.'],['Go somewhere','new.','Kiwi discoveries, seasonal picks and local places.'],['Grow a world','together.','Stories, learning and the love of family life.'],['A little better,','at your pace.','Focus, movement and confidence for everyday living.'],['Let hope','have a home.','Prayer, Scripture and a moment of encouragement.'],['Good company.','Little connections.','Our family, helpful guides and local makers.']];
+BrowseHome=function DiscoveryHome({onNavigate,onStory}){const familyStories=stories.map((story,index)=>({story,index})).filter(x=>!jBibleData.some(b=>b.index===x.index));return jH('div',{className:'z-home'},
+ jH('section',{className:'z-discover','aria-labelledby':'z-discovery-heading'},jH('div',{className:'z-home-intro'},jH('p',{className:'eyebrow'},'FAITH. FAMILY. EVERYDAY WONDER.'),jH('h1',{id:'z-discovery-heading'},'Find your next',jH('br'),jH('em',null,'little discovery.')),jH('p',{className:'z-intro-note'},'A little inspiration for the life you’re living. Choose a place to begin.')),
+ jH('div',{className:'z-discovery-grid'},collections.map((c,i)=>jH('button',{key:c.title,type:'button',className:'z-discovery-card z-card-'+i,onClick:()=>onNavigate(c.section),'aria-label':'Explore '+c.title},jH('img',{src:i===5?jAsset('./oct13/about-storybook-texture.png'):c.image,alt:'',loading:i<2?'eager':'lazy',decoding:'async'}),jH('span',{className:'z-discovery-copy'},jH('span',{className:'z-discovery-label'},String(i+1).padStart(2,'0')+' / '+c.title),jH('strong',null,zHomeCopy[i][0],jH('br'),jH('em',null,zHomeCopy[i][1])),jH('span',{className:'z-card-caption'},zHomeCopy[i][2]),jH('span',{className:'z-card-arrow','aria-hidden':true},'↗')))))),
+ jH('section',{className:'z-story-feature'},jH('img',{src:stories[xChurchIndex].image,alt:stories[xChurchIndex].imageAlt,loading:'lazy'}),jH('div',null,jH('p',{className:'eyebrow'},'THE READING NOOK'),jH('h2',null,'One page.',jH('br'),jH('em',null,'A whole little world.')),jH('p',null,'Read with Dad, Mom, Sue, Rae, Mye and Mateo. Listen along, turn the page and find a story to share.'),jH('button',{className:'primary',onClick:()=>onStory(xChurchIndex)},'Read our Sunday story'),jH('button',{className:'z-text-link',onClick:()=>onNavigate('Reading nook')},'Browse the reading nook →'))),
+ jH('section',{className:'z-story-shelf'},jH('div',{className:'z-section-heading'},jH('h2',null,'Stories to',jH('em',null,' settle into.')),jH('button',{className:'z-text-link',onClick:()=>onNavigate('Reading nook')},'See all family stories →')),jH('div',{className:'z-story-grid'},familyStories.slice(0,4).map(({story:s,index})=>jH('button',{className:'z-story-card',key:s.title,onClick:()=>onStory(index)},jH('img',{src:s.image,alt:s.imageAlt,loading:'lazy'}),jH('span',{className:'eyebrow'},s.theme),jH('strong',null,s.title),jH('small',null,s.level))))));};
+
+// Mateo now renders one compact animated smiling portrait in the chat header.
+
+// Responsive refresh: clear destinations, stable bookmarks and one Mateo portrait.
+const vTopicLabels={
+ 'Coffee corner':'Coffee & a Smile','Homemade recipes':'From Our Kitchen','Grocery list':'Shopping Made Simple','Saving tips':'Smart Little Savings','Budget tracker':'My Money Plan','Home & garden':'Home & Green',
+ 'Weather & OOTD':'Weather & What to Wear','Today’s fruit & vege picks':'Fresh Picks Today','NZ bucket lists':'My Kiwi Adventures','NZ quiz':'How Kiwi Are You?','Catholic churches':'Find a Catholic Church',
+ 'Family tips':'Family Life, Made Easier','Family checklists':'Family Checklists','Pregnancy & baby age':'Bump & Baby Milestones','Pregnancy quotes & tips':'Growing a Little Life','Parenting quotes & tips':'Parenting with Heart','Breastfeeding quotes & tips':'Feeding with Love','Partnership quotes & tips':'Together Time','Husband & wife quotes & tips':'Love Notes & Little Kindnesses','Parent–child & child–parent':'Our Memory Jar',
+ 'Kids’ learning & activities':'Little Learners','Reading nook':'The Story Nook','Bible stories for kids':'Bible Stories for Little Hearts','Languages':'Hello, World!',
+ 'Focus time':'Pause & Focus','Workouts':'Move Your Way','Water tracker':'Sip & Feel Good','Speaking practice':'Find Your Voice','Leadership practice':'Lead with Heart',
+ 'Today’s prayer':'Today’s Prayer','Communal prayers':'Pray Together','How to pray the rosary':'The Rosary, Step by Step','Bible & Gospel':'Scripture & Today’s Gospel','Saints day':'Saint of the Day','Catholic songs & guitar':'Songs of Faith','Inspiration':'A Little Lift','Lives that inspire':'Lives to Learn From',
+ 'About us':'Our Story','Small business':'Meet Local Makers','How to use this website':'Start Here: Website Guide','FAQ':'Good to Know','Mateo · AI friend':'Ask Mateo'};
+const vGroupNames=['Everyday Joy','Kiwi Adventures','Family Together','Your Next Step','Faith & Hope','Our Place'];
+navGroups=navGroups.map((g,i)=>({...g,label:vGroupNames[i].toUpperCase(),items:g.items.map(item=>({...item,displayName:vTopicLabels[item.name]||item.name}))}));
+const vFamilyOrder=['Kids’ learning & activities','Reading nook','Bible stories for kids','Languages','Family tips','Family checklists','Pregnancy & baby age','Pregnancy quotes & tips','Parenting quotes & tips','Breastfeeding quotes & tips','Partnership quotes & tips','Husband & wife quotes & tips','Parent–child & child–parent'];
+navGroups[2].items=vFamilyOrder.map(name=>navGroups[2].items.find(item=>item.name===name));
+const vMenuHeadings={'Coffee corner':'Enjoy the everyday','Saving tips':'Make life simpler','Weather & OOTD':'Plan your day','NZ bucket lists':'Explore & discover','Kids’ learning & activities':'Learn & imagine','Family tips':'Care for your family','Partnership quotes & tips':'Make meaningful connections','Focus time':'Feel your best','Speaking practice':'Grow your confidence','Today’s prayer':'A moment of prayer','Bible & Gospel':'Learn & be inspired','About us':'Meet our community','How to use this website':'Find your way'};
+navGroups=navGroups.map(group=>({...group,items:group.items.map(item=>({...item,menuHeading:vMenuHeadings[item.name]}))}));
+titles=vGroupNames;
+collections=collections.map((c,i)=>({...c,title:titles[i]}));
+const vPreviousGuide=NavigationGuide;
+NavigationGuide=function FriendlyNavigationGuide(props){return rTransform(vPreviousGuide(props),node=>typeof node.props.children==='string'&&vTopicLabels[node.props.children]?import_react.cloneElement(node,{},vTopicLabels[node.props.children]):node)};
+
 //#region .sites-runtime/github-export/entry.tsx
 (0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Q7Entry, { canEdit: new URLSearchParams(location.search).get("editor")==="1" }));
 //#endregion
