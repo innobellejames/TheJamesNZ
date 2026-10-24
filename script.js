@@ -27561,7 +27561,7 @@ function SiteNavigation({ tab, onNavigate }) {
 								defaultValue: navGroups.filter((g) => g.items.some((t) => t.name === tab)).map((g) => g.label),
 								children: navGroups.map((group, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(AccordionItem, {
 									value: group.label,
-									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionTrigger, { children: titles[i] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionContent, { children: group.items.flatMap((item) => [item.menuHeading && jH("p",{className:"v-menu-heading",key:item.name+"-heading"},item.menuHeading), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
+									children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionTrigger, { children: titles[i] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(AccordionContent, { children: group.items.flatMap((item) => item.hidden ? [] : [item.menuHeading && jH("p",{className:"v-menu-heading",key:item.name+"-heading"},item.menuHeading), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
 										className: "mobile-section-link",
 										"aria-current": tab === item.name ? "page" : void 0,
 										onClick: () => go(item.name),
@@ -27583,21 +27583,17 @@ function SiteNavigation({ tab, onNavigate }) {
 				"aria-current": tab === "Home" ? "page" : void 0,
 				onClick: () => go("Home"),
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(House, { size: 18 }), "Home"]
-			}), navGroups.map((group, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DropdownMenu, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DropdownMenuTrigger, {
+			}), navGroups.map((group, i) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DropdownMenu, { children: [jH("span", { className: "jx-cat", "data-active": group.items.some((item) => item.name === tab) }, jH("button", { type: "button", className: "category-trigger jx-cat-link", "data-active": group.items.some((item) => item.name === tab), onClick: () => go(window.JNZX ? JNZX.groupTab(i) : "Home") }, titles[i]), /* @__PURE__ */ (0, import_jsx_runtime.jsx)(DropdownMenuTrigger, {
 				asChild: true,
-				children: /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("button", {
-					className: "category-trigger",
-					"data-active": group.items.some((item) => item.name === tab),
-					children: [titles[i], /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { size: 16 })]
-				})
-			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DropdownMenuContent, {
+				children: jH("button", { type: "button", className: "category-trigger jx-cat-more", "aria-label": "Show " + titles[i] + " topics" }, /* @__PURE__ */ (0, import_jsx_runtime.jsx)(ChevronDown, { size: 16 }))
+			})), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DropdownMenuContent, {
 				className: "bookstore-mega-menu",
 				align: "start",
 				sideOffset: 8,
 				collisionPadding: 16,
 				children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(DropdownMenuLabel, { children: titles[i] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 					className: "mega-menu-items",
-					children: group.items.flatMap((item) => [item.menuHeading && jH(DropdownMenuLabel,{className:"v-menu-heading",key:item.name+"-heading"},item.menuHeading), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DropdownMenuItem, {
+					children: group.items.flatMap((item) => item.hidden ? [] : [item.menuHeading && jH(DropdownMenuLabel,{className:"v-menu-heading",key:item.name+"-heading"},item.menuHeading), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(DropdownMenuItem, {
 						onSelect: () => go(item.name),
 						className: "mega-menu-link",
 						"aria-current": tab === item.name ? "page" : void 0,
@@ -42982,11 +42978,10 @@ function Home({ canEdit }) {
 										children: "Home"
 									}),
 									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "/" }),
-									navGroups.find((g) => g.items.some((t) => t.name === tab))?.label,
-									/* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "/" }),
-									vTopicLabels[tab] || tab
+									window.JNZX ? JNZX.crumbs(tab, navigate) : [navGroups.find((g) => g.items.some((t) => t.name === tab))?.label, jH("span", { key: "s" }, "/"), vTopicLabels[tab] || tab]
 								]
 							}),
+							window.JNZX && JNZX.page(tab, navigate, canEdit),
 							tab === "Grocery list" && jH(GroceryList),
 							tab === "Budget tracker" && jH(BudgetTracker),
 							tab === "Kids’ learning & activities" && jH(KidsLearning),
@@ -49337,5 +49332,6 @@ vTopicLabels[KZ_ROUTE]='Safety & Know-how';
 navGroups[1].items.push({name:KZ_ROUTE,displayName:'Safety & Know-how',icon:Heart,menuHeading:'Be ready, wherever you go'});
 
 //#region .sites-runtime/github-export/entry.tsx
-(0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Q7Entry, { canEdit: new URLSearchParams(location.search).get("editor")==="1" }));
+function __jnzStart(){(0, import_client.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Q7Entry, { canEdit: new URLSearchParams(location.search).get("editor")==="1" }));}
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", __jnzStart); else __jnzStart();
 //#endregion
