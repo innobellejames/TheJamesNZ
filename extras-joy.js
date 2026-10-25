@@ -252,3 +252,69 @@
   }
   try { WaterTracker = WaterIntake; } catch (e) { console.warn('[JNZX] water', e); }
 })();
+
+/* Kiwi Adventures › Fresh Picks Today: witty quotes and a shareable picture */
+(function () {
+  'use strict';
+  var R = import_react, h = jH, useState = R.useState, useEffect = R.useEffect, useRef = R.useRef;
+  var WIT = {
+    'Peaches': 'Life’s a peach — enjoy every juicy bite.', 'Nectarines': 'A nectarine is just a peach that skipped the fuzz.', 'Apricots': 'Apricots: little suns you can eat.',
+    'Plums': 'Plum-believably good.', 'Strawberries': 'Berry happy days start here.', 'Blueberries': 'Feeling blue? Grab a handful of blueberries.',
+    'Courgettes': 'Plant one courgette, feed the whole street.', 'Tomatoes': 'Knowledge is knowing a tomato is a fruit. Wisdom is not putting it in a fruit salad.', 'Sweetcorn': 'Summer on a cob — simply a-maize-ing.',
+    'Cucumber': 'Stay cool as a cucumber.', 'Capsicum': 'Red, orange or green — nature’s own traffic lights.', 'Green beans': 'Full of beans and ready for the day!',
+    'Apples': 'An apple a day keeps the doctor away.', 'Pears': 'The perfect pear for any lunchbox.', 'Feijoas': 'Feijoa season: when Kiwis leave mystery bags on the neighbours’ doorstep.',
+    'Kiwifruit': 'Small, fuzzy and full of goodness — a true Kiwi.', 'Persimmons': 'Persimmons: autumn’s sweetest little secret.', 'Grapes': 'Grape things come in bunches.',
+    'Pumpkin': 'Soup weather? You gourd-n’t ask for better.', 'Kūmara': 'Every roast is better with a bit of kūmara.', 'Broccoli': 'Tiny trees for growing tall.',
+    'Carrots': 'Carrots won’t give you night vision — but they will brighten your plate.', 'Beetroot': 'Simply unbeetable colour.', 'Cauliflower': 'Cauliflower: broccoli’s clever cousin.',
+    'Mandarins': 'Easy-peel winter sunshine.', 'Oranges': 'Orange you glad it’s citrus season?', 'Lemons': 'When life gives you lemons, make lemonade.',
+    'Leeks': 'Leek-ing with flavour.', 'Cabbage': 'One cabbage, a whole week of crunch.', 'Silverbeet': 'The garden gift that keeps on giving.',
+    'Brussels sprouts': 'Love them or not, they’re tiny cabbages full of goodness.', 'Grapefruit': 'A zesty wake-up call.', 'Avocados': 'Holy guacamole — avocados are in!',
+    'Asparagus': 'Spring has sprung, and so has the asparagus.', 'Radishes': 'Small, crunchy and totally rad.', 'Lettuce': 'Lettuce celebrate salad season!',
+    'Spinach': 'Little leaves, big strength.', 'Spring onions': 'The finishing touch on every dish.'
+  };
+  var GENERIC = ['Eat a rainbow every day.', 'Fresh from the garden, straight to your heart.', 'Good food is good mood.', 'In season, on the plate, money in your pocket.'];
+  function wit(n) { return WIT[n] || GENERIC[n.length % GENERIC.length]; }
+  function todayPicks() {
+    var date = (typeof nzDate === 'function' ? nzDate() : new Date().toISOString().slice(0, 10)), m = Number(date.slice(5, 7)), season = m === 12 || m <= 2 ? 'Summer' : m <= 5 ? 'Autumn' : m <= 8 ? 'Winter' : 'Spring', data = seasons[season], off = Number(date.slice(8)) % 6;
+    var fr = [0, 1, 2].map(function (i) { return data.fruit[(off + i) % 6]; }), vg = [0, 1, 2].map(function (i) { return data.vege[(off + i) % 6]; });
+    return { season: season, date: date, fruit: fr, vege: vg, all: fr.concat(vg) };
+  }
+  function drawPicks(c, p, quoteIdx, sheet) {
+    var W = 1080, H = 1350, g = c.getContext('2d'); c.width = W; c.height = H;
+    g.fillStyle = '#fbf6ec'; g.fillRect(0, 0, W, H);
+    g.fillStyle = '#2f6b3a'; g.fillRect(0, 0, W, 190);
+    g.fillStyle = '#fff'; g.textAlign = 'center'; g.font = 'bold 64px Georgia, serif'; g.fillText('Today’s fresh picks', W / 2, 105);
+    g.font = '30px Arial, sans-serif'; g.fillText(p.season + ' in Aotearoa · ' + new Date(p.date + 'T12:00:00').toLocaleDateString('en-NZ', { day: 'numeric', month: 'long', year: 'numeric' }), W / 2, 155);
+    var tile = 300, gap = 30, x0 = (W - 3 * tile - 2 * gap) / 2;
+    p.all.forEach(function (n, i) {
+      var x = x0 + (i % 3) * (tile + gap), y = 230 + Math.floor(i / 3) * (tile + 80), idx = uProduceNames.indexOf(n);
+      g.fillStyle = '#fff'; g.beginPath(); g.roundRect ? g.roundRect(x, y, tile, tile, 24) : g.rect(x, y, tile, tile); g.fill();
+      if (sheet && idx >= 0) { var sw = sheet.width / 8, sh = sheet.height / 5; g.save(); g.beginPath(); g.roundRect ? g.roundRect(x, y, tile, tile, 24) : g.rect(x, y, tile, tile); g.clip(); g.drawImage(sheet, (idx % 8) * sw, Math.floor(idx / 8) * sh, sw, sh, x, y, tile, tile); g.restore(); }
+      g.fillStyle = '#2b2622'; g.font = 'bold 30px Arial, sans-serif'; g.fillText(n, x + tile / 2, y + tile + 44);
+    });
+    var q = wit(p.all[quoteIdx % p.all.length]);
+    g.fillStyle = '#2f6b3a'; g.font = 'italic 44px Georgia, serif';
+    var words = q.split(' '), lines = [], cur = ''; words.forEach(function (w) { var t = cur ? cur + ' ' + w : w; if (g.measureText(t).width > W - 160 && cur) { lines.push(cur); cur = w; } else cur = t; }); lines.push(cur);
+    var y0 = 1050 - (lines.length - 1) * 28; lines.forEach(function (l, i) { g.fillText((i === 0 ? '“' : '') + l + (i === lines.length - 1 ? '”' : ''), W / 2, y0 + i * 58); });
+    g.fillStyle = '#6b5f55'; g.font = '26px Arial, sans-serif'; g.fillText('Fresh Picks Today · The James NZ · thejamesnz.com', W / 2, H - 50);
+  }
+  function PicksShare() {
+    var p = todayPicks(), qi = useState(0), qIdx = qi[0], setQ = qi[1], ref = useRef(null), sh = useState(null), sheet = sh[0], setSheet = sh[1];
+    useEffect(function () { var im = new Image(); im.onload = function () { setSheet(im); }; im.src = jAsset('./oct13/produce-sheet.png'); }, []);
+    useEffect(function () { if (ref.current) drawPicks(ref.current, p, qIdx, sheet); }, [qIdx, sheet, p.date]);
+    var name = p.all[qIdx % p.all.length];
+    return h('section', { className: 'jx-page jx-picks-share' },
+      h('div', { className: 'jx-card jx-picks-quote' }, h('p', { className: 'eyebrow' }, 'TODAY’S WITTY PICK · ' + name.toUpperCase()), h('p', { className: 'jx-picks-q' }, '“' + wit(name) + '”'),
+        h('div', { className: 'jx-row' }, h('button', { type: 'button', className: 'secondary', onClick: function () { setQ(qIdx + 1); } }, '🔄 Another quote'), h(JNZX.ShareMini, { title: 'Fresh Picks Today', text: 'Today’s fresh picks: ' + p.all.join(', ') + '.\n“' + wit(name) + '”' }))),
+      h('h2', null, 'Share today’s picks'),
+      h('div', { className: 'jx-poster-preview jx-keep-colour' }, h('canvas', { ref: ref, 'aria-label': 'Fresh picks picture' })),
+      JNZX.poster && h(JNZX.poster.ExportBar, { canvasRef: ref, name: 'TheJamesNZ-fresh-picks', title: 'Today’s fresh picks', text: '“' + wit(name) + '” — today’s fresh picks from The James NZ' }));
+  }
+  try {
+    var baseCard = uProducePhoto;
+    uProducePhoto = function (props) { return h('div', { className: 'jx-produce-wrap' }, h(baseCard, props), h('p', { className: 'jx-produce-wit' }, wit(props.name))); };
+    var baseSP = SeasonalProduce;
+    SeasonalProduce = function FreshPicks() { return h(R.Fragment, null, h(baseSP), h(PicksShare)); };
+    JNZX.ownShare['Today’s fruit & vege picks'] = 0;
+  } catch (e) { console.warn('[JNZX] picks', e); }
+})();

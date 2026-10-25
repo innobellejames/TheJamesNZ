@@ -16,6 +16,113 @@
   function K2C(k) { return k === null || k === undefined ? '—' : (Math.round((k - 273.15) * 10) / 10) + ' °C'; }
   function phaseAt(el, T) { if (el.melt === null || el.melt === undefined) return el.phase; if (T < el.melt) return 'Solid'; if (el.boil !== null && el.boil !== undefined && T >= el.boil) return 'Gas'; return 'Liquid'; }
 
+  // Original notes: where you meet each element (by atomic number)
+  var USES = {
+    1: 'The lightest element and most of the Sun. Part of every water molecule, and used to make fertiliser and as a clean fuel.',
+    2: 'Floats party balloons and airships, and cools the magnets inside MRI scanners.',
+    3: 'Powers the rechargeable batteries in phones, laptops and electric cars.',
+    4: 'A light, stiff metal used in space telescopes and precision instruments. Its dust is toxic.',
+    5: 'Found in borax and heat-resistant glass such as Pyrex. Plants need a tiny amount to grow.',
+    6: 'The basis of all life. Pure forms include diamond, graphite (pencil “lead”) and graphene.',
+    7: 'Makes up about 78% of the air. Used in fertilisers and to keep packaged food fresh.',
+    8: 'About 21% of the air — we breathe it to release energy from food. Also in water and rocks.',
+    9: 'Added as fluoride to toothpaste and some water supplies to help protect teeth.',
+    10: 'Glows red-orange in the classic “neon” signs.',
+    11: 'Half of table salt (sodium chloride). Our nerves need it to send messages.',
+    12: 'A light metal in car wheels and laptop cases. Burns with a brilliant white light.',
+    13: 'Drink cans, cooking foil, window frames and aeroplanes — light and rust-resistant.',
+    14: 'The heart of computer chips and solar panels. Sand and glass are mostly silicon and oxygen.',
+    15: 'In matches, fertilisers and our DNA and bones.',
+    16: 'Smells like rotten eggs in some compounds. Found near volcanoes — think Rotorua — and used to make sulfuric acid.',
+    17: 'Keeps swimming pools and drinking water free of germs. The other half of table salt.',
+    18: 'An unreactive gas that fills old-style light bulbs and protects metal during welding.',
+    19: 'Bananas and kūmara are rich in it. Our muscles and heart need it.',
+    20: 'Builds strong bones and teeth. Found in milk, chalk, limestone and shells.',
+    21: 'Mixed with aluminium for strong, light bike frames and sports gear.',
+    22: 'Strong and light — used in hip replacements, aircraft and white paint (titanium dioxide).',
+    23: 'Toughens steel for tools and springs.',
+    24: 'Makes stainless steel shine and resist rust — think kitchen sinks and chrome bumpers.',
+    25: 'Added to steel to make it tougher; also in some batteries.',
+    26: 'The main ingredient of steel and the iron in our blood that carries oxygen. NZ’s black sand beaches are rich in iron.',
+    27: 'Gives glass and pottery a deep blue colour; used in strong magnets and batteries.',
+    28: 'In coins, stainless steel and rechargeable batteries.',
+    29: 'Carries electricity in wires and water in pipes. Turns green over time, like old roofs.',
+    30: 'Coats steel to stop rust (galvanising) and helps wounds heal. In sunscreen as zinc oxide.',
+    31: 'Melts in your hand on a warm day. Used in LEDs and phone electronics.',
+    32: 'Used in fibre-optic cables and infrared lenses.',
+    33: 'Famous as a poison, but tiny amounts are used in electronics.',
+    34: 'Needed in tiny amounts in our diet; used in solar cells and glass colouring.',
+    35: 'One of only two elements that are liquid at room temperature. Used in fire retardants.',
+    36: 'Used in some bright photography flashes and energy-saving windows.',
+    37: 'A very reactive metal used in atomic clocks and research.',
+    38: 'Gives fireworks a bright red colour.',
+    39: 'Helps make the colours in LED lights and some lasers.',
+    40: 'Resists heat and corrosion — used in nuclear reactors and imitation diamonds (cubic zirconia).',
+    41: 'Used in superconducting magnets and strong steels for pipelines.',
+    42: 'Toughens steel for tools and engines; plants need a trace of it.',
+    43: 'The lightest element with no stable form. Used in medical scans.',
+    44: 'Used in electronics and to harden platinum jewellery.',
+    45: 'One of the rarest metals. Used in car catalytic converters.',
+    46: 'Helps clean car exhaust in catalytic converters.',
+    47: 'Jewellery, cutlery and the best electrical conductor of all.',
+    48: 'Once used in batteries; now limited because it is toxic.',
+    49: 'Used in touchscreens (as indium tin oxide).',
+    50: 'Coats steel “tin” cans and is mixed with copper to make bronze.',
+    51: 'Used in flame retardants and lead–acid batteries.',
+    52: 'Used in solar panels and thermoelectric devices.',
+    53: 'Needed for a healthy thyroid — that’s why iodised salt exists. Also an antiseptic.',
+    54: 'Used in very bright car headlights and in ion engines for spacecraft.',
+    55: 'Keeps time in atomic clocks, which define the second.',
+    56: 'Barium meals help doctors see the gut on X-rays; also gives fireworks green colour.',
+    57: 'Used in camera lenses and hybrid-car batteries.',
+    58: 'In lighter “flints” and self-cleaning ovens.',
+    59: 'Used in strong magnets and aircraft engines.',
+    60: 'Makes the super-strong magnets in headphones, motors and wind turbines.',
+    61: 'Radioactive; once used in glow-in-the-dark paint.',
+    62: 'Used in magnets and some cancer treatments.',
+    63: 'Makes the red and blue glow in screens and the anti-forgery marks on euro notes.',
+    64: 'Helps MRI scans show clearer pictures.',
+    65: 'Gives green light in screens and is used in sonar.',
+    66: 'Helps magnets in electric car motors work when hot.',
+    67: 'Has the strongest magnetic properties of any element; used in lasers.',
+    68: 'Boosts signals in fibre-optic internet cables; gives glass a pink colour.',
+    69: 'Used in portable X-ray machines.',
+    70: 'Used in very precise atomic clocks.',
+    71: 'Used in PET scan detectors.',
+    72: 'Used in computer chips and nuclear control rods.',
+    73: 'Inside the tiny capacitors in phones and laptops.',
+    74: 'Has the highest melting point of any metal — used in drill bits and old light-bulb filaments.',
+    75: 'Used in jet engine parts.',
+    76: 'The densest natural element; used in fountain-pen tips.',
+    77: 'Very corrosion-resistant; used in spark plugs.',
+    78: 'Jewellery, catalytic converters and some cancer medicines.',
+    79: 'Precious metal for jewellery and electronics — it never rusts. NZ had famous gold rushes in Otago and the West Coast.',
+    80: 'The other liquid element. Once used in thermometers; now restricted because it is toxic.',
+    81: 'Very toxic; used in some specialised electronics.',
+    82: 'Heavy and soft. Used in car batteries and X-ray shielding; no longer used in petrol or paint because it is toxic.',
+    83: 'Used in stomach-settling medicines and as a non-toxic replacement for lead.',
+    84: 'Highly radioactive; used in anti-static devices.',
+    85: 'One of the rarest natural elements — less than about a gram exists in Earth’s crust at any moment.',
+    86: 'A radioactive gas that can build up in some homes and is tested for in basements.',
+    87: 'Extremely rare and radioactive; studied in physics research.',
+    88: 'Once used in glow-in-the-dark watches; discovered by Marie and Pierre Curie.',
+    89: 'Radioactive; glows blue in the dark. Studied for cancer treatment.',
+    90: 'A radioactive metal studied as a future nuclear fuel.',
+    91: 'Rare and radioactive; used only in research.',
+    92: 'Fuel for nuclear power stations.',
+    93: 'Used to make plutonium; first made in 1940.',
+    94: 'Powers spacecraft that travel far from the Sun, such as Voyager.',
+    95: 'Found in many household smoke alarms.'
+  };
+  function originalSummary(e) {
+    var phase = (e.phase || '').toLowerCase(), cat = e.category || 'element', first = e.name + ' (' + e.symbol + ') is element number ' + e.number + ', a ' + (phase ? phase + ' ' : '') + cat.replace(/^unknown, /, '').replace(/^unknown/, 'little-studied element') + '.';
+    var bits = [];
+    if (e.appearance) bits.push('It looks ' + String(e.appearance).replace(/\.$/, '') + '.');
+    if (e.discovered_by) bits.push(/\d|BC|ancient|prehistor|middle east|egypt|india|china/i.test(e.discovered_by) && !/[A-Z][a-z]+ [A-Z][a-z]+/.test(e.discovered_by) ? 'People have known it since ' + String(e.discovered_by).replace(/^unknown, /i, '').replace(/\bchina\b/, 'China').replace(/^Ancient/, 'ancient times in').replace(/\.$/, '') + '.' : 'It was discovered by ' + String(e.discovered_by).replace(/\.$/, '') + '.');
+    if (e.number > 95) bits.push('It doesn’t occur in nature — scientists make a few atoms at a time in particle accelerators, and they last only moments.');
+    return first + ' ' + bits.join(' ');
+  }
+
   function ElementDetail(props) {
     var e = props.el, ck = catKey(e.category);
     useEffect(function () { function k(ev) { if (ev.key === 'Escape') props.onClose(); } window.addEventListener('keydown', k); return function () { window.removeEventListener('keydown', k); }; }, []);
@@ -32,7 +139,8 @@
         h('div', { className: 'jx-el-hero', style: { background: CAT[ck][1] } },
           h('span', { className: 'jx-el-num' }, e.number), h('span', { className: 'jx-el-sym' }, e.symbol), h('span', { className: 'jx-el-name' }, e.name)),
         h('div', { className: 'jx-el-body' },
-          h('p', null, e.summary),
+          h('p', null, originalSummary(e)),
+          h('div', { className: 'jx-note' }, h('strong', null, 'Where you’ll meet it: '), USES[e.number] || 'A synthetic, highly radioactive element made only in laboratories for research.'),
           h('div', { className: 'jx-el-pics' },
             e.bohr && h('figure', null, h('img', { src: e.bohr, alt: 'Bohr model of ' + e.name, loading: 'lazy', onError: function (ev) { ev.target.parentNode.style.display = 'none'; } }), h('figcaption', null, 'Bohr model')),
             e.img && h('figure', null, h('img', { src: e.img, alt: e.name + ' sample', loading: 'lazy', onError: function (ev) { ev.target.parentNode.style.display = 'none'; } }), h('figcaption', null, 'Photo: ' + (e.imgCredit || 'images-of-elements.com')))),
@@ -40,8 +148,8 @@
           h('div', { className: 'jx-row' },
             h('button', { type: 'button', className: 'secondary', disabled: e.number <= 1, onClick: function () { props.onGo(e.number - 1); } }, '← ' + (props.prev || 'Previous')),
             h('button', { type: 'button', className: 'secondary', disabled: e.number >= 118, onClick: function () { props.onGo(e.number + 1); } }, (props.next || 'Next') + ' →'),
-            e.source && h('a', { className: 'secondary', href: e.source, target: '_blank', rel: 'noopener noreferrer' }, 'Read more on Wikipedia')),
-          h('p', { className: 'small-note' }, 'Summary text from Wikipedia via Periodic-Table-JSON (CC BY-SA 3.0).'))));
+            null),
+          h('p', { className: 'small-note' }, 'Notes written by The James NZ. Element data from Periodic-Table-JSON (CC BY-SA 3.0); sample photos from images-of-elements.com.'))));
   }
 
   function PeriodicTable() {
@@ -120,12 +228,12 @@
   ];
   JNZX.register('x:science', function SciencePage(props) {
     return h('div', null,
-      JNZX.Header('LEARNING · SCIENCE', 'The periodic table, explored.', 'All 118 elements in an interactive table. Tap an element to learn about it, colour the table by category, state or electronegativity, and test yourself with the element quiz.'),
+      JNZX.Header('LEARNING · SCIENCE', 'Science: elements and chemistry.', 'All 118 elements in an interactive table, plus chemistry tools — balance equations, work out molar masses, moles, concentrations and gas laws, with a calculator and step-by-step guides. Tap an element to learn about it, colour the table by category, state or electronegativity, and test yourself with the element quiz.'),
       h(JNZX.Tabs, { id: 'science', label: 'Science', items: [
         { id: 'table', label: '⚛️ Periodic table', render: function () { return h(PeriodicTable); } },
         { id: 'basics', label: 'How the table works', render: function () { return h(JNZX.Accordion, { openFirst: true, items: SCI_BASICS.map(function (b) { return { title: b[0], body: function () { return h('ul', null, b[1].map(function (x, i) { return h('li', { key: i }, x); })); } }; }) }); } },
         { id: 'quiz', label: 'Element quiz', render: function () { return h(ElementQuiz); } }
-      ] }),
+      ].concat(JNZX.chemTabs || []) }),
       h(JNZX.ShareBar, { tab: props.tab }));
   });
 

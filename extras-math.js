@@ -629,4 +629,5 @@
       ] }),
       h(JNZX.ShareBar, { tab: props.tab }));
   });
+  JNZX.SciCalc = SciCalc;
 })();

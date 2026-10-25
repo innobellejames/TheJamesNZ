@@ -91,13 +91,21 @@
       keep('NZ quiz', 'How Kiwi Are You?'),
       keep('NZ safety & know-how', 'Safety & Know-how')
     ] },
-    { title: 'Family Together', blurb: 'Stories, home life, cooking, money, projects and celebrations to share as a family.', image: './story-pages/story-02-middle.webp', items: [
+    { title: 'Family Together', blurb: 'Stories, home life, food and money, growing families, love and connection, projects and celebrations.', image: './story-pages/story-02-middle.webp', items: [
       overview('Family Together'),
       keep('Reading nook', 'The Story Nook', 'Read & grow'),
       keep('Family tips', 'Family Life, Made Easier', 'Run the home'),
-      keep('Homemade recipes', 'From Our Kitchen'),
+      keep('Family checklists', 'Family Checklists'),
+      keep('Homemade recipes', 'From Our Kitchen', 'Food & money'),
       keep('Grocery list', 'Shopping Made Simple'),
       keep('Budget tracker', 'My Money Plan'),
+      keep('Pregnancy & baby age', 'Bump & Baby Milestones', 'Growing families'),
+      keep('Pregnancy quotes & tips', 'Growing a Little Life'),
+      keep('Parenting quotes & tips', 'Parenting with Heart'),
+      keep('Breastfeeding quotes & tips', 'Feeding with Love'),
+      keep('Partnership quotes & tips', 'Together Time', 'Love & connection'),
+      keep('Husband & wife quotes & tips', 'Love Notes & Little Kindnesses'),
+      keep('Parent–child & child–parent', 'Our Memory Jar'),
       add('x:diy', 'DIY Home Projects', Icons.hammer, 'Make & do'),
       add('x:holidays', 'School Holiday Fun', Icons.puzzle),
       add('x:celebrations', 'Christmas, Easter & Matariki', Icons.star, 'Celebrate together'),
@@ -131,19 +139,11 @@
       add('x:faith-formation', 'Faith Formation Library', Icons.library),
       add('x:bible-dictionary', 'Bible Dictionary', Icons.scroll)
     ] },
-    { title: 'Modern & Lifestyle', blurb: 'Creative tools, digital skills and life-stage guides for modern family life.', image: './photo-share/inspiration.webp', items: [
+    { title: 'Modern & Lifestyle', blurb: 'Creative tools, digital skills and smart money ideas for modern life.', image: './photo-share/inspiration.webp', items: [
       overview('Modern & Lifestyle'),
       add('x:design', 'Design Studio', Icons.palette, 'Create & work smarter'),
       add('x:shortcuts', 'Office Shortcuts', Icons.keyboard),
-      keep('Saving tips', 'Smart Little Savings', 'Life & home'),
-      keep('Family checklists', 'Family Checklists'),
-      keep('Pregnancy & baby age', 'Bump & Baby Milestones', 'Growing families'),
-      keep('Pregnancy quotes & tips', 'Growing a Little Life'),
-      keep('Parenting quotes & tips', 'Parenting with Heart'),
-      keep('Breastfeeding quotes & tips', 'Feeding with Love'),
-      keep('Partnership quotes & tips', 'Together Time', 'Love & connection'),
-      keep('Husband & wife quotes & tips', 'Love Notes & Little Kindnesses'),
-      keep('Parent–child & child–parent', 'Our Memory Jar')
+      keep('Saving tips', 'Smart Little Savings', 'Money & lifestyle')
     ] },
     { title: 'Community', blurb: 'Our story, local makers, website help and greener living.', image: './oct13/about-storybook-texture.png', items: [
       overview('Community'),
