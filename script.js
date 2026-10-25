@@ -27527,13 +27527,7 @@ function SiteNavigation({ tab, onNavigate }) {
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "header-shortcuts",
-					children: [jH("button",{onClick:()=>go("How to use this website")},"Website guide"),/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-						onClick: () => go("Reading nook"),
-						children: "Reading nook"
-					}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-						onClick: () => go("Mateo · AI friend"),
-						children: "Meet Mateo"
-					})]
+					children: [jH("button",{type:"button",className:"jx-hdr-mateo",onClick:()=>go("Mateo · AI friend")},"Ask Mateo"),jH("button",{type:"button",onClick:()=>go("How to use this website")},"Website guide")]
 				}),
 				jH(PageShare),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Sheet, {
@@ -43274,7 +43268,7 @@ function Home({ canEdit }) {
 								kind: "review",
 								canEdit
 							}),
-							/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("footer", {
+							window.JNZX && JNZX.pageEnd ? JNZX.pageEnd(tab, navigate) : null, /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("footer", {
 								className: "page-footer",
 								children: [/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("span", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Sun, { size: 16 }), "The James NZ"] }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("span", { children: "© The James NZ 2026. All rights reserved." })]
 							})

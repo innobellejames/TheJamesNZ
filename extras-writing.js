@@ -269,8 +269,33 @@
   }
 
   JNZX.WritingCheck = WritingCheck;
+  /* One Ask Mateo box: a "Writing helper" chip sits with the quick prompts and
+     opens the checker inside the same chat card. */
+  function MateoWritingDock() {
+    var hosts = useState(null), hs = hosts[0], setHs = hosts[1];
+    var o = useState(function () { try { return sessionStorage.getItem('jnzx-mateo-writing') === '1'; } catch (e) { return false; } }), open = o[0], setOpen = o[1];
+    R.useEffect(function () {
+      var chip, panel, stop = false;
+      function attach() {
+        if (stop) return;
+        var room = document.querySelector('section.m-chat'), prompts = room && room.querySelector('.m-chat-prompts');
+        if (!prompts) return;
+        if (!chip || !chip.isConnected) { chip = document.createElement('span'); chip.className = 'jx-mateo-chip-host'; prompts.insertBefore(chip, prompts.firstChild); }
+        if (!panel || !panel.isConnected) { panel = document.createElement('div'); panel.className = 'jx-mateo-writing-host'; prompts.parentNode.insertBefore(panel, prompts); }
+        setHs(function (cur) { return cur && cur.chip === chip && cur.panel === panel ? cur : { chip: chip, panel: panel }; });
+      }
+      attach();
+      var mo = new MutationObserver(attach); mo.observe(document.getElementById('root'), { childList: true, subtree: true });
+      return function () { stop = true; mo.disconnect(); if (chip) chip.remove(); if (panel) panel.remove(); };
+    }, []);
+    function toggle() { var v = !open; setOpen(v); try { sessionStorage.setItem('jnzx-mateo-writing', v ? '1' : '0'); } catch (e) {} }
+    if (!hs) return h(WritingCheck);
+    return h(R.Fragment, null,
+      import_react_dom.createPortal(h('button', { type: 'button', className: 'jx-mateo-chip' + (open ? ' is-on' : ''), 'aria-expanded': open, onClick: toggle }, '✍️ Writing helper'), hs.chip),
+      open && import_react_dom.createPortal(h('div', { className: 'jx-mateo-writing' }, h('button', { type: 'button', className: 'jx-x jx-mateo-close', 'aria-label': 'Close writing helper', onClick: toggle }, '×'), h(WritingCheck)), hs.panel));
+  }
   var prevFriend = AIFriend;
   AIFriend = function MateoWithWriting(props) {
-    return h(R.Fragment, null, h(prevFriend, props), h(WritingCheck));
+    return h(R.Fragment, null, h(prevFriend, props), h(MateoWritingDock));
   };
 })();

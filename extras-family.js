@@ -139,7 +139,8 @@
               h('div', null, h('h3', null, 'Materials'), list(d[7]))),
             h('h3', null, 'Steps'), list(d[8], true),
             h('div', { className: 'jx-note warn' }, h('strong', null, 'Safety & rules: '), d[9]),
-            h('p', null, h('strong', null, 'Family helpers: '), d[10]));
+            h('p', null, h('strong', null, 'Family helpers: '), d[10]),
+            h(JNZX.ShareMini, { title: d[1], text: d[1] + ' (' + d[3] + ', ' + d[4] + ')\nTools: ' + d[6].join(', ') + '\nMaterials: ' + d[7].join(', ') + '\n' + d[8].map(function (x, i) { return (i + 1) + '. ' + x; }).join('\n') + '\nSafety: ' + d[9] }));
         } };
       }) }),
       h('p', { className: 'small-note' }, 'Cost guide: $ under about $50, $$ about $50–$300. Prices vary by store and season. These are general guides, not professional advice; follow product instructions.'),
@@ -218,7 +219,7 @@
           h('p', null, h('strong', null, 'You need: '), x[5]),
           h('p', null, x[6]),
           h('p', { className: 'small-note' }, '💡 ' + x[7]),
-          h('button', { type: 'button', className: on ? 'primary' : 'secondary', 'aria-pressed': on, onClick: function () { toggle(x[0]); } }, on ? '✓ In our plan' : '+ Add to our plan'));
+          h('div', { className: 'jx-row' }, h('button', { type: 'button', className: on ? 'primary' : 'secondary', 'aria-pressed': on, onClick: function () { toggle(x[0]); } }, on ? '✓ In our plan' : '+ Add to our plan'), h(JNZX.ShareMini, { title: x[0], text: x[0] + ' (ages ' + x[2] + ', ' + x[3] + ')\nYou need: ' + x[5] + '\n' + x[6] + '\nTip: ' + x[7] })));
       })),
       h('div', { className: 'jx-note' }, h('strong', null, 'Holiday tips: '), 'Plan one “big” activity a day and leave space for boredom — it sparks creativity. Many councils and libraries run free or low-cost school holiday programmes; check your local library or council website.'),
       h(JNZX.ShareBar, { tab: props.tab, printable: true }));
@@ -242,9 +243,35 @@
     ];
     if (MATARIKI[y]) out.push(['Matariki public holiday', new Date(y, MATARIKI[y][0], MATARIKI[y][1])]);
     out.push(['First Sunday of Advent', advent(y)], ['Christmas Day', new Date(y, 11, 25)]);
+    NZEVENTS.forEach(function (ev) { var d = ev[1] && ev[1](y); if (d) out.push([ev[0], d]); });
     return out.sort(function (a, b) { return a[1] - b[1]; });
   }
 
+  function nthDow(y, m, dow, n) { var d = new Date(y, m, 1); while (d.getDay() !== dow) d = addDays(d, 1); return addDays(d, 7 * (n - 1)); }
+  function lastDow(y, m, dow) { var d = new Date(y, m + 1, 0); while (d.getDay() !== dow) d = addDays(d, -1); return d; }
+  var LUNAR = { 2026: [1, 17], 2027: [1, 6], 2028: [0, 26], 2029: [1, 13], 2030: [1, 3] };
+  // [name, function(y) -> Date | null, when (text), about, family idea]
+  var NZEVENTS = [
+    ['Waitangi Day', function (y) { return new Date(y, 1, 6); }, '6 February', 'Marks the signing of Te Tiriti o Waitangi (the Treaty of Waitangi) in 1840 — New Zealand’s founding document.', 'Visit a local Waitangi Day event or read a children’s book about Te Tiriti together and talk about partnership and promises.'],
+    ['Lunar New Year', function (y) { return LUNAR[y] ? new Date(y, LUNAR[y][0], LUNAR[y][1]) : null; }, 'January or February', 'Celebrated by Chinese, Korean, Vietnamese and other communities with lantern festivals, family meals and red envelopes.', 'Go to a lantern festival (Auckland and Christchurch hold big ones), make paper lanterns or try making dumplings.'],
+    ['Daylight saving ends', function (y) { return nthDow(y, 3, 0, 1); }, 'First Sunday in April', 'Clocks go back one hour at 3 am.', 'Check smoke alarms and emergency kits on the same day each year.'],
+    ['Anzac Day', function (y) { return new Date(y, 3, 25); }, '25 April', 'Remembers New Zealanders and Australians who served and died in war, beginning with the Gallipoli landings in 1915.', 'Go to a dawn service or a local wreath-laying, make paper poppies and bake Anzac biscuits.'],
+    ['Mother’s Day', function (y) { return nthDow(y, 4, 0, 2); }, 'Second Sunday in May', 'A day to thank mothers, grandmothers and the women who care for us.', 'Make breakfast, write a card or plant something together.'],
+    ['NZ Sign Language Week', null, 'May (usually early May)', 'Celebrates NZSL, one of our official languages, and the Deaf community.', 'Learn ten signs together — see Learning › Speech › NZ Sign Language.'],
+    ['Pink Shirt Day', null, 'May', 'Speaks up against bullying and celebrates diversity and inclusion.', 'Wear pink and talk with children about being an upstander.'],
+    ['King’s Birthday', function (y) { return nthDow(y, 5, 1, 1); }, 'First Monday in June', 'A public holiday marking the Sovereign’s official birthday.', 'Enjoy a long-weekend winter walk or a family movie afternoon.'],
+    ['Arbor Day', function (y) { return new Date(y, 5, 5); }, '5 June', 'A day for planting trees and caring for the environment.', 'Plant a native tree or join a community planting day.'],
+    ['Pacific language weeks', null, 'May to October', 'Weeks celebrating Samoan, Cook Islands Māori, Tongan, Tuvaluan, Fijian, Niuean, Tokelauan and other Pacific languages.', 'Learn a greeting in a Pacific language each week — try Hello, World! in Learning.'],
+    ['Father’s Day', function (y) { return nthDow(y, 8, 0, 1); }, 'First Sunday in September', 'A day to thank fathers, grandfathers and the men who care for us.', 'Make a “Dad’s day” coupon book or cook his favourite meal together.'],
+    ['Te Wiki o te Reo Māori', null, 'September (Māori Language Week)', 'A week celebrating te reo Māori, an official language of Aotearoa. It marks the 1972 Māori language petition.', 'Use one new kupu (word) a day at home, and learn a mihi or waiata as a family.'],
+    ['Suffrage Day', function (y) { return new Date(y, 8, 19); }, '19 September', 'In 1893 New Zealand became the first self-governing country in the world where women won the right to vote.', 'Talk about Kate Sheppard and why voting matters; find her on the $10 note.'],
+    ['Daylight saving starts', function (y) { return lastDow(y, 8, 0); }, 'Last Sunday in September', 'Clocks go forward one hour at 2 am.', 'Plan an evening walk to enjoy the longer light.'],
+    ['Labour Day', function (y) { return nthDow(y, 9, 1, 4); }, 'Fourth Monday in October', 'Celebrates the eight-hour working day, won by New Zealand workers in the 1840s.', 'A traditional weekend for planting the vegetable garden — sow tomatoes and beans together.'],
+    ['Diwali', null, 'October or November', 'The Hindu, Sikh and Jain festival of lights, celebrated with lamps, sweets and fireworks.', 'Visit a Diwali festival, make clay diya lamps or rangoli patterns with coloured rice.'],
+    ['Guy Fawkes and Parihaka Day', function (y) { return new Date(y, 10, 5); }, '5 November', 'Fireworks night, and also the day Parihaka in Taranaki is remembered for its peaceful resistance led by Te Whiti o Rongomai and Tohu Kākahi in 1881.', 'Watch a public fireworks display safely, and learn the story of Parihaka and its white feather symbol of peace.'],
+    ['New Year’s Eve', function (y) { return new Date(y, 11, 31); }, '31 December', 'The end of the year, often with summer barbecues and fireworks.', 'Write family hopes for the new year and open last year’s.']
+  ];
+  JNZX.nzEvents = NZEVENTS;
   var FEASTS = {
     christmas: { title: 'Advent & Christmas', kicker: 'PREPARE AND REJOICE', intro: 'Advent is the four weeks of joyful waiting before Christmas, when the Church prepares to celebrate the birth of Jesus and looks forward to his coming again. Christmas is a season, not just a day: it runs from Christmas Eve to the Baptism of the Lord in January. In Aotearoa it falls in summer, so many traditions happen outdoors.',
       meaning: ['The Advent wreath has four candles — three purple and one rose (for the third Sunday, Gaudete, “rejoice”). Light one more each Sunday.', 'The colours: purple for preparation, white and gold at Christmas for joy and light.', 'The nativity scene (crib) recalls the humble birth of Jesus in Bethlehem. Many families add the figure of Jesus on Christmas Eve and the Magi on Epiphany.'],
@@ -275,7 +302,7 @@
         h('div', { className: 'jx-cards3' }, f.acts.map(function (a) { return h('article', { key: a[0], className: 'jx-card' }, h('h4', null, a[0]), h('p', { className: 'jx-muted' }, 'Ages: ' + a[1]), h('p', null, a[2])); })));
     }
     return h('div', null,
-      JNZX.Header('FAMILY TOGETHER · CELEBRATE TOGETHER', 'Christmas, Holy Week, Easter & Matariki.', 'The meaning behind each season, the dates for the year ahead and simple activities to share at home.'),
+      JNZX.Header('FAMILY TOGETHER · CELEBRATE TOGETHER', 'Christmas, Easter, Matariki & NZ days.', 'The meaning behind each season, important New Zealand days, the dates for the year ahead and simple activities to share at home.'),
       h('div', { className: 'jx-card' }, h('h2', null, 'Coming up'),
         h('ul', { className: 'jx-dates' }, items.map(function (x) { return h('li', { key: x[0] + x[1] }, h('strong', null, x[0]), h('span', null, fmt(x[1]))); })),
         h('p', { className: 'small-note' }, 'Church dates are calculated with the standard Easter formula used by the Catholic Church. Matariki dates are those set by the Government for the public holiday. Mass times vary — check with your parish.')),
@@ -284,7 +311,12 @@
         { id: 'lent', label: 'Lent', render: function () { return feast('lent'); } },
         { id: 'holyweek', label: '✝️ Holy Week', render: function () { return feast('holyweek'); } },
         { id: 'easter', label: '🥚 Easter', render: function () { return feast('easter'); } },
-        { id: 'matariki', label: '✨ Matariki', render: function () { return feast('matariki'); } }
+        { id: 'matariki', label: '✨ Matariki', render: function () { return feast('matariki'); } },
+        { id: 'nzdays', label: '🇳🇿 NZ days', render: function () { return h('div', { className: 'jx-feast' },
+          h('p', { className: 'eyebrow' }, 'IMPORTANT DAYS IN AOTEAROA'), h('h2', null, 'New Zealand days to mark together'),
+          h('p', null, 'National days, remembrance and the cultures that make up Aotearoa — with a simple family idea for each.'),
+          h('div', { className: 'jx-cards3' }, NZEVENTS.map(function (ev) { var d = ev[1] && ev[1](year); return h('article', { key: ev[0], className: 'jx-card' }, h('h4', null, ev[0]), h('p', { className: 'jx-muted' }, d ? fmt(d) : ev[2]), h('p', null, ev[3]), h('p', null, h('strong', null, 'Family idea: '), ev[4]), h(JNZX.ShareMini, { title: ev[0], text: ev[0] + ' — ' + ev[4] })); })),
+          h('p', { className: 'small-note' }, 'Events shown by month vary each year — check the organisers’ websites for exact dates. Lunar New Year dates are listed for 2026–2030.')); } }
       ] }),
       h(JNZX.ShareBar, { tab: props.tab, printable: true }));
   }

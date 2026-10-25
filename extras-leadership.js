@@ -120,45 +120,41 @@
 
   function wrapText(g, text, maxW) { var words = text.split(' '), lines = [], cur = ''; words.forEach(function (w) { var t = cur ? cur + ' ' + w : w; if (g.measureText(t).width > maxW && cur) { lines.push(cur); cur = w; } else cur = t; }); if (cur) lines.push(cur); return lines; }
   function drawRecord(canvas, rec) {
-    var W = 2339, H = 1654, S = W / 702; // scale from the 702-px reference layout
+    var W = 2339, H = 1654, S = W / 702; // A4 landscape, 702 x 496 reference layout
     canvas.width = W; canvas.height = H;
     var g = canvas.getContext('2d');
-    var ink = '#163a3a', teal = '#1b6b63', soft = '#4c5f63', line = '#c8d6d3', serif = 'Georgia, "Times New Roman", serif', sans = 'Arial, Helvetica, sans-serif';
-    g.fillStyle = '#fbfbf8'; g.fillRect(0, 0, W, H);
-    g.fillStyle = teal; g.fillRect(0, 0, W, 8 * S);
-    // logo
-    g.fillStyle = '#b42132'; g.fillRect(40 * S, 35 * S, 32 * S, 32 * S);
-    g.strokeStyle = '#fff'; g.lineWidth = 2.2 * S; g.beginPath(); g.arc(56 * S, 51 * S, 6 * S, 0, Math.PI * 2); g.stroke();
-    for (var k = 0; k < 8; k++) { var a = k * Math.PI / 4; g.beginPath(); g.moveTo(56 * S + Math.cos(a) * 9.5 * S, 51 * S + Math.sin(a) * 9.5 * S); g.lineTo(56 * S + Math.cos(a) * 12.5 * S, 51 * S + Math.sin(a) * 12.5 * S); g.stroke(); }
-    g.fillStyle = ink; g.font = 'bold ' + 15 * S + 'px ' + sans; g.fillText('The James NZ', 82 * S, 50 * S);
-    g.fillStyle = soft; g.font = 7.5 * S + 'px ' + sans; g.fillText('Faith · family · community · learning', 82 * S, 63 * S);
-    // watermark
-    g.save(); g.translate(330 * S, 230 * S); g.rotate(-0.36); g.fillStyle = 'rgba(27,107,99,0.07)'; g.font = 'bold ' + 40 * S + 'px ' + sans; g.textAlign = 'center'; g.fillText('THE JAMES NZ', 0, 0);
-    g.font = 8 * S + 'px ' + sans; g.fillText('SELF-ASSESSED · ' + rec.score + '/' + TOTAL + ' · ' + rec.dateShort + ' · ' + rec.ref.slice(0, 13), 0, 22 * S); g.restore();
-    g.fillStyle = ink; g.font = 23 * S + 'px ' + serif; g.fillText('Introductory Learning', 40 * S, 110 * S); g.fillText('Completion Record', 40 * S, 140 * S);
-    g.fillStyle = teal; g.font = 8.5 * S + 'px ' + sans; g.fillText('Self-assessed · Unproctored · Non-accredited', 40 * S, 164 * S);
-    function rule(y) { g.strokeStyle = line; g.lineWidth = 1 * S; g.beginPath(); g.moveTo(40 * S, y * S); g.lineTo(662 * S, y * S); g.stroke(); }
-    rule(181);
-    function label(t, x, y) { g.fillStyle = soft; g.font = 'bold ' + 5.6 * S + 'px ' + sans; g.fillText(t.toUpperCase(), x * S, y * S); }
-    label('Learner name supplied', 40, 201);
-    g.fillStyle = ink; var nameSize = 23; g.font = nameSize * S + 'px ' + sans; while (g.measureText(rec.name).width > 600 * S && nameSize > 12) { nameSize--; g.font = nameSize * S + 'px ' + sans; } g.fillText(rec.name, 40 * S, 233 * S);
-    label('Topic', 40, 258); g.fillStyle = ink; g.font = 13 * S + 'px ' + sans; g.fillText(TOPIC, 40 * S, 278 * S);
-    rule(292);
-    label('Assessment score', 40, 309); label('Quiz attempted', 358, 309);
-    g.fillStyle = teal; g.font = 'bold ' + 17 * S + 'px ' + sans; g.fillText(rec.score + ' / ' + TOTAL, 40 * S, 333 * S);
-    g.fillStyle = soft; g.font = 9 * S + 'px ' + sans; g.fillText('(' + rec.pct + '%)', 132 * S, 331 * S);
-    g.fillStyle = ink; g.font = 11.5 * S + 'px ' + sans; g.fillText(rec.dateLong, 358 * S, 325 * S);
-    g.fillStyle = soft; g.font = 7.5 * S + 'px ' + sans; g.fillText(rec.timeLong + ' · Pacific/Auckland', 358 * S, 340 * S);
-    g.fillStyle = ink; g.font = 7 * S + 'px ' + sans; g.fillText('Completion threshold: ' + PASS + '/' + TOTAL + ' is the minimum whole-number score meeting 85%.', 40 * S, 358 * S);
-    var disc = 'This records a browser-calculated introductory quiz result. Identity, supervision and workplace competence have not been verified. Not an NZQA-approved qualification or micro-credential, not listed on the NZQCF, carries no credits, and is not a professional accreditation. Not issued or endorsed by NZQA, the New Zealand Institute of Management & Leadership (NZIM) or any other training provider. A free learning resource from The James NZ.';
-    g.font = 7 * S + 'px ' + sans; var lines = wrapText(g, disc, 622 * S), y = 380;
-    lines.forEach(function (l) { g.fillText(l, 40 * S, y * S); y += 11; });
-    g.fillStyle = soft; g.font = 6.2 * S + 'px ' + sans;
-    g.fillText('Content version: ' + CONTENT_VERSION + ' · Browser-reported attempt time: ' + rec.iso, 40 * S, (y + 14) * S);
-    g.fillText('Local attempt reference: ' + rec.ref + ' · No public verification register · Name entered by the learner and kept on their device', 40 * S, (y + 25) * S);
-    rule(456);
-    g.fillStyle = teal; g.font = 'bold ' + 6.6 * S + 'px ' + sans; g.fillText('Issued by The James NZ', 40 * S, 469 * S);
-    g.textAlign = 'right'; g.font = 6.6 * S + 'px ' + sans; g.fillText('thejamesnz.com', 662 * S, 469 * S); g.textAlign = 'left';
+    var ink = '#1f2a33', teal = '#1b6b63', soft = '#5d6872', serif = 'Georgia, "Times New Roman", serif', sans = 'Arial, Helvetica, sans-serif';
+    function px(n) { return n * S; }
+    function text(t, x, y, font, color, align) { g.font = font; g.fillStyle = color; g.textAlign = align || 'center'; g.fillText(t, px(x), px(y)); }
+    function rrect(x, y, w, h, r) { g.beginPath(); g.moveTo(px(x + r), px(y)); g.arcTo(px(x + w), px(y), px(x + w), px(y + h), px(r)); g.arcTo(px(x + w), px(y + h), px(x), px(y + h), px(r)); g.arcTo(px(x), px(y + h), px(x), px(y), px(r)); g.arcTo(px(x), px(y), px(x + w), px(y), px(r)); g.closePath(); }
+    g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
+    // soft colour band and a single rounded frame
+    var gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, '#1b6b63'); gr.addColorStop(1, '#2f8f86');
+    g.fillStyle = gr; g.fillRect(0, 0, W, px(10));
+    g.strokeStyle = 'rgba(27,107,99,.35)'; g.lineWidth = px(1.2); rrect(22, 30, 658, 444, 14); g.stroke();
+    // brand
+    g.fillStyle = '#b42132'; g.beginPath(); g.arc(px(60), px(70), px(13), 0, Math.PI * 2); g.fill();
+    g.strokeStyle = '#fff'; g.lineWidth = px(1.5); g.beginPath(); g.arc(px(60), px(70), px(4.2), 0, Math.PI * 2); g.stroke();
+    for (var k = 0; k < 8; k++) { var a = k * Math.PI / 4; g.beginPath(); g.moveTo(px(60) + Math.cos(a) * px(6.5), px(70) + Math.sin(a) * px(6.5)); g.lineTo(px(60) + Math.cos(a) * px(9.3), px(70) + Math.sin(a) * px(9.3)); g.stroke(); }
+    text('The James NZ', 80, 68, 'bold ' + px(12) + 'px ' + sans, ink, 'left');
+    text('Learning · Leadership', 80, 82, px(7.5) + 'px ' + sans, soft, 'left');
+    // title
+    text('Certificate of Completion', 351, 150, px(31) + 'px ' + serif, ink);
+    text('Presented to', 351, 192, px(11) + 'px ' + sans, soft);
+    var size = 30; do { g.font = px(size) + 'px ' + serif; size -= 0.5; } while (g.measureText(rec.name).width > px(560) && size > 12);
+    g.fillStyle = teal; g.textAlign = 'center'; g.fillText(rec.name, px(351), px(236));
+    g.strokeStyle = 'rgba(27,107,99,.25)'; g.lineWidth = px(0.8); g.beginPath(); g.moveTo(px(201), px(250)); g.lineTo(px(501), px(250)); g.stroke();
+    text('for completing the online course', 351, 276, px(11) + 'px ' + sans, soft);
+    text(TOPIC, 351, 304, 'bold ' + px(16) + 'px ' + serif, ink);
+    text('Assessment score: ' + rec.score + ' / ' + TOTAL + ' (' + rec.pct + '%)', 351, 330, px(10) + 'px ' + sans, soft);
+    // details row
+    function detail(label, value, x) { text(label, x, 384, 'bold ' + px(6.5) + 'px ' + sans, soft); text(value, x, 401, px(11) + 'px ' + sans, ink); }
+    detail('DATE', rec.dateLong, 210);
+    detail('RECORD', rec.ref.slice(0, 8).toUpperCase() + '-' + rec.ref.slice(9, 13).toUpperCase(), 492);
+    // footer
+    text('Self-assessed, non-accredited course record. Not an NZQA qualification, not on the NZQCF and carries no credits. Not endorsed by NZQA or NZIM.', 351, 446, px(6.2) + 'px ' + sans, soft);
+    text('thejamesnz.com · name entered by the learner and kept on their device', 351, 458, px(6.2) + 'px ' + sans, soft);
+    g.textAlign = 'left';
   }
   function uuid() { try { return crypto.randomUUID(); } catch (e) { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }); } }
   function nzParts(d) {
@@ -181,9 +177,9 @@
     useEffect(function () { if (cv.current) drawRecord(cv.current, rec); }, [rec]);
     useEffect(function () { setRemembered(remember ? clean : ''); }, [remember, clean]);
     function blobOf(type, q) { return new Promise(function (res) { cv.current.toBlob(res, type, q); }); }
-    async function pdf() { var b = await blobOf('image/jpeg', 0.95); var bytes = new Uint8Array(await b.arrayBuffer()); download(pdfFromJpeg(bytes, cv.current.width, cv.current.height, { title: 'Introductory Learning Completion Record', author: 'The James NZ', subject: 'Self-assessed learning record: ' + TOPIC }), 'TheJamesNZ-Leadership-Record.pdf'); setMsg('PDF downloaded.'); }
-    async function png() { download(await blobOf('image/png'), 'TheJamesNZ-Leadership-Record.png'); setMsg('Picture downloaded.'); }
-    async function share() { var b = await blobOf('image/png'); var f = new File([b], 'TheJamesNZ-Leadership-Record.png', { type: 'image/png' }); if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: 'My learning record', text: 'I completed ' + TOPIC + ' on The James NZ.' }); return; } catch (e) { if (e.name === 'AbortError') return; } } download(b, f.name); setMsg('Sharing isn’t available here, so the picture was downloaded instead.'); }
+    async function pdf() { var b = await blobOf('image/jpeg', 0.95); var bytes = new Uint8Array(await b.arrayBuffer()); download(pdfFromJpeg(bytes, cv.current.width, cv.current.height, { title: 'Certificate of Completion (self-assessed, non-accredited)', author: 'The James NZ', subject: 'Self-assessed learning record: ' + TOPIC }), 'TheJamesNZ-Leadership-Certificate.pdf'); setMsg('PDF downloaded.'); }
+    async function png() { download(await blobOf('image/png'), 'TheJamesNZ-Leadership-Certificate.png'); setMsg('Picture downloaded.'); }
+    async function share() { var b = await blobOf('image/png'); var f = new File([b], 'TheJamesNZ-Leadership-Certificate.png', { type: 'image/png' }); if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f], title: 'My learning record', text: 'I completed ' + TOPIC + ' on The James NZ.' }); return; } catch (e) { if (e.name === 'AbortError') return; } } download(b, f.name); setMsg('Sharing isn’t available here, so the picture was downloaded instead.'); }
     return h('div', { className: 'jx-cert' },
       h('h3', null, '🎉 You passed with ' + att.score + ' / ' + TOTAL),
       h('p', null, 'Create your completion record (certificate). It is drawn on your own device.'),
