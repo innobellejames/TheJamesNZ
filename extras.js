@@ -126,6 +126,7 @@
       add('x:science', 'Science', Icons.flask, 'Subjects'),
       add('x:math', 'Math', Icons.calc),
       add('x:english', 'English', Icons.book),
+      add('x:exam', 'Exam English (IELTS · Cambridge · NZCEL)', Icons.award),
       add('x:leadership', 'Leadership', Icons.award),
       keep('Speaking practice', 'Speech'),
       add('x:speaking-time', 'Speaking Time Calculator', Icons.timer),
@@ -367,10 +368,15 @@
   /* Small share button for one item on a page (an activity, a project, a workout). */
   JNZX.ShareMini = function ShareMini(props) {
     var st = useState(''), msg = st[0], setMsg = st[1];
-    var url = props.url || JNZX.pageUrl(JNZX._tab || 'Home');
-    var text = (props.text || props.title) + '\n' + url;
-    async function go() {
-      if (navigator.share) { try { await navigator.share({ title: props.title + ' · The James NZ', text: props.text || props.title, url: url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    /* Share the post itself: its words plus a link that opens just this post. */
+    async function go(ev) {
+      var body = props.text || props.title;
+      var line = JNZX.catchyFor ? JNZX.catchyFor(ev && ev.currentTarget, props.title, body) : '';
+      if (line && body.indexOf(line) < 0) body += '\n\n' + line;
+      var url = props.url;
+      if (!url) { try { url = q7ShareURL({ title: props.title, text: body, credit: 'The James NZ' }); } catch (e) { url = JNZX.pageUrl(JNZX._tab || 'Home'); } }
+      var text = body + '\n\n' + url;
+      if (navigator.share) { try { await navigator.share({ title: props.title + ' · The James NZ', text: body + '\n', url: url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
       try { await navigator.clipboard.writeText(text); setMsg('Copied — paste it into a message.'); } catch (e) { setMsg('Copy this: ' + text); }
       setTimeout(function () { setMsg(''); }, 4000);
     }
@@ -501,6 +507,7 @@
     'x:science': [null, 'An interactive periodic table and science basics.'],
     'x:math': [null, 'Scientific and graphing calculators, simulations and trigonometry.'],
     'x:english': [null, 'A 128,000-word dictionary and Kiwi expressions.'],
+    'x:exam': [null, 'Writing and speaking practice for IELTS, Cambridge B2 First, C1 Advanced, C2 Proficiency and NZCEL, with instant feedback.'],
     'x:leadership': [null, 'A free course with a 30-question assessment and certificate.'],
     'Speaking practice': ['./mateo-smile-clean.webp', 'Tips, practice tools and quizzes for speaking with confidence.'],
     'x:speaking-time': [null, 'How long will your speech take? Find out and practise.'],

@@ -70,7 +70,12 @@
 
   var FAMILY = ['x:potty', 'Reading nook', 'Family tips', 'Family checklists', 'Homemade recipes', 'Grocery list', 'Budget tracker', 'Pregnancy & baby age', 'Pregnancy quotes & tips', 'Parenting quotes & tips', 'Breastfeeding quotes & tips', 'Partnership quotes & tips', 'Husband & wife quotes & tips', 'Parent–child & child–parent', 'x:diy', 'x:holidays', 'x:celebrations', 'x:book'];
   var SEL = 'main article, main .j-card, main .jx-card, main .jx-act, main .story-card, main .l-jar-result, main .jx-acc-item, main .jx-cards3 > *, main .checklist-panel li';
-  function inFamily() { return FAMILY.indexOf(JNZX._tab) >= 0; }
+  function inFamily(tab) {
+    tab = tab || JNZX._tab;
+    if (FAMILY.indexOf(tab) >= 0) return true;
+    try { var gi = JNZX.groupOf(tab); return gi >= 0 && JNZX.groupTab(gi) === 'group:Family Together' && tab.indexOf('group:') !== 0; } catch (e) { return false; }
+  }
+  JNZX.inFamily = inFamily;
   function scan() {
     if (!inFamily()) return;
     document.querySelectorAll(SEL).forEach(function (card) {
@@ -104,6 +109,56 @@
       if (el.getAttribute('data-for') !== title) { el.setAttribute('data-for', title); el.textContent = '✨ “' + lineFor(title, '') + '”'; }
     });
   }
+
+  /* ---------- the catchy line travels with every shared post ---------- */
+  function shownLine(el) {
+    for (var n = el; n && n.nodeType === 1 && n.tagName !== 'MAIN' && n !== document.body; n = n.parentElement) {
+      var c = n.querySelectorAll('.jx-catchy');
+      if (c.length === 1) return c[0].textContent.trim();
+      if (c.length > 1) return '';
+    }
+    return '';
+  }
+  JNZX.catchyFor = function (el, title, body) {
+    var shown = el ? shownLine(el) : '';
+    if (shown) return shown;
+    if (!inFamily()) return '';
+    return '✨ “' + lineFor(title, body) + '”';
+  };
+  try {
+    var BasePS = PhotoShare;
+    PhotoShare = function PhotoShareWithLine(props) {
+      var post = props && props.post || {};
+      var extra = import_react.useRef('');
+      var wrapped = import_react.useMemo(function () {
+        var p = {};
+        Object.keys(post).forEach(function (k) { if (k !== 'text') p[k] = post[k]; });
+        Object.defineProperty(p, 'text', { enumerable: true, get: function () { var t = post.text || ''; return extra.current && t.indexOf(extra.current) < 0 ? (t ? t + '\n\n' : '') + extra.current : t; } });
+        return p;
+      }, [post, post.title, post.text]);
+      function capture(e) {
+        if (e.target && e.target.closest && e.target.closest('.photo-share-trigger')) extra.current = JNZX.catchyFor(e.target, post.title, post.text) || '';
+        JNZX._sharePost = { post: wrapped, at: Date.now() };
+      }
+      return jH('span', { className: 'jx-ps-wrap', style: { display: 'contents' }, onPointerDownCapture: capture, onClickCapture: capture }, jH(BasePS, Object.assign({}, props, { post: wrapped })));
+    };
+    /* when a post picture is shared, send its words and its own link too */
+    var baseSend = sharePhotoFile;
+    sharePhotoFile = async function (file, title) {
+      var ctx = JNZX._sharePost, nav = navigator;
+      if (!ctx || Date.now() - ctx.at > 10 * 60 * 1000) return baseSend(file, title);
+      var p = ctx.post, url = '';
+      try { url = q7ShareURL(p); } catch (e) {}
+      var text = (p.title ? p.title + '\n' : '') + (p.text || '') + (url ? '\n\n' + url : '');
+      try { await nav.clipboard.writeText(text); } catch (e) {}
+      if (file && nav.share && nav.canShare && nav.canShare({ files: [file], text: text })) {
+        try { await nav.share({ files: [file], title: (p.title || 'The James NZ'), text: text }); return { kind: 'shared', message: 'Shared! The words and link were also copied.' }; }
+        catch (e) { if (e && e.name === 'AbortError') return { kind: 'cancelled', message: 'Sharing cancelled. Your picture is still ready.' }; }
+      }
+      return baseSend(file, title);
+    };
+  } catch (e) { console.warn('[JNZX] catchy share', e); }
+
   var t = null;
   function soon() { if (!t) t = setTimeout(function () { t = null; try { scan(); prompts(); } catch (e) {} }, 120); }
   function start() { new MutationObserver(soon).observe(document.getElementById('root') || document.body, { childList: true, subtree: true, characterData: true }); soon(); }

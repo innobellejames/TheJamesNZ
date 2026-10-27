@@ -78,6 +78,7 @@
     'x:science': ['night', 'night', '⚗️', ['⚛️', '🔬', '🧪'], 'Chemistry jokes? Only if I get a reaction.'],
     'x:math': ['desk', 'lilac', '➗', ['📐', '🧮', '📈'], 'Maths: the only place where 60 watermelons is normal.'],
     'x:english': ['room', 'cream', '📖', ['✏️', '🔤', '💬'], 'Words are free. Use them beautifully.'],
+    'x:exam': ['room', 'cream', '🎓', ['⏱️', '✍️', '🗣️'], 'Practise like it counts. Walk in like you belong.'],
     'x:leadership': ['mountains', 'sun', '🧭', ['🏆', '🤝', '⛰️'], 'Lead from the front, care from the heart.'],
     'Speaking practice': ['hills', 'dusk', '🎤', ['🗣️', '👏', '⏱️'], 'Nervous? That just means it matters.'],
     'x:speaking-time': ['desk', 'mint', '⏱️', ['🎤', '📝', '⌛'], 'Time flies when you’re talking.'],
