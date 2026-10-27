@@ -360,6 +360,41 @@
     [new RegExp('(^|[.!?;]\\s+|,\\s+)((?:Working|Living|Studying|Learning|Reading|Travelling|Traveling|Cooking|Exercising|Walking|Shopping|Eating|Using|Having|Being|Playing|Saving|Owning|Driving|Moving|Speaking|Writing|Volunteering)(?: (?:from|at|in|on|abroad|online|with|for)(?: [a-z]+){0,2})?) (save|help|make|give|cost|take|allow|mean|cause|improve|reduce|create|lead|keep|offer|provide|let|bring|become|seem|need|require|teach|give)\\b', 'gi'), function (m, pre, subj, v) { v = v.toLowerCase(); return VERB[v] ? pre + subj + ' ' + VERB[v][0] : m; }, 'An -ing subject is singular: “Working from home saves…”'],
     [/\b(miss|love|see|visit|call|with|and|of|to|for|help|ask|meet|like|about) there (colleagues|friends|family|families|children|kids|parents|house|home|car|cars|money|jobs?|teachers?|boss|partners?|work|lives|life|own|time|homes|neighbours|culture|language|country)\b/gi, function (m, a, n) { return a + ' their ' + n; }, '“their” = belonging to them'],
   ]);
+
+  /* ---------- punctuation ---------- */
+  var INTRO = 'However|Therefore|Firstly|Secondly|Thirdly|Finally|Lastly|In addition|Furthermore|Moreover|For example|For instance|In conclusion|To sum up|On the other hand|Unfortunately|Fortunately|Luckily|Sadly|Meanwhile|Overall|Of course|In fact|As a result|Nevertheless|Consequently|Additionally|Besides|Otherwise|Honestly|Personally|In my opinion|In my view|First of all|After that|Also|Then again|On balance|Instead|Surprisingly|Hopefully|Basically|Anyway|By the way|Please note|(?:Well|Yes|No|Sorry|Okay|OK|Oh)(?= (?:I|I’m|we|you|he|she|it|they|that|this|there|thanks|thank|please|of course)\\b)';
+  var PUNCT = [
+    [new RegExp('(^|[.!?]\\s+|\\n)(' + INTRO + ') (?=[A-Za-z])', 'g'), function (m, pre, w) { return pre + w + ', '; }, 'Add a comma after an opening word or phrase'],
+    [/(^|\n)(Hi|Hello|Hey|Kia ora|Dear|Good morning|Good afternoon|Good evening|Morning) ([A-Z][a-z]+(?: [A-Z][a-z]+)?) (?=(how|I|I’m|we|thank|thanks|hope|just|it|this|i)\b)/g, function (m, pre, g, n) { return pre + g + ' ' + n + ', '; }, 'Add a comma after the greeting'],
+    [/(^|\n)(Dear|Hi|Hello|Kia ora) ([A-Z][a-z]+(?: [A-Z][a-z]+)?)[ \t]*(?=\n)/g, function (m, pre, g, n) { return pre + g + ' ' + n + ','; }, 'Add a comma after the greeting'],
+    [/(^|\n)(Kind regards|Best regards|Warm regards|Best wishes|Regards|Yours sincerely|Yours faithfully|Many thanks|Thanks again|Cheers|Ngā mihi|Nga mihi|Love|Take care)[ \t]+(?=[A-Z][a-z]+\s*$)/gm, function (m, pre, w) { return pre + w + ',\n'; }, 'Put a comma after the sign-off and your name on the next line'],
+    [/(^|\n)(Kind regards|Best regards|Warm regards|Best wishes|Regards|Yours sincerely|Yours faithfully|Many thanks|Ngā mihi|Nga mihi)[ \t]*(?=\n)/g, function (m, pre, w) { return pre + w + ','; }, 'Add a comma after the sign-off'],
+    [/([a-z]) (but|so|yet) (I|we|he|she|they|it|you|my \w+|the \w+|there) (?=\w)/g, function (m, a, c, s2) { return a + ', ' + c + ' ' + s2 + ' '; }, 'Add a comma before “but/so” joining two sentences'],
+    [/\b(home|today|yesterday|tonight|now|later|there|here|again|too|late|early|soon|tired|happy|sad|busy|done|finished|okay|fine|great|outside|inside|work|school|cold|hot|warm|wet|sunny|raining|well|morning|afternoon|evening|night|week|weekend|year|month|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|January|February|March|April|June|July|August|September|October|November|December) (i|I|we|they|he|she|it|my \w+|it’s|it's|it is|there’s|there is|that’s|that is|this is) ((?:am|was|were|is|are|have|had|will|went|think|thought|feel|felt|got|need|want|can|could|did|do|love|like|hope|wish|always|never|really|so|very|a|an|the|not|too|still|just|free|busy|ready|here|there|going|coming)\b)/g, function (m, a, s2, v, off, all) {
+      var before = all.slice(0, off).split(/[.!?\n]/).pop();
+      var hasVerb = before.split(/[^A-Za-z’']+/).some(function (t) { var l = t.toLowerCase(); return l && (FORM[l] || /^(am|is|are|was|were|be|been|can|could|will|would|should|must|let’s|it’s|that’s)$/.test(l)); });
+      if (!hasVerb) return m;
+      var S = s2 === 'i' ? 'I' : s2.charAt(0).toUpperCase() + s2.slice(1); return a + '. ' + S + ' ' + v; }, 'Two sentences: add a full stop'],
+    [/([a-z]) (isn’t|isn't|aren’t|aren't|don’t|don't|doesn’t|doesn't|won’t|won't|wasn’t|wasn't|didn’t|didn't) (it|he|she|they|you|we|there)\s*[.]?\s*$/gim, function (m, a, t, p2) { return a + ', ' + t + ' ' + p2 + '?'; }, 'A tag question ends with “?”'],
+    [/,\s*(isn’t|isn't|aren’t|aren't|don’t|don't|doesn’t|doesn't|won’t|won't|can’t|can't|didn’t|didn't|wasn’t|wasn't|right|okay|eh) ?(it|he|she|they|you|we|I|there)?\s*\./gi, function (m, t, p2) { return ', ' + t + (p2 ? ' ' + p2 : '') + '?'; }, 'A tag question ends with “?”'],
+    [/\b(my|your|his|her|our|their|the|a) (mum|dad|mom|mother|father|sister|brother|friend|son|daughter|wife|husband|boss|teacher|neighbour|neighbor|baby|dog|cat|grandma|grandpa|nana|uncle|aunty|auntie|aunt|cousin|partner|child|girlfriend|boyfriend|colleague|manager)s (house|home|car|birthday|name|room|phone|job|school|party|wedding|bag|toys?|food|bed|work|place|family|friends?|kids|children|address|number|email|idea|advice|help|book|clothes|shoes|garden)\b/gi, function (m, d, n, o) { return d + ' ' + n + '’s ' + o; }, 'Use ’s to show belonging (my mum’s house)'],
+    [/\b(childrens|womens|mens|peoples) (book|books|clothes|toys?|day|room|shoes|rights|health|party|hospital|team|section)\b/gi, function (m, w, n) { return w.slice(0, -1) + '’s ' + n; }, 'Use ’s to show belonging (children’s books)'],
+    [/\b(lets) (go|start|eat|play|meet|see|try|talk|do|make|get|have|celebrate|pray|begin|be)\b/gi, function (m, l, v) { return keepCase(l, 'let’s') + ' ' + v; }, '“let’s” = let us'],
+    [/\b(theyre|youre|were’nt|wer’ent|shes|hes|whos|theres|heres|wheres|thats|whats|isnt|wasnt|weve|theyve|youve|youll|theyll|well(?= be\b)|Ill(?= be\b| go\b| call\b| see\b| send\b| do\b| try\b)|id(?= like\b| love\b| be\b)|Id(?= like\b| love\b| be\b))\b/g, function (m) { var x = m.toLowerCase(), map = { theyre: 'they’re', youre: 'you’re', shes: 'she’s', hes: 'he’s', whos: 'who’s', theres: 'there’s', heres: 'here’s', wheres: 'where’s', thats: 'that’s', whats: 'what’s', isnt: 'isn’t', wasnt: 'wasn’t', weve: 'we’ve', theyve: 'they’ve', youve: 'you’ve', youll: 'you’ll', theyll: 'they’ll', well: 'we’ll', ill: 'I’ll', id: 'I’d' }; var o = map[x] || m; return x === 'ill' || x === 'id' ? o : keepCase(m, o); }, 'Add the apostrophe'],
+    [/\b(how are you|how are you doing|how have you been|how was your (?:day|weekend|week|trip|holiday)|how is (?:everyone|the family|your family|work)|are you (?:well|okay|ok|free))\s*,\s*(?=[A-Za-z])/gi, function (m, q) { return q + '? '; }, 'A question ends with “?”'],
+    [/,{2,}/g, ',', 'One comma is enough'],
+    [/,\./g, '.', 'Remove the extra comma'],
+    [/(?<!\.)\.\.(?!\.)/g, '.', 'One full stop is enough'],
+    [/\.{4,}/g, '…', 'Use three dots for an ellipsis'],
+    [/([!?])\.(?=\s|$)/g, function (m, a) { return a; }, 'No full stop after ! or ?'],
+    [/\s+([’'](?:s|re|ve|ll|d|m|t))\b/g, function (m, a) { return a; }, 'No space before the apostrophe'],
+    [/\b(\w+) ,(\w)/g, function (m, a, b) { return a + ', ' + b; }, 'Comma goes straight after the word'],
+    [/\(\s+/g, '(', 'No space inside brackets'],
+    [/\s+\)/g, ')', 'No space inside brackets'],
+    [/"([^"\n]+)"/g, function (m, a) { return '“' + a + '”'; }, '']
+  ];
+  GRAM_PRE.push.apply(GRAM_PRE, PUNCT.filter(function (r) { return r[2]; }));
+
   var GRAM_POST = [
     [/\b(an|a) some\b/gi, 'some', 'Use “some”']
   ];
@@ -484,8 +519,8 @@
     // word choice
     [/\b(their|there) (going|coming|doing|not|always|never|very|so|really|here)\b/gi, function (m, a, b) { return keepCase(a, 'they’re') + ' ' + b; }, 'Did you mean “they’re”?'],
     [/\btheir (is|are|was|were)\b/gi, function (m, a) { return keepCase(m, 'there') + ' ' + a; }, 'Use “there is/are”'],
-    [/\byour (welcome|right|wrong|going|coming|doing|not|very|so|the best|amazing|late|early)\b/gi, function (m, a) { return keepCase(m, 'you’re') + ' ' + a; }, 'Did you mean “you’re”?'],
-    [/\bits (a|an|the|been|not|going|very|so|time|important|raining|hard|easy|ok|okay|fine)\b/gi, function (m, a) { return keepCase(m, 'it’s') + ' ' + a; }, 'Use “it’s” for “it is”'],
+    [/\byour (welcome|right|wrong|going|coming|doing|not|very|so|the best|amazing|late|early|well|okay|ok|sure|kidding|joking|kind|lucky|invited|always|never|too)\b/gi, function (m, a) { return keepCase(m, 'you’re') + ' ' + a; }, 'Did you mean “you’re”?'],
+    [/\bits (a|an|the|been|not|going|very|so|too|time|important|raining|snowing|hard|easy|ok|okay|fine|cold|hot|warm|sunny|windy|nice|great|late|early|true|my|your|our|their|his|her|always|never|really|quite|getting|about|all|just|only|still|almost|already|here|there|over|up|done|good|bad|lovely|beautiful|amazing|hard|difficult|possible|impossible|clear|obvious)\b/gi, function (m, a) { return keepCase(m, 'it’s') + ' ' + a; }, 'Use “it’s” for “it is”'],
     [/\b(more|less|better|worse|bigger|smaller|faster|slower|rather|other|older|younger|taller) then\b/gi, function (m, a) { return a + ' than'; }, 'Use “than” for comparisons'],
     [/\bloose (weight|track|touch|my|your|the game|it)\b/gi, function (m, a) { return keepCase(m, 'lose') + ' ' + a; }, '“lose”, not “loose”'],
     [/\bless (people|children|kids|cars|books|friends|mistakes|things)\b/gi, function (m, n) { return keepCase(m, 'fewer') + ' ' + n; }, 'Use “fewer” with countable nouns'],
@@ -621,6 +656,13 @@
 
   function grammarFix(text) {
     var cur = text.replace(/(\w)'(\w)/g, '$1’$2'), changes = [];
+    var pre0 = cur;
+    cur = cur.replace(/(^|[.!?]\s+|\n\s*)([a-z])/g, function (m, a, b) { return a + b.toUpperCase(); })
+      .replace(/\bi\b/g, 'I')
+      .replace(/(^|\n\s*)(Hi|Hello|Hey|Dear|Kia ora|Morning|Good morning|Good afternoon|Good evening) ([a-z])([a-z]+)\b/g, function (m, a, g, f, r) { return /^(everyone|all|there|team|guys|friends|sir|madam|whānau|whanau|both)$/.test(f + r) ? m : a + g + ' ' + f.toUpperCase() + r; })
+      .replace(/(^|\n\s*)(kind regards|best regards|warm regards|best wishes|regards|yours sincerely|yours faithfully|many thanks|cheers|ngā mihi|nga mihi|love|take care)\b/gi, function (m, a, w) { return a + w.charAt(0).toUpperCase() + w.slice(1); })
+      .replace(/(\n\s*)([a-z])([a-z]+)\s*$/g, function (m, a, f, r) { return a + f.toUpperCase() + r; });
+    if (pre0 !== cur) changes.push({ from: '', to: '', why: 'Capital letters at the start of sentences, for “I” and for names' });
     var ALLR = GRAM_PRE.concat(GRAM, GRAM_POST);
     for (var pass = 0; pass < 2; pass++) {
       ALLR.forEach(function (r) {
@@ -652,7 +694,16 @@
     t = t.replace(/\s+([,.;:!?])/g, '$1');
     // questions end with a question mark
     t = t.replace(/(^|[.!?]\s+|\n)((?:Can|Could|Would|Will|Do|Does|Did|Is|Are|Was|Were|What|Why|How|Where|When|Who|Which|Shall|Should|Have|Has|May)\b[^.!?\n]*)([.]|(?=\n)|$)/g, function (m, a, q, p) { if (/^How (lovely|nice|great|wonderful|kind|sweet|beautiful)\b/.test(q)) return m; return a + q.replace(/\s+$/, '') + '?'; });
-    if (t && !/[.!?…:"”)]$/.test(t) && !/\n/.test(t.slice(-40))) t += '.';
+    t = t.split('\n').map(function (line, i, all) {
+      var L = line.replace(/\s+$/, ''); if (!L.trim()) return L;
+      if (/[.!?…:;,"”)\]]$/.test(L)) return L;
+      var words = L.trim().split(/\s+/).length;
+      if (/^(Hi|Hello|Hey|Dear|Kia ora|To whom)/i.test(L.trim()) && words <= 5) return L + ',';
+      if (/^(Kind regards|Best regards|Warm regards|Best wishes|Regards|Yours sincerely|Yours faithfully|Many thanks|Cheers|Ngā mihi|Nga mihi|Love|Take care|Thanks|Thank you)$/i.test(L.trim())) return L + ',';
+      if (words < 3 || /^[-•*\d]/.test(L.trim()) || /^#/.test(L.trim())) return L;
+      if (/^(Can|Could|Would|Will|Do|Does|Did|Is|Are|Was|Were|What|Why|How|Where|When|Who|Which|Shall|Should|Have|Has|May)\b/.test(L.trim())) return L + '?';
+      return L + '.';
+    }).join('\n');
     return t;
   }
   function fixText(text, mode) {

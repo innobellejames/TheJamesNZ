@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   if (!window.JNZX) return;
-  var R = import_react, h = jH, useState = R.useState, useEffect = R.useEffect, useRef = R.useRef;
+  var R = import_react, h = jH, useState = R.useState, useEffect = R.useEffect, useRef = R.useRef, useMemo = R.useMemo;
 
   // [name, flag, city, lat, lon, IANA time zone]
   var PLACES = [
@@ -97,6 +97,91 @@
     ['Chile', '🇨🇱', 'Santiago', -33.45, -70.67, 'America/Santiago', 'Santiago', 'CLP', 'Chilean peso'],
     ['Argentina', '🇦🇷', 'Buenos Aires', -34.6, -58.38, 'America/Argentina/Buenos_Aires', 'Buenos Aires', 'ARS', 'Argentine peso'],
     ['Brazil', '🇧🇷', 'São Paulo', -23.55, -46.63, 'America/Sao_Paulo', 'Brasília', 'BRL', 'Brazilian real'],
+    ['India (Kerala)', '🇮🇳', 'Kochi', 9.93, 76.27, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Kerala capital: Thiruvananthapuram · backwaters, houseboats and tea hills'],
+    ['India (Thiruvananthapuram)', '🇮🇳', 'Thiruvananthapuram', 8.52, 76.94, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Kerala’s capital · Padmanabhaswamy Temple and Kovalam beach'],
+    ['India (Indore)', '🇮🇳', 'Indore', 22.72, 75.86, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Madhya Pradesh · street food at Sarafa Bazaar'],
+    ['India (Bhopal)', '🇮🇳', 'Bhopal', 23.26, 77.41, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Capital of Madhya Pradesh · the City of Lakes'],
+    ['India (Mumbai)', '🇮🇳', 'Mumbai', 19.08, 72.88, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Maharashtra · Gateway of India and Bollywood'],
+    ['India (Pune)', '🇮🇳', 'Pune', 18.52, 73.86, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Maharashtra · universities and hill forts'],
+    ['India (Goa)', '🇮🇳', 'Panaji', 15.49, 73.83, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Beaches and old Portuguese churches'],
+    ['India (Bengaluru)', '🇮🇳', 'Bengaluru', 12.97, 77.59, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Karnataka · India’s tech city'],
+    ['India (Chennai)', '🇮🇳', 'Chennai', 13.08, 80.27, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Tamil Nadu · Marina Beach and temples'],
+    ['India (Hyderabad)', '🇮🇳', 'Hyderabad', 17.39, 78.49, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Telangana · Charminar and biryani'],
+    ['India (Kolkata)', '🇮🇳', 'Kolkata', 22.57, 88.36, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'West Bengal · Victoria Memorial and Durga Puja'],
+    ['India (Darjeeling)', '🇮🇳', 'Darjeeling', 27.04, 88.27, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'West Bengal · tea gardens and Himalayan views'],
+    ['India (Ahmedabad)', '🇮🇳', 'Ahmedabad', 23.02, 72.57, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Gujarat · Sabarmati Ashram'],
+    ['India (Jaipur)', '🇮🇳', 'Jaipur', 26.91, 75.79, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Rajasthan · the Pink City'],
+    ['India (Agra)', '🇮🇳', 'Agra', 27.18, 78.02, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Uttar Pradesh · the Taj Mahal'],
+    ['India (Varanasi)', '🇮🇳', 'Varanasi', 25.32, 82.97, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Uttar Pradesh · ghats on the Ganges'],
+    ['India (Lucknow)', '🇮🇳', 'Lucknow', 26.85, 80.95, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Capital of Uttar Pradesh'],
+    ['India (Punjab)', '🇮🇳', 'Amritsar', 31.63, 74.87, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'The Golden Temple'],
+    ['India (Chandigarh)', '🇮🇳', 'Chandigarh', 30.73, 76.78, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Capital of Punjab and Haryana'],
+    ['India (Kashmir)', '🇮🇳', 'Srinagar', 34.08, 74.8, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Dal Lake and houseboats'],
+    ['India (Shimla)', '🇮🇳', 'Shimla', 31.1, 77.17, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Himachal Pradesh · hill station'],
+    ['India (Assam)', '🇮🇳', 'Guwahati', 26.14, 91.74, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Tea country on the Brahmaputra'],
+    ['India (Odisha)', '🇮🇳', 'Bhubaneswar', 20.3, 85.82, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Temple city · Konark Sun Temple nearby'],
+    ['India (Mysuru)', '🇮🇳', 'Mysuru', 12.3, 76.64, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Karnataka · Mysore Palace'],
+    ['India (Madurai)', '🇮🇳', 'Madurai', 9.93, 78.12, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee', 'Tamil Nadu · Meenakshi Temple'],
+    ['New Zealand (Auckland)', '🇳🇿', 'Auckland', -36.85, 174.76, 'Pacific/Auckland', 'Wellington', 'NZD', 'NZ dollar', 'The City of Sails'],
+    ['New Zealand (Queenstown)', '🇳🇿', 'Queenstown', -45.03, 168.66, 'Pacific/Auckland', 'Wellington', 'NZD', 'NZ dollar', 'Adventure capital'],
+    ['New Zealand (Chatham Islands)', '🇳🇿', 'Waitangi', -43.95, -176.56, 'Pacific/Chatham', 'Wellington', 'NZD', 'NZ dollar', '45 minutes ahead of the mainland'],
+    ['Australia (Melbourne)', '🇦🇺', 'Melbourne', -37.81, 144.96, 'Australia/Melbourne', 'Canberra', 'AUD', 'Australian dollar', 'Laneways, coffee and the MCG'],
+    ['Australia (Gold Coast)', '🇦🇺', 'Gold Coast', -28.02, 153.4, 'Australia/Brisbane', 'Canberra', 'AUD', 'Australian dollar', 'Theme parks and surf beaches'],
+    ['Australia (Darwin)', '🇦🇺', 'Darwin', -12.46, 130.84, 'Australia/Darwin', 'Canberra', 'AUD', 'Australian dollar', 'Gateway to Kakadu'],
+    ['Australia (Hobart)', '🇦🇺', 'Hobart', -42.88, 147.33, 'Australia/Hobart', 'Canberra', 'AUD', 'Australian dollar', 'Tasmania · MONA and Mt Wellington'],
+    ['Australia (Uluru)', '🇦🇺', 'Uluru', -25.34, 131.04, 'Australia/Darwin', 'Canberra', 'AUD', 'Australian dollar', 'The Red Centre'],
+    ['Philippines (Cebu)', '🇵🇭', 'Cebu City', 10.32, 123.89, 'Asia/Manila', 'Manila', 'PHP', 'Philippine peso', 'Santo Niño Basilica and island hopping'],
+    ['Philippines (Davao)', '🇵🇭', 'Davao City', 7.19, 125.46, 'Asia/Manila', 'Manila', 'PHP', 'Philippine peso', 'Mt Apo and durian'],
+    ['Philippines (Baguio)', '🇵🇭', 'Baguio', 16.4, 120.6, 'Asia/Manila', 'Manila', 'PHP', 'Philippine peso', 'Summer capital in the pines'],
+    ['Philippines (Boracay)', '🇵🇭', 'Boracay', 11.97, 121.92, 'Asia/Manila', 'Manila', 'PHP', 'Philippine peso', 'White Beach'],
+    ['Philippines (Palawan)', '🇵🇭', 'Puerto Princesa', 9.74, 118.74, 'Asia/Manila', 'Manila', 'PHP', 'Philippine peso', 'El Nido and the Underground River'],
+    ['Philippines (Iloilo)', '🇵🇭', 'Iloilo City', 10.72, 122.56, 'Asia/Manila', 'Manila', 'PHP', 'Philippine peso', 'Heritage churches and La Paz batchoy'],
+    ['Indonesia (Bali)', '🇮🇩', 'Denpasar', -8.65, 115.22, 'Asia/Makassar', 'Jakarta', 'IDR', 'Indonesian rupiah', 'Temples, rice terraces and surf'],
+    ['Thailand (Phuket)', '🇹🇭', 'Phuket', 7.88, 98.39, 'Asia/Bangkok', 'Bangkok', 'THB', 'Thai baht', 'Beaches and islands'],
+    ['Vietnam (Ho Chi Minh City)', '🇻🇳', 'Ho Chi Minh City', 10.82, 106.63, 'Asia/Ho_Chi_Minh', 'Hanoi', 'VND', 'Vietnamese đồng', 'Saigon street life'],
+    ['Malaysia (Penang)', '🇲🇾', 'George Town', 5.41, 100.33, 'Asia/Kuala_Lumpur', 'Kuala Lumpur', 'MYR', 'Malaysian ringgit', 'Street art and hawker food'],
+    ['Sri Lanka (Kandy)', '🇱🇰', 'Kandy', 7.29, 80.63, 'Asia/Colombo', 'Colombo', 'LKR', 'Sri Lankan rupee', 'Temple of the Tooth'],
+    ['Nepal (Pokhara)', '🇳🇵', 'Pokhara', 28.21, 83.99, 'Asia/Kathmandu', 'Kathmandu', 'NPR', 'Nepalese rupee', 'Gateway to the Annapurnas'],
+    ['China (Shanghai)', '🇨🇳', 'Shanghai', 31.23, 121.47, 'Asia/Shanghai', 'Beijing', 'CNY', 'Chinese yuan', 'The Bund'],
+    ['Japan (Osaka)', '🇯🇵', 'Osaka', 34.69, 135.5, 'Asia/Tokyo', 'Tokyo', 'JPY', 'Japanese yen', 'Street food capital'],
+    ['Japan (Kyoto)', '🇯🇵', 'Kyoto', 35.01, 135.77, 'Asia/Tokyo', 'Tokyo', 'JPY', 'Japanese yen', 'Temples and cherry blossoms'],
+    ['South Korea (Busan)', '🇰🇷', 'Busan', 35.18, 129.08, 'Asia/Seoul', 'Seoul', 'KRW', 'South Korean won', 'Beaches and seafood markets'],
+    ['UAE (Abu Dhabi)', '🇦🇪', 'Abu Dhabi', 24.45, 54.38, 'Asia/Dubai', 'Abu Dhabi', 'AED', 'UAE dirham', 'Sheikh Zayed Grand Mosque'],
+    ['Saudi Arabia (Mecca)', '🇸🇦', 'Mecca', 21.39, 39.86, 'Asia/Riyadh', 'Riyadh', 'SAR', 'Saudi riyal', 'The holiest city in Islam'],
+    ['Türkiye (Istanbul)', '🇹🇷', 'Istanbul', 41.01, 28.98, 'Europe/Istanbul', 'Ankara', 'TRY', 'Turkish lira', 'Hagia Sophia and the Bosphorus'],
+    ['Greece (Santorini)', '🇬🇷', 'Fira', 36.42, 25.43, 'Europe/Athens', 'Athens', 'EUR', 'Euro', 'White villages and sunsets'],
+    ['Italy (Venice)', '🇮🇹', 'Venice', 45.44, 12.32, 'Europe/Rome', 'Rome', 'EUR', 'Euro', 'Canals and gondolas'],
+    ['Italy (Florence)', '🇮🇹', 'Florence', 43.77, 11.26, 'Europe/Rome', 'Rome', 'EUR', 'Euro', 'Renaissance art'],
+    ['Italy (Milan)', '🇮🇹', 'Milan', 45.46, 9.19, 'Europe/Rome', 'Rome', 'EUR', 'Euro', 'Fashion and the Duomo'],
+    ['Italy (Assisi)', '🇮🇹', 'Assisi', 43.07, 12.62, 'Europe/Rome', 'Rome', 'EUR', 'Euro', 'Home of St Francis'],
+    ['France (Lourdes)', '🇫🇷', 'Lourdes', 43.09, -0.05, 'Europe/Paris', 'Paris', 'EUR', 'Euro', 'Marian shrine and grotto'],
+    ['France (Nice)', '🇫🇷', 'Nice', 43.7, 7.27, 'Europe/Paris', 'Paris', 'EUR', 'Euro', 'The French Riviera'],
+    ['Portugal (Fátima)', '🇵🇹', 'Fátima', 39.63, -8.67, 'Europe/Lisbon', 'Lisbon', 'EUR', 'Euro', 'Sanctuary of Our Lady of Fátima'],
+    ['Spain (Barcelona)', '🇪🇸', 'Barcelona', 41.39, 2.17, 'Europe/Madrid', 'Madrid', 'EUR', 'Euro', 'Sagrada Família'],
+    ['Spain (Santiago de Compostela)', '🇪🇸', 'Santiago de Compostela', 42.88, -8.54, 'Europe/Madrid', 'Madrid', 'EUR', 'Euro', 'End of the Camino pilgrimage'],
+    ['Germany (Munich)', '🇩🇪', 'Munich', 48.14, 11.58, 'Europe/Berlin', 'Berlin', 'EUR', 'Euro', 'Bavaria and the Alps'],
+    ['Switzerland (Zurich)', '🇨🇭', 'Zurich', 47.38, 8.54, 'Europe/Zurich', 'Bern', 'CHF', 'Swiss franc', 'Lakes and mountains'],
+    ['Austria', '🇦🇹', 'Vienna', 48.21, 16.37, 'Europe/Vienna', 'Vienna', 'EUR', 'Euro', 'Music and coffee houses'],
+    ['Czechia', '🇨🇿', 'Prague', 50.08, 14.44, 'Europe/Prague', 'Prague', 'CZK', 'Czech koruna', 'Charles Bridge'],
+    ['Hungary', '🇭🇺', 'Budapest', 47.5, 19.04, 'Europe/Budapest', 'Budapest', 'HUF', 'Hungarian forint', 'Thermal baths on the Danube'],
+    ['Denmark', '🇩🇰', 'Copenhagen', 55.68, 12.57, 'Europe/Copenhagen', 'Copenhagen', 'DKK', 'Danish krone', 'Nyhavn harbour'],
+    ['Belgium', '🇧🇪', 'Brussels', 50.85, 4.35, 'Europe/Brussels', 'Brussels', 'EUR', 'Euro', 'Chocolate and waffles'],
+    ['Croatia', '🇭🇷', 'Dubrovnik', 42.65, 18.09, 'Europe/Zagreb', 'Zagreb', 'EUR', 'Euro', 'Old town walls'],
+    ['United Kingdom (Edinburgh)', '🇬🇧', 'Edinburgh', 55.95, -3.19, 'Europe/London', 'London', 'GBP', 'Pound sterling', 'Scotland · castle and festivals'],
+    ['United Kingdom (Manchester)', '🇬🇧', 'Manchester', 53.48, -2.24, 'Europe/London', 'London', 'GBP', 'Pound sterling', 'Football and music'],
+    ['Egypt (Giza)', '🇪🇬', 'Giza', 29.98, 31.13, 'Africa/Cairo', 'Cairo', 'EGP', 'Egyptian pound', 'The Great Pyramids'],
+    ['Kenya (Mombasa)', '🇰🇪', 'Mombasa', -4.04, 39.67, 'Africa/Nairobi', 'Nairobi', 'KES', 'Kenyan shilling', 'Indian Ocean beaches'],
+    ['South Africa (Cape Town)', '🇿🇦', 'Cape Town', -33.92, 18.42, 'Africa/Johannesburg', 'Pretoria', 'ZAR', 'South African rand', 'Table Mountain'],
+    ['Canada (Montréal)', '🇨🇦', 'Montréal', 45.5, -73.57, 'America/Toronto', 'Ottawa', 'CAD', 'Canadian dollar', 'Old Montréal'],
+    ['Canada (Calgary)', '🇨🇦', 'Calgary', 51.05, -114.07, 'America/Edmonton', 'Ottawa', 'CAD', 'Canadian dollar', 'Gateway to Banff'],
+    ['USA (San Francisco)', '🇺🇸', 'San Francisco', 37.77, -122.42, 'America/Los_Angeles', 'Washington, D.C.', 'USD', 'US dollar', 'Golden Gate Bridge'],
+    ['USA (Las Vegas)', '🇺🇸', 'Las Vegas', 36.17, -115.14, 'America/Los_Angeles', 'Washington, D.C.', 'USD', 'US dollar', 'The Strip · Grand Canyon nearby'],
+    ['USA (Seattle)', '🇺🇸', 'Seattle', 47.61, -122.33, 'America/Los_Angeles', 'Washington, D.C.', 'USD', 'US dollar', 'Space Needle'],
+    ['USA (Orlando)', '🇺🇸', 'Orlando', 28.54, -81.38, 'America/New_York', 'Washington, D.C.', 'USD', 'US dollar', 'Theme parks'],
+    ['USA (Washington, D.C.)', '🇺🇸', 'Washington, D.C.', 38.91, -77.04, 'America/New_York', 'Washington, D.C.', 'USD', 'US dollar', 'The capital'],
+    ['Mexico (Cancún)', '🇲🇽', 'Cancún', 21.16, -86.85, 'America/Cancun', 'Mexico City', 'MXN', 'Mexican peso', 'Caribbean beaches and Mayan ruins'],
+    ['Peru (Machu Picchu)', '🇵🇪', 'Cusco', -13.53, -71.97, 'America/Lima', 'Lima', 'PEN', 'Peruvian sol', 'The Inca citadel'],
+    ['Brazil (Rio de Janeiro)', '🇧🇷', 'Rio de Janeiro', -22.91, -43.17, 'America/Sao_Paulo', 'Brasília', 'BRL', 'Brazilian real', 'Christ the Redeemer'],
     ['Antarctica (Scott Base)', '🇦🇶', 'Scott Base', -77.85, 166.76, 'Antarctica/McMurdo', '— (no capital)', 'NZD', 'NZ dollar (Scott Base)']
   ];
   // Simplified continents [lon, lat], drawn for the site
@@ -164,6 +249,7 @@
     UAH: 41.5, EUR: 0.897, CHF: 0.80, PLN: 3.8, SEK: 9.6, NOK: 10.2, GBP: 0.76, ISK: 125, EGP: 49, KES: 129, ETB: 140, NGN: 1550, GHS: 12, MAD: 9.1, ZAR: 18, MUR: 46, CAD: 1.38, MXN: 18.5, CUP: 24, JMD: 160,
     COP: 4100, PEN: 3.6, CLP: 950, ARS: 1300, BRL: 5.5 };
   var RATES = { src: 'approx', date: 'Oct 2026', perNZD: {} };
+  USD.CZK = USD.CZK || 23.2; USD.HUF = USD.HUF || 365; USD.DKK = USD.DKK || 6.9;
   Object.keys(USD).forEach(function (k) { RATES.perNZD[k] = USD[k] / USD.NZD; });
   var ratesTried = false, rateSubs = [];
   function loadRates() {
@@ -261,6 +347,18 @@
     try { var n = new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', timeZoneName: 'short' }).formatToParts(date).find(function (p) { return p.type === 'timeZoneName'; }); return n ? n.value : 'NZT'; } catch (e) { return 'NZT'; }
   }
 
+
+  /* ---------- grouping for the dropdowns ---------- */
+  function countryOf(p) { var n = p[0]; if (/^Hawaiʻi/.test(n)) return 'USA'; if (/^Antarctica/.test(n)) return 'Antarctica'; n = n.replace(/\s*\(.*\)$/, ''); return n === 'UAE' ? 'United Arab Emirates' : n; }
+  function regionOf(p) { var tz = p[5]; if (/^(Pacific|Australia)/.test(tz)) return 'Pacific & Australia'; if (/^Antarctica/.test(tz)) return 'Antarctica'; if (/^(Europe|Atlantic)/.test(tz)) return 'Europe'; if (/^(Africa|Indian)/.test(tz)) return 'Africa'; if (/^America/.test(tz)) return 'Americas'; if (/^Asia\/(Kolkata|Colombo|Kathmandu|Dhaka|Karachi|Kabul)/.test(tz)) return 'South Asia'; if (/^Asia\/(Tehran|Dubai|Qatar|Riyadh|Jerusalem|Beirut)/.test(tz)) return 'Middle East'; return 'East & South-East Asia'; }
+  function placeLabel(p) { var c = countryOf(p), m = p[0].match(/\((.*)\)$/); var sub = m && !/^Hawaiʻi|Antarctica/.test(p[0]) ? m[1] : p[2]; if (/^Hawaiʻi/.test(p[0])) sub = 'Hawaiʻi'; return sub === c ? sub : sub + (sub !== p[2] ? ' · ' + p[2] : ''); }
+  var REGIONS = ['Pacific & Australia', 'East & South-East Asia', 'South Asia', 'Middle East', 'Europe', 'Africa', 'Americas', 'Antarctica'];
+  var BYC = {}; PLACES.forEach(function (p, i) { var c = countryOf(p); (BYC[c] = BYC[c] || []).push(i); });
+  Object.keys(BYC).forEach(function (c) { BYC[c].sort(function (a, b) { var A = PLACES[a], B = PLACES[b]; var capA = A[2] === A[6] || !/\(/.test(A[0]) ? 0 : 1, capB = B[2] === B[6] || !/\(/.test(B[0]) ? 0 : 1; return capA - capB || placeLabel(A).localeCompare(placeLabel(B)); }); });
+  var QUICK = ['New Zealand', 'Australia (Sydney)', 'Philippines', 'India (Kerala)', 'United Kingdom', 'USA (Los Angeles)'];
+  function recentGet() { try { return JSON.parse(localStorage.getItem('jnzx-globe-recent')) || []; } catch (e) { return []; } }
+  function recentAdd(i) { try { var r = recentGet().filter(function (x) { return x !== PLACES[i][0]; }); r.unshift(PLACES[i][0]); localStorage.setItem('jnzx-globe-recent', JSON.stringify(r.slice(0, 4))); } catch (e) {} }
+
   function WorldGlobe(props) {
     var cvRef = useRef(null), dotsRef = useRef([]), viewRef = useRef({ lat: -15, lon: 150 }), drag = useRef(null), spin = useRef(true), frame = useRef(0);
     var st = useState(18), sel = st[0], setSel = st[1];
@@ -309,7 +407,6 @@
     }
     function choose(i) { setSel(i); if (cvRef.current && cvRef.current._goto) cvRef.current._goto(i); }
     var P = PLACES[sel], date = new Date(now), nz = show(date, 'Pacific/Auckland'), there = show(date, P[5]);
-    var list = PLACES.map(function (p, i) { return [p, i]; }).filter(function (x) { return !qq || (x[0][0] + ' ' + x[0][2]).toLowerCase().indexOf(qq.toLowerCase()) >= 0; });
     var shareText = P[1] + ' ' + P[0] + ' (' + P[2] + '; capital ' + P[6] + '): ' + there + '\n🇳🇿 ' + nzLabel(date) + ': ' + nz + '\nMoney: ' + P[8] + ' (' + P[7] + ')';
     return h('section', { className: 'jx-globe' + (props.compact ? ' is-compact' : '') },
       h('div', { className: 'jx-globe-head' }, h('h2', null, '🌏 World clock'), h('p', { className: 'jx-muted' }, 'Spin the globe and tap a dot: local time, NZ time, the capital and a money converter.')),
@@ -320,17 +417,51 @@
             h('button', { type: 'button', className: 'secondary', onClick: function () { spin.current = !spin.current; } }, '⟳ Spin'),
             h('button', { type: 'button', className: 'secondary', onClick: function () { choose(0); } }, '🇳🇿 Home'))),
         h('div', { className: 'jx-globe-info', 'aria-live': 'polite' },
+          h(Picker, { sel: sel, choose: choose }),
           h('div', { className: 'jx-globe-card is-there' }, h('small', null, P[1] + ' ' + P[0].toUpperCase()), h('strong', null, there), h('span', null, '🕰️ ' + P[2] + ' · 🏛️ Capital: ' + P[6])),
           h('div', { className: 'jx-globe-card is-nz' }, h('small', null, '🇳🇿 ' + nzLabel(date) + ' · NEW ZEALAND'), h('strong', null, nz), h('span', null, sel === 0 ? 'You’re home!' : diffText(date, P[5]))),
           h(CurrencyBox, { key: 'cur-' + sel, place: P }),
           h('div', { className: 'jx-row' }, h(JNZX.ShareMini, { title: 'Time in ' + P[0], text: shareText, label: 'Share these times' })),
-          h(JNZX.Search, { value: qq, onChange: setQ, placeholder: 'Find a country or city' }),
-          h('div', { className: 'jx-globe-list' }, list.map(function (x) {
-            return h('button', { key: x[1], type: 'button', className: 'jx-chip' + (x[1] === sel ? ' is-on' : ''), onClick: function () { choose(x[1]); } }, x[0][1] + ' ' + x[0][0]);
-          })))));
+          null)));
+  }
+  function Picker(props) {
+    var sel = props.sel, P = PLACES[sel], country = countryOf(P), sub = BYC[country] || [sel];
+    var q = useState(''), text = q[0], setText = q[1];
+    var labels = useMemo(function () { return PLACES.map(function (p) { var c = countryOf(p), l = placeLabel(p); return l === c ? c : c + ' — ' + l; }); }, []);
+    var recent = recentGet().map(function (n) { return PLACES.findIndex(function (p) { return p[0] === n; }); }).filter(function (i) { return i >= 0; });
+    var quick = recent.concat(QUICK.map(function (n) { return PLACES.findIndex(function (p) { return p[0] === n; }); })).filter(function (i, k, a) { return i >= 0 && a.indexOf(i) === k; }).slice(0, 6);
+    function pick(i) { if (i >= 0) { recentAdd(i); props.choose(i); } }
+    function typed(v) { setText(v); var k = labels.indexOf(v); if (k < 0) { var lv = v.trim().toLowerCase(); if (lv.length > 2) k = labels.findIndex(function (l) { return l.toLowerCase() === lv || l.toLowerCase().split(' — ').pop().split(' · ')[0] === lv; }); } if (k >= 0) { pick(k); setText(''); } }
+    var countries = {}; REGIONS.forEach(function (r) { countries[r] = []; });
+    Object.keys(BYC).forEach(function (c) { var r = regionOf(PLACES[BYC[c][0]]); (countries[r] = countries[r] || []).push(c); });
+    Object.keys(countries).forEach(function (r) { countries[r].sort(function (a, b) { return a === 'New Zealand' ? -1 : b === 'New Zealand' ? 1 : a.localeCompare(b); }); });
+    return h('div', { className: 'jx-gp' },
+      h('div', { className: 'jx-gp-quick', role: 'group', 'aria-label': 'Quick picks' }, quick.map(function (i) { var p = PLACES[i]; return h('button', { key: i, type: 'button', className: 'jx-gp-chip' + (i === sel ? ' is-on' : ''), onClick: function () { pick(i); } }, p[1] + ' ' + (/\(/.test(p[0]) ? placeLabel(p).split(' · ')[0] : countryOf(p))); })),
+      h('div', { className: 'jx-gp-row' },
+        h('label', { className: 'jx-gp-field' }, h('span', null, '🌍 Country'),
+          h('select', { value: country, onChange: function (e) { pick(BYC[e.target.value][0]); } },
+            REGIONS.filter(function (r) { return countries[r] && countries[r].length; }).map(function (r) { return h('optgroup', { key: r, label: r }, countries[r].map(function (c) { var f = PLACES[BYC[c][0]][1]; return h('option', { key: c, value: c }, f + ' ' + c + (BYC[c].length > 1 ? ' (' + BYC[c].length + ')' : '')); })); }))),
+        sub.length > 1 && h('label', { className: 'jx-gp-field' }, h('span', null, '📍 City or region'),
+          h('select', { value: sel, onChange: function (e) { pick(+e.target.value); } }, sub.map(function (i) { return h('option', { key: i, value: i }, placeLabel(PLACES[i]) + (PLACES[i][2] === PLACES[i][6] ? ' (capital)' : '')); })))),
+      h('label', { className: 'jx-gp-field jx-gp-search' }, h('span', null, '🔎 Or type a place'),
+        h('input', { type: 'search', list: 'jx-gp-list', value: text, placeholder: 'e.g. Kerala, Indore, Cebu, Paris', onChange: function (e) { typed(e.target.value); } }),
+        h('datalist', { id: 'jx-gp-list' }, labels.map(function (l, i) { return h('option', { key: i, value: l }); }))),
+      P[9] && h('p', { className: 'jx-gp-note' }, '✨ ' + P[9]),
+      h('p', { className: 'jx-muted jx-gp-count' }, PLACES.length + ' places in ' + Object.keys(BYC).length + ' countries and territories.'));
   }
   JNZX.WorldGlobe = WorldGlobe;
   JNZX.register('x:world-clock', function WorldClockPage(props) {
     return h('div', null, JNZX.Header('KIWI ADVENTURES · WORLD CLOCK', 'What time is it there?', 'Keep in touch with whānau and friends overseas — check their time before you call.'), h(WorldGlobe, {}), h(JNZX.ShareBar, { tab: props.tab }));
   });
+
+  (function () {
+    var css = '.jx-gp{display:grid;gap:12px;margin:0 0 12px;padding:14px;border-radius:16px;background:#f1f6f3;color:#1f2a2a;border:1px solid #dbe5df}' +
+      '.jx-gp-quick{display:flex;flex-wrap:wrap;gap:6px}.jx-gp-chip{border:1px solid #cfdad3;background:#fff;color:#1f2a2a;border-radius:999px;padding:7px 12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;min-height:38px}.jx-gp-chip.is-on{background:#1f4d3a;border-color:#1f4d3a;color:#fff}' +
+      '.jx-gp-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}.jx-gp-field{display:grid;gap:4px;font-weight:700;font-size:14px}' +
+      '.jx-gp-field select,.jx-gp-field input{font:inherit;font-size:16px;font-weight:500;padding:10px 12px;border-radius:12px;border:1px solid #c6d3cb;background:#fff;color:#1f2a2a;width:100%;box-sizing:border-box;min-height:46px}' +
+      '.jx-gp-note{margin:0;font-size:15px}.jx-gp-count{margin:0;font-size:13px}' +
+      'html[data-reading-theme="dark"] .jx-gp{background:#1b2524;color:#eef3f1;border-color:#33433f}html[data-reading-theme="dark"] .jx-gp-chip,html[data-reading-theme="dark"] .jx-gp-field select,html[data-reading-theme="dark"] .jx-gp-field input{background:#141c1b;color:#eef3f1;border-color:#3a4a46}' +
+      'html[data-reading-theme="dark"] .jx-gp-chip.is-on{background:#7fc4a2;color:#0f1a17;border-color:#7fc4a2}html[data-reading-theme="dark"] .jx-gp-field,html[data-reading-theme="dark"] .jx-gp-note{color:#eef3f1}';
+    var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+  })();
 })();
