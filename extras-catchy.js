@@ -68,7 +68,7 @@
   }
   JNZX.catchy = lineFor;
 
-  var FAMILY = ['Reading nook', 'Family tips', 'Family checklists', 'Homemade recipes', 'Grocery list', 'Budget tracker', 'Pregnancy & baby age', 'Pregnancy quotes & tips', 'Parenting quotes & tips', 'Breastfeeding quotes & tips', 'Partnership quotes & tips', 'Husband & wife quotes & tips', 'Parent–child & child–parent', 'x:diy', 'x:holidays', 'x:celebrations', 'x:book'];
+  var FAMILY = ['x:potty', 'Reading nook', 'Family tips', 'Family checklists', 'Homemade recipes', 'Grocery list', 'Budget tracker', 'Pregnancy & baby age', 'Pregnancy quotes & tips', 'Parenting quotes & tips', 'Breastfeeding quotes & tips', 'Partnership quotes & tips', 'Husband & wife quotes & tips', 'Parent–child & child–parent', 'x:diy', 'x:holidays', 'x:celebrations', 'x:book'];
   var SEL = 'main article, main .j-card, main .jx-card, main .jx-act, main .story-card, main .l-jar-result, main .jx-acc-item, main .jx-cards3 > *, main .checklist-panel li';
   function inFamily() { return FAMILY.indexOf(JNZX._tab) >= 0; }
   function scan() {

@@ -9,95 +9,95 @@
 
   // [name, flag, city, lat, lon, IANA time zone]
   var PLACES = [
-    ['New Zealand', '🇳🇿', 'Wellington', -41.29, 174.78, 'Pacific/Auckland'],
-    ['Australia (Sydney)', '🇦🇺', 'Sydney', -33.87, 151.21, 'Australia/Sydney'],
-    ['Australia (Brisbane)', '🇦🇺', 'Brisbane', -27.47, 153.03, 'Australia/Brisbane'],
-    ['Australia (Perth)', '🇦🇺', 'Perth', -31.95, 115.86, 'Australia/Perth'],
-    ['Australia (Adelaide)', '🇦🇺', 'Adelaide', -34.93, 138.6, 'Australia/Adelaide'],
-    ['Fiji', '🇫🇯', 'Suva', -18.14, 178.44, 'Pacific/Fiji'],
-    ['Samoa', '🇼🇸', 'Apia', -13.83, -171.76, 'Pacific/Apia'],
-    ['Tonga', '🇹🇴', 'Nukuʻalofa', -21.14, -175.2, 'Pacific/Tongatapu'],
-    ['Cook Islands', '🇨🇰', 'Avarua', -21.21, -159.78, 'Pacific/Rarotonga'],
-    ['Niue', '🇳🇺', 'Alofi', -19.06, -169.92, 'Pacific/Niue'],
-    ['French Polynesia', '🇵🇫', 'Papeete', -17.53, -149.57, 'Pacific/Tahiti'],
-    ['New Caledonia', '🇳🇨', 'Nouméa', -22.27, 166.45, 'Pacific/Noumea'],
-    ['Vanuatu', '🇻🇺', 'Port Vila', -17.73, 168.32, 'Pacific/Efate'],
-    ['Solomon Islands', '🇸🇧', 'Honiara', -9.43, 159.95, 'Pacific/Guadalcanal'],
-    ['Papua New Guinea', '🇵🇬', 'Port Moresby', -9.44, 147.18, 'Pacific/Port_Moresby'],
-    ['Kiribati', '🇰🇮', 'Tarawa', 1.45, 172.98, 'Pacific/Tarawa'],
-    ['Tuvalu', '🇹🇻', 'Funafuti', -8.52, 179.2, 'Pacific/Funafuti'],
-    ['Hawaiʻi (USA)', '🇺🇸', 'Honolulu', 21.31, -157.86, 'Pacific/Honolulu'],
-    ['Philippines', '🇵🇭', 'Manila', 14.6, 120.98, 'Asia/Manila'],
-    ['Indonesia', '🇮🇩', 'Jakarta', -6.21, 106.85, 'Asia/Jakarta'],
-    ['Malaysia', '🇲🇾', 'Kuala Lumpur', 3.14, 101.69, 'Asia/Kuala_Lumpur'],
-    ['Singapore', '🇸🇬', 'Singapore', 1.35, 103.82, 'Asia/Singapore'],
-    ['Thailand', '🇹🇭', 'Bangkok', 13.76, 100.5, 'Asia/Bangkok'],
-    ['Vietnam', '🇻🇳', 'Hanoi', 21.03, 105.85, 'Asia/Ho_Chi_Minh'],
-    ['Cambodia', '🇰🇭', 'Phnom Penh', 11.56, 104.92, 'Asia/Phnom_Penh'],
-    ['Myanmar', '🇲🇲', 'Yangon', 16.87, 96.2, 'Asia/Yangon'],
-    ['China', '🇨🇳', 'Beijing', 39.9, 116.4, 'Asia/Shanghai'],
-    ['Hong Kong', '🇭🇰', 'Hong Kong', 22.32, 114.17, 'Asia/Hong_Kong'],
-    ['Taiwan', '🇹🇼', 'Taipei', 25.03, 121.57, 'Asia/Taipei'],
-    ['Japan', '🇯🇵', 'Tokyo', 35.68, 139.69, 'Asia/Tokyo'],
-    ['South Korea', '🇰🇷', 'Seoul', 37.57, 126.98, 'Asia/Seoul'],
-    ['Mongolia', '🇲🇳', 'Ulaanbaatar', 47.89, 106.91, 'Asia/Ulaanbaatar'],
-    ['India', '🇮🇳', 'New Delhi', 28.61, 77.21, 'Asia/Kolkata'],
-    ['Sri Lanka', '🇱🇰', 'Colombo', 6.93, 79.86, 'Asia/Colombo'],
-    ['Nepal', '🇳🇵', 'Kathmandu', 27.72, 85.32, 'Asia/Kathmandu'],
-    ['Bangladesh', '🇧🇩', 'Dhaka', 23.81, 90.41, 'Asia/Dhaka'],
-    ['Pakistan', '🇵🇰', 'Islamabad', 33.68, 73.05, 'Asia/Karachi'],
-    ['Afghanistan', '🇦🇫', 'Kabul', 34.56, 69.21, 'Asia/Kabul'],
-    ['Iran', '🇮🇷', 'Tehran', 35.69, 51.39, 'Asia/Tehran'],
-    ['United Arab Emirates', '🇦🇪', 'Dubai', 25.2, 55.27, 'Asia/Dubai'],
-    ['Qatar', '🇶🇦', 'Doha', 25.29, 51.53, 'Asia/Qatar'],
-    ['Saudi Arabia', '🇸🇦', 'Riyadh', 24.71, 46.68, 'Asia/Riyadh'],
-    ['Israel', '🇮🇱', 'Jerusalem', 31.77, 35.21, 'Asia/Jerusalem'],
-    ['Lebanon', '🇱🇧', 'Beirut', 33.89, 35.5, 'Asia/Beirut'],
-    ['Türkiye', '🇹🇷', 'Ankara', 39.93, 32.86, 'Europe/Istanbul'],
-    ['Russia (Moscow)', '🇷🇺', 'Moscow', 55.76, 37.62, 'Europe/Moscow'],
-    ['Russia (Vladivostok)', '🇷🇺', 'Vladivostok', 43.12, 131.89, 'Asia/Vladivostok'],
-    ['Ukraine', '🇺🇦', 'Kyiv', 50.45, 30.52, 'Europe/Kyiv'],
-    ['Greece', '🇬🇷', 'Athens', 37.98, 23.73, 'Europe/Athens'],
-    ['Italy', '🇮🇹', 'Rome', 41.9, 12.5, 'Europe/Rome'],
-    ['Vatican City', '🇻🇦', 'Vatican City', 41.9, 12.45, 'Europe/Vatican'],
-    ['Germany', '🇩🇪', 'Berlin', 52.52, 13.4, 'Europe/Berlin'],
-    ['France', '🇫🇷', 'Paris', 48.86, 2.35, 'Europe/Paris'],
-    ['Spain', '🇪🇸', 'Madrid', 40.42, -3.7, 'Europe/Madrid'],
-    ['Portugal', '🇵🇹', 'Lisbon', 38.72, -9.14, 'Europe/Lisbon'],
-    ['Netherlands', '🇳🇱', 'Amsterdam', 52.37, 4.9, 'Europe/Amsterdam'],
-    ['Switzerland', '🇨🇭', 'Bern', 46.95, 7.45, 'Europe/Zurich'],
-    ['Poland', '🇵🇱', 'Warsaw', 52.23, 21.01, 'Europe/Warsaw'],
-    ['Sweden', '🇸🇪', 'Stockholm', 59.33, 18.07, 'Europe/Stockholm'],
-    ['Norway', '🇳🇴', 'Oslo', 59.91, 10.75, 'Europe/Oslo'],
-    ['Finland', '🇫🇮', 'Helsinki', 60.17, 24.94, 'Europe/Helsinki'],
-    ['Ireland', '🇮🇪', 'Dublin', 53.35, -6.26, 'Europe/Dublin'],
-    ['United Kingdom', '🇬🇧', 'London', 51.51, -0.13, 'Europe/London'],
-    ['Iceland', '🇮🇸', 'Reykjavík', 64.15, -21.94, 'Atlantic/Reykjavik'],
-    ['Egypt', '🇪🇬', 'Cairo', 30.04, 31.24, 'Africa/Cairo'],
-    ['Kenya', '🇰🇪', 'Nairobi', -1.29, 36.82, 'Africa/Nairobi'],
-    ['Ethiopia', '🇪🇹', 'Addis Ababa', 9.03, 38.74, 'Africa/Addis_Ababa'],
-    ['Nigeria', '🇳🇬', 'Lagos', 6.52, 3.38, 'Africa/Lagos'],
-    ['Ghana', '🇬🇭', 'Accra', 5.6, -0.19, 'Africa/Accra'],
-    ['Morocco', '🇲🇦', 'Rabat', 34.02, -6.83, 'Africa/Casablanca'],
-    ['South Africa', '🇿🇦', 'Johannesburg', -26.2, 28.05, 'Africa/Johannesburg'],
-    ['Zimbabwe', '🇿🇼', 'Harare', -17.83, 31.05, 'Africa/Harare'],
-    ['Mauritius', '🇲🇺', 'Port Louis', -20.16, 57.5, 'Indian/Mauritius'],
-    ['Canada (Toronto)', '🇨🇦', 'Toronto', 43.65, -79.38, 'America/Toronto'],
-    ['Canada (Vancouver)', '🇨🇦', 'Vancouver', 49.28, -123.12, 'America/Vancouver'],
-    ['USA (New York)', '🇺🇸', 'New York', 40.71, -74.01, 'America/New_York'],
-    ['USA (Chicago)', '🇺🇸', 'Chicago', 41.88, -87.63, 'America/Chicago'],
-    ['USA (Denver)', '🇺🇸', 'Denver', 39.74, -104.99, 'America/Denver'],
-    ['USA (Los Angeles)', '🇺🇸', 'Los Angeles', 34.05, -118.24, 'America/Los_Angeles'],
-    ['USA (Alaska)', '🇺🇸', 'Anchorage', 61.22, -149.9, 'America/Anchorage'],
-    ['Mexico', '🇲🇽', 'Mexico City', 19.43, -99.13, 'America/Mexico_City'],
-    ['Cuba', '🇨🇺', 'Havana', 23.11, -82.37, 'America/Havana'],
-    ['Jamaica', '🇯🇲', 'Kingston', 18.02, -76.8, 'America/Jamaica'],
-    ['Colombia', '🇨🇴', 'Bogotá', 4.71, -74.07, 'America/Bogota'],
-    ['Peru', '🇵🇪', 'Lima', -12.05, -77.04, 'America/Lima'],
-    ['Chile', '🇨🇱', 'Santiago', -33.45, -70.67, 'America/Santiago'],
-    ['Argentina', '🇦🇷', 'Buenos Aires', -34.6, -58.38, 'America/Argentina/Buenos_Aires'],
-    ['Brazil', '🇧🇷', 'São Paulo', -23.55, -46.63, 'America/Sao_Paulo'],
-    ['Antarctica (Scott Base)', '🇦🇶', 'Scott Base', -77.85, 166.76, 'Antarctica/McMurdo']
+    ['New Zealand', '🇳🇿', 'Wellington', -41.29, 174.78, 'Pacific/Auckland', 'Wellington', 'NZD', 'NZ dollar'],
+    ['Australia (Sydney)', '🇦🇺', 'Sydney', -33.87, 151.21, 'Australia/Sydney', 'Canberra', 'AUD', 'Australian dollar'],
+    ['Australia (Brisbane)', '🇦🇺', 'Brisbane', -27.47, 153.03, 'Australia/Brisbane', 'Canberra', 'AUD', 'Australian dollar'],
+    ['Australia (Perth)', '🇦🇺', 'Perth', -31.95, 115.86, 'Australia/Perth', 'Canberra', 'AUD', 'Australian dollar'],
+    ['Australia (Adelaide)', '🇦🇺', 'Adelaide', -34.93, 138.6, 'Australia/Adelaide', 'Canberra', 'AUD', 'Australian dollar'],
+    ['Fiji', '🇫🇯', 'Suva', -18.14, 178.44, 'Pacific/Fiji', 'Suva', 'FJD', 'Fijian dollar'],
+    ['Samoa', '🇼🇸', 'Apia', -13.83, -171.76, 'Pacific/Apia', 'Apia', 'WST', 'Samoan tālā'],
+    ['Tonga', '🇹🇴', 'Nukuʻalofa', -21.14, -175.2, 'Pacific/Tongatapu', 'Nukuʻalofa', 'TOP', 'Tongan paʻanga'],
+    ['Cook Islands', '🇨🇰', 'Avarua', -21.21, -159.78, 'Pacific/Rarotonga', 'Avarua', 'NZD', 'NZ dollar'],
+    ['Niue', '🇳🇺', 'Alofi', -19.06, -169.92, 'Pacific/Niue', 'Alofi', 'NZD', 'NZ dollar'],
+    ['French Polynesia', '🇵🇫', 'Papeete', -17.53, -149.57, 'Pacific/Tahiti', 'Papeete', 'XPF', 'CFP franc'],
+    ['New Caledonia', '🇳🇨', 'Nouméa', -22.27, 166.45, 'Pacific/Noumea', 'Nouméa', 'XPF', 'CFP franc'],
+    ['Vanuatu', '🇻🇺', 'Port Vila', -17.73, 168.32, 'Pacific/Efate', 'Port Vila', 'VUV', 'Vanuatu vatu'],
+    ['Solomon Islands', '🇸🇧', 'Honiara', -9.43, 159.95, 'Pacific/Guadalcanal', 'Honiara', 'SBD', 'Solomon Islands dollar'],
+    ['Papua New Guinea', '🇵🇬', 'Port Moresby', -9.44, 147.18, 'Pacific/Port_Moresby', 'Port Moresby', 'PGK', 'PNG kina'],
+    ['Kiribati', '🇰🇮', 'Tarawa', 1.45, 172.98, 'Pacific/Tarawa', 'Tarawa', 'AUD', 'Australian dollar'],
+    ['Tuvalu', '🇹🇻', 'Funafuti', -8.52, 179.2, 'Pacific/Funafuti', 'Funafuti', 'AUD', 'Australian dollar'],
+    ['Hawaiʻi (USA)', '🇺🇸', 'Honolulu', 21.31, -157.86, 'Pacific/Honolulu', 'Washington, D.C.', 'USD', 'US dollar'],
+    ['Philippines', '🇵🇭', 'Manila', 14.6, 120.98, 'Asia/Manila', 'Manila', 'PHP', 'Philippine peso'],
+    ['Indonesia', '🇮🇩', 'Jakarta', -6.21, 106.85, 'Asia/Jakarta', 'Jakarta', 'IDR', 'Indonesian rupiah'],
+    ['Malaysia', '🇲🇾', 'Kuala Lumpur', 3.14, 101.69, 'Asia/Kuala_Lumpur', 'Kuala Lumpur', 'MYR', 'Malaysian ringgit'],
+    ['Singapore', '🇸🇬', 'Singapore', 1.35, 103.82, 'Asia/Singapore', 'Singapore', 'SGD', 'Singapore dollar'],
+    ['Thailand', '🇹🇭', 'Bangkok', 13.76, 100.5, 'Asia/Bangkok', 'Bangkok', 'THB', 'Thai baht'],
+    ['Vietnam', '🇻🇳', 'Hanoi', 21.03, 105.85, 'Asia/Ho_Chi_Minh', 'Hanoi', 'VND', 'Vietnamese đồng'],
+    ['Cambodia', '🇰🇭', 'Phnom Penh', 11.56, 104.92, 'Asia/Phnom_Penh', 'Phnom Penh', 'KHR', 'Cambodian riel'],
+    ['Myanmar', '🇲🇲', 'Yangon', 16.87, 96.2, 'Asia/Yangon', 'Naypyidaw', 'MMK', 'Myanmar kyat'],
+    ['China', '🇨🇳', 'Beijing', 39.9, 116.4, 'Asia/Shanghai', 'Beijing', 'CNY', 'Chinese yuan'],
+    ['Hong Kong', '🇭🇰', 'Hong Kong', 22.32, 114.17, 'Asia/Hong_Kong', 'Hong Kong', 'HKD', 'Hong Kong dollar'],
+    ['Taiwan', '🇹🇼', 'Taipei', 25.03, 121.57, 'Asia/Taipei', 'Taipei', 'TWD', 'New Taiwan dollar'],
+    ['Japan', '🇯🇵', 'Tokyo', 35.68, 139.69, 'Asia/Tokyo', 'Tokyo', 'JPY', 'Japanese yen'],
+    ['South Korea', '🇰🇷', 'Seoul', 37.57, 126.98, 'Asia/Seoul', 'Seoul', 'KRW', 'South Korean won'],
+    ['Mongolia', '🇲🇳', 'Ulaanbaatar', 47.89, 106.91, 'Asia/Ulaanbaatar', 'Ulaanbaatar', 'MNT', 'Mongolian tögrög'],
+    ['India', '🇮🇳', 'New Delhi', 28.61, 77.21, 'Asia/Kolkata', 'New Delhi', 'INR', 'Indian rupee'],
+    ['Sri Lanka', '🇱🇰', 'Colombo', 6.93, 79.86, 'Asia/Colombo', 'Sri Jayawardenepura Kotte', 'LKR', 'Sri Lankan rupee'],
+    ['Nepal', '🇳🇵', 'Kathmandu', 27.72, 85.32, 'Asia/Kathmandu', 'Kathmandu', 'NPR', 'Nepalese rupee'],
+    ['Bangladesh', '🇧🇩', 'Dhaka', 23.81, 90.41, 'Asia/Dhaka', 'Dhaka', 'BDT', 'Bangladeshi taka'],
+    ['Pakistan', '🇵🇰', 'Islamabad', 33.68, 73.05, 'Asia/Karachi', 'Islamabad', 'PKR', 'Pakistani rupee'],
+    ['Afghanistan', '🇦🇫', 'Kabul', 34.56, 69.21, 'Asia/Kabul', 'Kabul', 'AFN', 'Afghan afghani'],
+    ['Iran', '🇮🇷', 'Tehran', 35.69, 51.39, 'Asia/Tehran', 'Tehran', 'IRR', 'Iranian rial'],
+    ['United Arab Emirates', '🇦🇪', 'Dubai', 25.2, 55.27, 'Asia/Dubai', 'Abu Dhabi', 'AED', 'UAE dirham'],
+    ['Qatar', '🇶🇦', 'Doha', 25.29, 51.53, 'Asia/Qatar', 'Doha', 'QAR', 'Qatari riyal'],
+    ['Saudi Arabia', '🇸🇦', 'Riyadh', 24.71, 46.68, 'Asia/Riyadh', 'Riyadh', 'SAR', 'Saudi riyal'],
+    ['Israel', '🇮🇱', 'Jerusalem', 31.77, 35.21, 'Asia/Jerusalem', 'Jerusalem', 'ILS', 'Israeli shekel'],
+    ['Lebanon', '🇱🇧', 'Beirut', 33.89, 35.5, 'Asia/Beirut', 'Beirut', 'LBP', 'Lebanese pound'],
+    ['Türkiye', '🇹🇷', 'Ankara', 39.93, 32.86, 'Europe/Istanbul', 'Ankara', 'TRY', 'Turkish lira'],
+    ['Russia (Moscow)', '🇷🇺', 'Moscow', 55.76, 37.62, 'Europe/Moscow', 'Moscow', 'RUB', 'Russian rouble'],
+    ['Russia (Vladivostok)', '🇷🇺', 'Vladivostok', 43.12, 131.89, 'Asia/Vladivostok', 'Moscow', 'RUB', 'Russian rouble'],
+    ['Ukraine', '🇺🇦', 'Kyiv', 50.45, 30.52, 'Europe/Kyiv', 'Kyiv', 'UAH', 'Ukrainian hryvnia'],
+    ['Greece', '🇬🇷', 'Athens', 37.98, 23.73, 'Europe/Athens', 'Athens', 'EUR', 'euro'],
+    ['Italy', '🇮🇹', 'Rome', 41.9, 12.5, 'Europe/Rome', 'Rome', 'EUR', 'euro'],
+    ['Vatican City', '🇻🇦', 'Vatican City', 41.9, 12.45, 'Europe/Vatican', 'Vatican City', 'EUR', 'euro'],
+    ['Germany', '🇩🇪', 'Berlin', 52.52, 13.4, 'Europe/Berlin', 'Berlin', 'EUR', 'euro'],
+    ['France', '🇫🇷', 'Paris', 48.86, 2.35, 'Europe/Paris', 'Paris', 'EUR', 'euro'],
+    ['Spain', '🇪🇸', 'Madrid', 40.42, -3.7, 'Europe/Madrid', 'Madrid', 'EUR', 'euro'],
+    ['Portugal', '🇵🇹', 'Lisbon', 38.72, -9.14, 'Europe/Lisbon', 'Lisbon', 'EUR', 'euro'],
+    ['Netherlands', '🇳🇱', 'Amsterdam', 52.37, 4.9, 'Europe/Amsterdam', 'Amsterdam', 'EUR', 'euro'],
+    ['Switzerland', '🇨🇭', 'Bern', 46.95, 7.45, 'Europe/Zurich', 'Bern', 'CHF', 'Swiss franc'],
+    ['Poland', '🇵🇱', 'Warsaw', 52.23, 21.01, 'Europe/Warsaw', 'Warsaw', 'PLN', 'Polish złoty'],
+    ['Sweden', '🇸🇪', 'Stockholm', 59.33, 18.07, 'Europe/Stockholm', 'Stockholm', 'SEK', 'Swedish krona'],
+    ['Norway', '🇳🇴', 'Oslo', 59.91, 10.75, 'Europe/Oslo', 'Oslo', 'NOK', 'Norwegian krone'],
+    ['Finland', '🇫🇮', 'Helsinki', 60.17, 24.94, 'Europe/Helsinki', 'Helsinki', 'EUR', 'euro'],
+    ['Ireland', '🇮🇪', 'Dublin', 53.35, -6.26, 'Europe/Dublin', 'Dublin', 'EUR', 'euro'],
+    ['United Kingdom', '🇬🇧', 'London', 51.51, -0.13, 'Europe/London', 'London', 'GBP', 'pound sterling'],
+    ['Iceland', '🇮🇸', 'Reykjavík', 64.15, -21.94, 'Atlantic/Reykjavik', 'Reykjavík', 'ISK', 'Icelandic króna'],
+    ['Egypt', '🇪🇬', 'Cairo', 30.04, 31.24, 'Africa/Cairo', 'Cairo', 'EGP', 'Egyptian pound'],
+    ['Kenya', '🇰🇪', 'Nairobi', -1.29, 36.82, 'Africa/Nairobi', 'Nairobi', 'KES', 'Kenyan shilling'],
+    ['Ethiopia', '🇪🇹', 'Addis Ababa', 9.03, 38.74, 'Africa/Addis_Ababa', 'Addis Ababa', 'ETB', 'Ethiopian birr'],
+    ['Nigeria', '🇳🇬', 'Lagos', 6.52, 3.38, 'Africa/Lagos', 'Abuja', 'NGN', 'Nigerian naira'],
+    ['Ghana', '🇬🇭', 'Accra', 5.6, -0.19, 'Africa/Accra', 'Accra', 'GHS', 'Ghanaian cedi'],
+    ['Morocco', '🇲🇦', 'Rabat', 34.02, -6.83, 'Africa/Casablanca', 'Rabat', 'MAD', 'Moroccan dirham'],
+    ['South Africa', '🇿🇦', 'Johannesburg', -26.2, 28.05, 'Africa/Johannesburg', 'Pretoria (executive)', 'ZAR', 'South African rand'],
+    ['Zimbabwe', '🇿🇼', 'Harare', -17.83, 31.05, 'Africa/Harare', 'Harare', 'USD', 'US dollar (widely used)'],
+    ['Mauritius', '🇲🇺', 'Port Louis', -20.16, 57.5, 'Indian/Mauritius', 'Port Louis', 'MUR', 'Mauritian rupee'],
+    ['Canada (Toronto)', '🇨🇦', 'Toronto', 43.65, -79.38, 'America/Toronto', 'Ottawa', 'CAD', 'Canadian dollar'],
+    ['Canada (Vancouver)', '🇨🇦', 'Vancouver', 49.28, -123.12, 'America/Vancouver', 'Ottawa', 'CAD', 'Canadian dollar'],
+    ['USA (New York)', '🇺🇸', 'New York', 40.71, -74.01, 'America/New_York', 'Washington, D.C.', 'USD', 'US dollar'],
+    ['USA (Chicago)', '🇺🇸', 'Chicago', 41.88, -87.63, 'America/Chicago', 'Washington, D.C.', 'USD', 'US dollar'],
+    ['USA (Denver)', '🇺🇸', 'Denver', 39.74, -104.99, 'America/Denver', 'Washington, D.C.', 'USD', 'US dollar'],
+    ['USA (Los Angeles)', '🇺🇸', 'Los Angeles', 34.05, -118.24, 'America/Los_Angeles', 'Washington, D.C.', 'USD', 'US dollar'],
+    ['USA (Alaska)', '🇺🇸', 'Anchorage', 61.22, -149.9, 'America/Anchorage', 'Washington, D.C.', 'USD', 'US dollar'],
+    ['Mexico', '🇲🇽', 'Mexico City', 19.43, -99.13, 'America/Mexico_City', 'Mexico City', 'MXN', 'Mexican peso'],
+    ['Cuba', '🇨🇺', 'Havana', 23.11, -82.37, 'America/Havana', 'Havana', 'CUP', 'Cuban peso'],
+    ['Jamaica', '🇯🇲', 'Kingston', 18.02, -76.8, 'America/Jamaica', 'Kingston', 'JMD', 'Jamaican dollar'],
+    ['Colombia', '🇨🇴', 'Bogotá', 4.71, -74.07, 'America/Bogota', 'Bogotá', 'COP', 'Colombian peso'],
+    ['Peru', '🇵🇪', 'Lima', -12.05, -77.04, 'America/Lima', 'Lima', 'PEN', 'Peruvian sol'],
+    ['Chile', '🇨🇱', 'Santiago', -33.45, -70.67, 'America/Santiago', 'Santiago', 'CLP', 'Chilean peso'],
+    ['Argentina', '🇦🇷', 'Buenos Aires', -34.6, -58.38, 'America/Argentina/Buenos_Aires', 'Buenos Aires', 'ARS', 'Argentine peso'],
+    ['Brazil', '🇧🇷', 'São Paulo', -23.55, -46.63, 'America/Sao_Paulo', 'Brasília', 'BRL', 'Brazilian real'],
+    ['Antarctica (Scott Base)', '🇦🇶', 'Scott Base', -77.85, 166.76, 'Antarctica/McMurdo', '— (no capital)', 'NZD', 'NZ dollar (Scott Base)']
   ];
   // Simplified continents [lon, lat], drawn for the site
   var LAND = [
@@ -157,6 +157,44 @@
     } catch (e) {}
   }
 
+
+  // Offline fallback only: approximate units per 1 US dollar (late October 2026). Live rates are fetched when online.
+  var USD = { NZD: 1.754, AUD: 1.52, FJD: 2.25, WST: 2.72, TOP: 2.35, XPF: 107, VUV: 119, SBD: 8.3, PGK: 4.1, USD: 1, PHP: 64.05, IDR: 16400, MYR: 4.2, SGD: 1.281, THB: 32.5, VND: 26200, KHR: 4020, MMK: 2100, CNY: 7.1,
+    HKD: 7.78, TWD: 30.5, JPY: 157.7, KRW: 1380, MNT: 3450, INR: 87, LKR: 300, NPR: 139, BDT: 122, PKR: 282, AFN: 70, IRR: 42000, AED: 3.6725, QAR: 3.64, SAR: 3.75, ILS: 3.6, LBP: 89500, TRY: 41, RUB: 80,
+    UAH: 41.5, EUR: 0.897, CHF: 0.80, PLN: 3.8, SEK: 9.6, NOK: 10.2, GBP: 0.76, ISK: 125, EGP: 49, KES: 129, ETB: 140, NGN: 1550, GHS: 12, MAD: 9.1, ZAR: 18, MUR: 46, CAD: 1.38, MXN: 18.5, CUP: 24, JMD: 160,
+    COP: 4100, PEN: 3.6, CLP: 950, ARS: 1300, BRL: 5.5 };
+  var RATES = { src: 'approx', date: 'Oct 2026', perNZD: {} };
+  Object.keys(USD).forEach(function (k) { RATES.perNZD[k] = USD[k] / USD.NZD; });
+  var ratesTried = false, rateSubs = [];
+  function loadRates() {
+    if (ratesTried) return; ratesTried = true;
+    function done() { rateSubs.forEach(function (f) { try { f(); } catch (e) {} }); }
+    fetch('https://open.er-api.com/v6/latest/NZD').then(function (r) { if (!r.ok) throw Error(); return r.json(); }).then(function (d) {
+      if (!d || !d.rates) throw Error(); RATES = { src: 'live', date: (d.time_last_update_utc || '').slice(5, 16), perNZD: d.rates }; done();
+    }).catch(function () {
+      fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/nzd.json').then(function (r) { if (!r.ok) throw Error(); return r.json(); }).then(function (d) {
+        var o = {}; Object.keys(d.nzd || {}).forEach(function (k) { o[k.toUpperCase()] = d.nzd[k]; }); if (!o.USD) throw Error(); RATES = { src: 'live', date: d.date || '', perNZD: o }; done();
+      }).catch(function () {});
+    });
+  }
+  function money(n, code) {
+    return n.toLocaleString('en-NZ', { minimumFractionDigits: n >= 1000 ? 0 : 2, maximumFractionDigits: n >= 1000 ? 0 : 2 }) + ' ' + code;
+  }
+  function CurrencyBox(props) {
+    var P = props.place, code = P[7], st = useState(100), amt = st[0], setAmt = st[1], dir = useState('nzd'), d = dir[0], setD = dir[1], tick = useState(0);
+    useEffect(function () { var f = function () { tick[1](function (x) { return x + 1; }); }; rateSubs.push(f); loadRates(); return function () { rateSubs = rateSubs.filter(function (g) { return g !== f; }); }; }, []);
+    var rate = RATES.perNZD[code];
+    if (code === 'NZD') return h('div', { className: 'jx-globe-card is-money' }, h('small', null, '💱 MONEY'), h('strong', null, 'NZ dollar (NZD)'), h('span', null, 'Same money as home — no exchange needed.'));
+    var a = +amt || 0, out = !rate ? null : d === 'nzd' ? a * rate : a / rate;
+    return h('div', { className: 'jx-globe-card is-money' },
+      h('small', null, '💱 MONEY · ' + P[8].toUpperCase() + ' (' + code + ')'),
+      h('div', { className: 'jx-money-row' },
+        h('input', { type: 'number', min: 0, step: 'any', value: amt, 'aria-label': 'Amount', onChange: function (e) { setAmt(e.target.value); } }),
+        h('button', { type: 'button', className: 'secondary', onClick: function () { setD(d === 'nzd' ? 'local' : 'nzd'); }, 'aria-label': 'Swap currencies' }, d === 'nzd' ? 'NZD → ' + code : code + ' → NZD')),
+      rate ? h('strong', null, money(a, d === 'nzd' ? 'NZD' : code) + ' = ' + money(out, d === 'nzd' ? code : 'NZD')) : h('span', null, 'Rate unavailable'),
+      rate && h('span', null, '1 NZD = ' + (rate >= 100 ? Math.round(rate).toLocaleString('en-NZ') : rate.toFixed(rate < 1 ? 4 : 2)) + ' ' + code + ' · ' + (RATES.src === 'live' ? 'live rate ' + RATES.date : 'approximate rate (' + RATES.date + ') — connect to update')),
+      h('small', { className: 'jx-muted' }, 'A guide only — banks and money changers add fees.'));
+  }
   var D2R = Math.PI / 180;
   function project(lat, lon, lat0, lon0) {
     var p = lat * D2R, l = (lon - lon0) * D2R, p0 = lat0 * D2R;
@@ -272,9 +310,9 @@
     function choose(i) { setSel(i); if (cvRef.current && cvRef.current._goto) cvRef.current._goto(i); }
     var P = PLACES[sel], date = new Date(now), nz = show(date, 'Pacific/Auckland'), there = show(date, P[5]);
     var list = PLACES.map(function (p, i) { return [p, i]; }).filter(function (x) { return !qq || (x[0][0] + ' ' + x[0][2]).toLowerCase().indexOf(qq.toLowerCase()) >= 0; });
-    var shareText = P[1] + ' ' + P[0] + ' (' + P[2] + '): ' + there + '\n🇳🇿 ' + nzLabel(date) + ': ' + nz;
+    var shareText = P[1] + ' ' + P[0] + ' (' + P[2] + '; capital ' + P[6] + '): ' + there + '\n🇳🇿 ' + nzLabel(date) + ': ' + nz + '\nMoney: ' + P[8] + ' (' + P[7] + ')';
     return h('section', { className: 'jx-globe' + (props.compact ? ' is-compact' : '') },
-      h('div', { className: 'jx-globe-head' }, h('h2', null, '🌏 World clock'), h('p', { className: 'jx-muted' }, 'Spin the globe and tap a dot to see the time there and in New Zealand.')),
+      h('div', { className: 'jx-globe-head' }, h('h2', null, '🌏 World clock'), h('p', { className: 'jx-muted' }, 'Spin the globe and tap a dot: local time, NZ time, the capital and a money converter.')),
       h('div', { className: 'jx-globe-body' },
         h('div', { className: 'jx-globe-stage' },
           h('canvas', { ref: cvRef, width: 360, height: 360, className: 'jx-globe-canvas', role: 'img', 'aria-label': 'Globe showing ' + P[0], onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: function () { drag.current = null; } }),
@@ -282,8 +320,9 @@
             h('button', { type: 'button', className: 'secondary', onClick: function () { spin.current = !spin.current; } }, '⟳ Spin'),
             h('button', { type: 'button', className: 'secondary', onClick: function () { choose(0); } }, '🇳🇿 Home'))),
         h('div', { className: 'jx-globe-info', 'aria-live': 'polite' },
-          h('div', { className: 'jx-globe-card is-there' }, h('small', null, P[1] + ' ' + P[0].toUpperCase()), h('strong', null, there), h('span', null, P[2])),
+          h('div', { className: 'jx-globe-card is-there' }, h('small', null, P[1] + ' ' + P[0].toUpperCase()), h('strong', null, there), h('span', null, '🕰️ ' + P[2] + ' · 🏛️ Capital: ' + P[6])),
           h('div', { className: 'jx-globe-card is-nz' }, h('small', null, '🇳🇿 ' + nzLabel(date) + ' · NEW ZEALAND'), h('strong', null, nz), h('span', null, sel === 0 ? 'You’re home!' : diffText(date, P[5]))),
+          h(CurrencyBox, { key: 'cur-' + sel, place: P }),
           h('div', { className: 'jx-row' }, h(JNZX.ShareMini, { title: 'Time in ' + P[0], text: shareText, label: 'Share these times' })),
           h(JNZX.Search, { value: qq, onChange: setQ, placeholder: 'Find a country or city' }),
           h('div', { className: 'jx-globe-list' }, list.map(function (x) {

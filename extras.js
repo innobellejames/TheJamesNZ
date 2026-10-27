@@ -53,10 +53,11 @@
       if (typeof tab !== 'string') return null;
       JNZX._nav = navigate; JNZX._tab = tab;
       if (tab.indexOf('group:') === 0) return h(GroupLanding, { key: tab, tab: tab, navigate: navigate });
-      var C = pages[tab];
-      if (!C && JNZX.extrasFor && JNZX.extrasFor[tab]) return h(JNZX.extrasFor[tab], { key: 'extra-' + tab, navigate: navigate, tab: tab });
-      if (!C) return null;
-      return h(PageFrame, { key: tab, tab: tab, navigate: navigate }, h(C, { navigate: navigate, canEdit: canEdit, tab: tab }));
+      var C = pages[tab], sub = JNZX.hubOf && JNZX.hubOf(tab) ? h(JNZX.SubNav, { key: 'sub-' + tab, tab: tab, navigate: navigate }) : null, main = null;
+      if (!C && JNZX.extrasFor && JNZX.extrasFor[tab]) main = h(JNZX.extrasFor[tab], { key: 'extra-' + tab, navigate: navigate, tab: tab });
+      else if (C) main = h(PageFrame, { key: tab, tab: tab, navigate: navigate }, h(C, { navigate: navigate, canEdit: canEdit, tab: tab }));
+      if (!sub) return main;
+      return h(R.Fragment, { key: 'wrap-' + tab }, sub, main);
     }
   };
 
@@ -87,29 +88,35 @@
       overview('Kiwi Adventures'),
       keep('Weather & OOTD', 'Weather & What to Wear', 'Plan your day'),
       keep('Today’s fruit & vege picks', 'Fresh Picks Today'),
+      add('x:seasons', 'Flowers & Fruit Picking', Icons.leaf),
       keep('NZ bucket lists', 'My Kiwi Adventures', 'Explore & discover'),
       keep('NZ quiz', 'How Kiwi Are You?'),
       keep('NZ safety & know-how', 'Safety & Know-how'),
-      add('x:world-clock', 'World Clock', Icons.timer)
+      add('x:world-clock', 'World Clock', Icons.timer),
+      add('x:citizenship', 'Mock Citizenship Test', Icons.award, 'Becoming a Kiwi')
     ] },
-    { title: 'Family Together', blurb: 'Stories, home life, food and money, growing families, love and connection, projects and celebrations.', image: './story-pages/story-02-middle.webp', items: [
+    { title: 'Family Together', blurb: 'Stories and play, home and kitchen, baby and toddler, love and connection, and celebrations.', image: './story-pages/story-02-middle.webp', items: [
       overview('Family Together'),
-      keep('Reading nook', 'The Story Nook', 'Read & grow'),
-      keep('Family tips', 'Family Life, Made Easier', 'Run the home'),
-      keep('Family checklists', 'Family Checklists'),
-      keep('Homemade recipes', 'From Our Kitchen', 'Food & money'),
+      keep('Reading nook', 'The Story Nook', 'Stories & play'),
+      add('x:holidays', 'School Holiday Fun', Icons.puzzle),
+      add('x:diy', 'DIY Home Projects', Icons.hammer),
+      keep('Homemade recipes', 'From Our Kitchen', 'Home & kitchen'),
       keep('Grocery list', 'Shopping Made Simple'),
       keep('Budget tracker', 'My Money Plan'),
-      keep('Pregnancy & baby age', 'Bump & Baby Milestones', 'Growing families'),
-      keep('Pregnancy quotes & tips', 'Growing a Little Life'),
-      keep('Parenting quotes & tips', 'Parenting with Heart'),
-      keep('Breastfeeding quotes & tips', 'Feeding with Love'),
-      keep('Partnership quotes & tips', 'Together Time', 'Love & connection'),
-      keep('Husband & wife quotes & tips', 'Love Notes & Little Kindnesses'),
-      keep('Parent–child & child–parent', 'Our Memory Jar'),
-      add('x:diy', 'DIY Home Projects', Icons.hammer, 'Make & do'),
-      add('x:holidays', 'School Holiday Fun', Icons.puzzle),
-      add('x:celebrations', 'Christmas, Easter & Matariki', Icons.star, 'Celebrate together'),
+      add('x:hometips', 'Home Tips & Checklists', Icons.grid),
+      keep('Family tips', 'Family Life, Made Easier', undefined, { hidden: true }),
+      keep('Family checklists', 'Family Checklists', undefined, { hidden: true }),
+      add('x:baby', 'Baby & Toddler', Icons.star, 'Family life & love'),
+      keep('Pregnancy & baby age', 'Bump & Baby Milestones', undefined, { hidden: true }),
+      keep('Pregnancy quotes & tips', 'Growing a Little Life', undefined, { hidden: true }),
+      keep('Breastfeeding quotes & tips', 'Feeding with Love', undefined, { hidden: true }),
+      add('x:potty', 'Potty Training Made Easy', Icons.star, undefined, { hidden: true }),
+      keep('Parenting quotes & tips', 'Parenting with Heart', undefined, { hidden: true }),
+      add('x:love', 'Love & Connection', Icons.halo),
+      keep('Partnership quotes & tips', 'Together Time', undefined, { hidden: true }),
+      keep('Husband & wife quotes & tips', 'Love Notes & Little Kindnesses', undefined, { hidden: true }),
+      keep('Parent–child & child–parent', 'Our Memory Jar', undefined, { hidden: true }),
+      add('x:celebrations', 'Christmas, Easter & Matariki', Icons.star),
       add('x:book', 'Flip-book reader', Icons.book, undefined, { hidden: true })
     ] },
     { title: 'Learning', blurb: 'Languages, little learners, science, maths, English, leadership and speech.', image: './story-pages/story-03-end.webp', items: [
@@ -204,6 +211,62 @@
     zHomeCopy[5] = ['Good company.', 'Little connections.', 'Our family, local makers, guides and greener living.'];
   } catch (e) { console.warn('[JNZX] home cards', e); }
 
+  /* ---------- hub pages: short menus, related topics grouped together ---------- */
+  var HUBS = {
+    'x:hometips': { kicker: 'FAMILY TOGETHER · HOME TIPS & CHECKLISTS', title: 'Home tips & checklists.', blurb: 'Practical ideas that make home life easier, and ready-made checklists for big family moments.', kids: ['Family tips', 'Family checklists'] },
+    'x:baby': { kicker: 'FAMILY TOGETHER · BABY & TODDLER', title: 'Baby & toddler.', blurb: 'From bump to big kid: milestones, pregnancy, feeding, potty training and parenting — all in one place.', kids: ['Pregnancy & baby age', 'Pregnancy quotes & tips', 'Breastfeeding quotes & tips', 'x:potty', 'Parenting quotes & tips'] },
+    'x:love': { kicker: 'FAMILY TOGETHER · LOVE & CONNECTION', title: 'Love & connection.', blurb: 'Little ways to stay close — date ideas, love notes and memories to treasure.', kids: ['Partnership quotes & tips', 'Husband & wife quotes & tips', 'Parent–child & child–parent'] }
+  };
+  var HUB_OF = {};
+  Object.keys(HUBS).forEach(function (k) { HUBS[k].kids.forEach(function (c) { HUB_OF[c] = k; }); });
+  JNZX.hubs = HUBS;
+  JNZX.hubOf = function (tab) { return HUB_OF[tab] || null; };
+  JNZX.SubNav = function SubNav(props) {
+    var hub = HUB_OF[props.tab]; if (!hub) return null;
+    return h('nav', { className: 'jx-subnav', 'aria-label': JNZX.label(hub) },
+      h('button', { type: 'button', className: 'jx-subnav-hub', onClick: function () { props.navigate(hub); } }, '← ' + JNZX.label(hub)),
+      HUBS[hub].kids.map(function (k) { return h('button', { key: k, type: 'button', className: k === props.tab ? 'is-on' : '', 'aria-current': k === props.tab ? 'page' : undefined, onClick: function () { props.navigate(k); } }, JNZX.label(k)); }));
+  };
+  function HubPage(props) {
+    var hb = HUBS[props.tab];
+    return h('div', { className: 'jx-hub' },
+      JNZX.Header(hb.kicker, hb.title, hb.blurb),
+      h('div', { className: 'jx-shop-grid jx-hub-grid' }, hb.kids.map(function (k) {
+        var drawn = JNZX.cover && JNZX.cover(k), info = TOPIC[k] || [null, ''], src = drawn || (info[0] ? jAsset(info[0]) : null), witty = JNZX.coverLine ? JNZX.coverLine(k) : '';
+        return h('button', { key: k, type: 'button', className: 'jx-shop-card', onClick: function () { props.navigate(k); } },
+          h('span', { className: 'jx-shop-img' + (drawn ? ' is-drawn' : '') }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : null),
+          h('span', { className: 'jx-shop-body' }, h('strong', null, JNZX.label(k)), info[1] && h('span', { className: 'jx-shop-desc' }, info[1]), witty && h('em', { className: 'jx-shop-witty' }, '“' + witty + '”'), h('span', { className: 'jx-shop-go' }, 'Open →')));
+      })),
+      h(ShareBar, { tab: props.tab }));
+  }
+  Object.keys(HUBS).forEach(function (k) { JNZX.register(k, HubPage); });
+
+
+  /* Header "Share this page": a short intro plus a link that opens the page directly */
+  JNZX.shareIntro = function (tab) {
+    tab = tab || JNZX._tab || 'Home';
+    if (tab === 'Home') return 'Kia ora! 🌿 The James NZ — faith, family and little discoveries from Aotearoa: stories, recipes, learning, prayer and everyday joy. Have a look:';
+    var info = (TOPIC[tab] || [])[1] || (tab.indexOf('group:') === 0 ? ((GROUPS.find(function (g) { return 'group:' + g.title === tab; }) || {}).blurb || '') : '');
+    return JNZX.label(tab) + ' · The James NZ' + (info ? ' — ' + info : '') + ' Have a look:';
+  };
+  try {
+    uSharePage = async function (url, withImage, nav) {
+      nav = nav || navigator;
+      var intro = JNZX.shareIntro(), text = intro + '\n' + url;
+      async function copy(msg) { try { await nav.clipboard.writeText(text); return msg || 'Copied: the intro and link are ready to paste.'; } catch (e) { return uCopyLink(url, nav); } }
+      if (withImage) {
+        var file = null; try { file = lGetPageBannerFile(); } catch (e) {}
+        if (file && nav.share && nav.canShare && nav.canShare({ files: [file], text: text })) {
+          try { try { await nav.clipboard.writeText(text); } catch (e) {} await nav.share({ files: [file], title: 'The James NZ', text: text }); return 'Shared! The intro and link were also copied — paste them under the picture if your app drops the text.'; }
+          catch (e) { if (e && e.name === 'AbortError') return ''; }
+        }
+        return copy('Pictures can’t be shared from this browser, so the intro and link were copied instead.');
+      }
+      if (nav.share) { try { await nav.share({ title: 'The James NZ', text: intro, url: url }); return 'Link sharing menu opened.'; } catch (e) { if (e && e.name === 'AbortError') return ''; } }
+      return copy();
+    };
+    uCopyLink = (function (base) { return async function (url, nav) { nav = nav || navigator; try { await nav.clipboard.writeText(JNZX.shareIntro() + '\n' + url); return 'Intro and link copied.'; } catch (e) { return base(url, nav); } }; })(uCopyLink);
+  } catch (e) { console.warn('[JNZX] page share', e); }
   /* ---------- breadcrumbs ---------- */
   JNZX.crumbs = function (tab, navigate) {
     if (tab.indexOf('group:') === 0) return [h('strong', { key: 'g', className: 'jx-crumb-current' }, tab.slice(6).toUpperCase())];
@@ -220,6 +283,11 @@
       if (tab === 'x:speaking-time' || tab === 'x:nzsl') {
         out.push(h('button', { key: 'p', type: 'button', className: 'jx-crumb-link', onClick: function () { navigate('Speaking practice'); } }, 'Speech'));
         out.push(h('span', { key: 's2' }, '/'));
+      }
+      var hub = JNZX.hubOf && JNZX.hubOf(tab);
+      if (hub) {
+        out.push(h('button', { key: 'hub', type: 'button', className: 'jx-crumb-link', onClick: function () { navigate(hub); } }, JNZX.label(hub)));
+        out.push(h('span', { key: 'sh' }, '/'));
       }
       if (tab === 'Leadership practice') {
         out.push(h('button', { key: 'p', type: 'button', className: 'jx-crumb-link', onClick: function () { navigate('x:leadership'); } }, 'Leadership'));
@@ -412,11 +480,17 @@
     'Today’s fruit & vege picks': ['./oct13/produce-sheet.png', 'What’s in season and good value this week.'],
     'NZ bucket lists': ['./family-seaside-consistent.webp', 'A family bucket list and poster for Aotearoa.'],
     'NZ quiz': ['./family-play-consistent.webp', 'Test your Kiwi knowledge with a fun quiz.'],
+    'x:seasons': [null, 'When to see the flowers and pick your own fruit, month by month.'],
+    'x:citizenship': [null, 'A 20-question practice test: 45 minutes, pass with 15.'],
+    'x:hometips': [null, 'Family Life, Made Easier and Family Checklists.'],
+    'x:baby': [null, 'Milestones, pregnancy, feeding, potty training and parenting.'],
+    'x:potty': [null, 'Readiness check, a calm 3-day plan, tips and a sticker chart.'],
+    'x:love': [null, 'Together Time, Love Notes and Our Memory Jar.'],
     'x:world-clock': [null, 'Spin the globe: the time anywhere, next to NZ time.'],
     'NZ safety & know-how': ['./oct15/preparedness.png', 'Be prepared: first aid, sun, road and emergencies.'],
     'Reading nook': ['./story-pages/story-02-middle.webp', 'Original family stories as page-turning flip-books.'],
     'Family tips': ['./family-home-clothes.png', 'Practical tips that make home life easier.'],
-    'Homemade recipes': ['./recipe-photos/soup.webp', '100 easy recipes with nutrition and recipe cards.'],
+    'Homemade recipes': ['./recipe-photos/soup.webp', '325 easy recipes for every meal, diet and cuisine, with nutrition.'],
     'Grocery list': ['./photo-share/savings-groceries.webp', 'A colourful grocery list with a budget.'],
     'Budget tracker': ['./photo-share/savings-money.webp', 'Plan income, bills, spending and savings.'],
     'x:diy': [null, '18 simple home projects with NZ safety notes.'],

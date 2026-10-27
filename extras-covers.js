@@ -48,6 +48,12 @@
     'NZ bucket lists': ['mountains', 'sky', '🗺️', ['⛺', '🚐', '🥾'], 'Life’s short. Take the scenic route.'],
     'NZ quiz': ['sea', 'sun', '❓', ['🐑', '🏉', '🥝'], 'Sweet as — let’s see how Kiwi you are.'],
     'x:world-clock': ['sea', 'sky', '🌏', ['⏰', '✈️', '📞'], 'Somewhere it’s always coffee o’clock.'],
+    'x:seasons': ['garden', 'rose', '🌸', ['🍓', '🫐', '🌻'], 'Stop and smell the roses — then pick the strawberries.'],
+    'x:citizenship': ['mountains', 'sky', '📜', ['🗳️', '🏛️', '🥝'], 'Study hard, belong for good.'],
+    'x:hometips': ['room', 'cream', '📋', ['🧺', '✅', '🏡'], 'A little plan makes a lot of calm.'],
+    'x:baby': ['hills', 'rose', '👶', ['🍼', '🧸', '💕'], 'Tiny humans, giant love.'],
+    'x:potty': ['room', 'mint', '🚽', ['⭐', '🧻', '🎉'], 'Every flush is a small victory.'],
+    'x:love': ['hills', 'dusk', '💞', ['💌', '🫶', '🌹'], 'Love grows in the little moments.'],
     'NZ safety & know-how': ['hills', 'mint', '🩹', ['🧴', '🔦', '🚗'], 'She’ll be right — once the first-aid kit is packed.'],
     // Family Together
     'Reading nook': ['night', 'night', '📚', ['⭐', '🧸', '🌙'], 'Once upon a time is the best time.'],
