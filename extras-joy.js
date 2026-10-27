@@ -42,72 +42,204 @@
   function start() { new MutationObserver(soon).observe(document.getElementById('root') || document.body, { childList: true, subtree: true }); soon(); }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 
-  /* ---------------- Coffee & a Smile ---------------- */
+  /* ---------------- Coffee & a Smile (simple, all original) ---------------- */
+  var CQ = [
+    'A warm cup, a kind word, a fresh beginning.',
+    'Let the coffee cool while the conversation warms.',
+    'Pour a little patience into your morning.',
+    'Good company is the best thing beside a coffee cup.',
+    'Some mornings begin with coffee; every morning can begin with kindness.',
+    'There is room at this table for your story.',
+    'Take your time. Even a small cup can hold a lovely moment.',
+    'Life is too short for lukewarm coffee and half-hearted hugs.',
+    'Sip slowly. The emails will still be there.',
+    'Coffee first, then conquer the world — gently.',
+    'Every great plan started over a cuppa.',
+    'A refill is just a second chance in a mug.',
+    'Steam rising, worries lifting.',
+    'Friendship is sharing the last biscuit with your flat white.',
+    'Today’s forecast: 100% chance of coffee and kindness.',
+    'Grind the beans, not yourself.',
+    'The best conversations happen between the first sip and the last.',
+    'Warm hands, warm heart, warm cup.',
+    'Make your coffee strong and your words gentle.',
+    'A quiet cup in the morning is a little prayer of thanks.',
+    'You’re the cream in someone’s coffee today.',
+    'Pause, pour, breathe, begin.',
+    'Great things brew slowly.',
+    'Hold the cup, hold the moment.',
+    'Some problems shrink after a hot drink and a friend.',
+    'Mugs are for hugging, coffee is for sharing.',
+    'Wake up, smell the coffee, notice the sunshine.',
+    'A coffee date is a small promise: I have time for you.',
+    'When in doubt, add a little froth.',
+    'Your morning cup doesn’t judge. It just helps.',
+    'Brew kindness by the potful.',
+    'A cuppa on the deck is a holiday in ten minutes.',
+    'Let the kettle sing and the day begin.',
+    'Coffee tastes better when someone else made it with love.',
+    'Busy day? Coffee helps. Friends help more.',
+    'Here’s to slow sips and fast friendships.',
+    'The secret ingredient is always good company.',
+    'A café table for two can fix a week of worries.',
+    'Rise and grind — but mostly rise.',
+    'Even the strongest espresso needs a gentle hand.',
+    'Every mug has a story. What’s in yours today?',
+    'Sit, sip, smile, repeat.',
+    'A shared pot of coffee is a small feast.',
+    'Coffee breaks are tiny holidays. Take them seriously.',
+    'Be like a flat white: smooth, warm and quietly strong.',
+    'Fill your cup and then fill someone else’s.',
+    'Mornings are softer with a mug in hand.',
+    'May your coffee be hot and your day be kind.',
+    'One cup, two chairs, endless stories.',
+    'Slow down — good coffee and good days both take time.'
+  ];
+  var CF = [
+    ['It’s really a seed', 'A coffee bean is the seed found inside a small red fruit called a coffee cherry. Most cherries hold two seeds.'],
+    ['Two main types', 'Most coffee comes from two plants: Arabica, which tastes smoother and sweeter, and Robusta, which is stronger and has more caffeine.'],
+    ['Grows near the equator', 'Coffee grows best in the “bean belt” — warm, rainy places between the Tropics of Cancer and Capricorn.'],
+    ['Cherries ripen unevenly', 'On one branch you can find green, yellow and red cherries at the same time, so careful farms pick by hand several times.'],
+    ['Green before roasting', 'Raw coffee beans are pale green and smell grassy. Roasting turns them brown and creates hundreds of aroma compounds.'],
+    ['First crack', 'During roasting, beans make a popping sound called “first crack” as moisture escapes — a little like popcorn.'],
+    ['Light vs dark roast', 'Light roasts keep more of the bean’s fruity flavour; dark roasts taste bolder and more bitter. Caffeine is very similar in both.'],
+    ['Freshness matters', 'Roasted beans taste best within about two to four weeks. Keep them in an airtight container away from light and heat.'],
+    ['Grind just before brewing', 'Ground coffee loses aroma quickly. Grinding right before you brew keeps the flavour brighter.'],
+    ['Water temperature', 'Just off the boil — around 92–96 °C — is ideal. Boiling water can make coffee taste harsh.'],
+    ['Mostly water', 'A cup of brewed coffee is about 98% water, so good-tasting water makes better coffee.'],
+    ['Crema', 'The golden foam on an espresso is called crema. It forms when pressure pushes oils and gases out of fresh coffee.'],
+    ['Espresso means pressed', 'An espresso is made by pushing hot water through finely ground coffee under high pressure in about 25–30 seconds.'],
+    ['Cold brew is slow', 'Cold brew steeps in cold water for 12–24 hours. It tastes smoother and less acidic than hot coffee.'],
+    ['Decaf isn’t zero', 'Decaffeinated coffee still has a tiny amount of caffeine — usually just a few milligrams per cup.'],
+    ['Caffeine takes time', 'Caffeine usually starts working about 15–45 minutes after your first sip.'],
+    ['Milk microfoam', 'Silky café milk is steamed to around 60–65 °C. Hotter milk loses its natural sweetness.'],
+    ['Latte art needs microfoam', 'Hearts and rosettas only work when milk has tiny, glossy bubbles — big bubbles won’t hold a pattern.'],
+    ['Flat white fame', 'The flat white is a café favourite in Aotearoa: espresso with a thin layer of velvety milk.'],
+    ['A fruit tea too', 'The dried skins of coffee cherries can be steeped as a fruity tea called cascara.'],
+    ['Coffee trees live long', 'A coffee plant can keep producing cherries for 20 years or more with good care.'],
+    ['Shade-grown coffee', 'Some coffee grows under taller trees, which shelters birds and helps protect the soil.'],
+    ['Altitude and flavour', 'Beans grown high in the mountains ripen slowly and often taste brighter and more complex.'],
+    ['Bloom', 'When hot water first hits fresh grounds, they puff up and bubble. Baristas call this the “bloom”.'],
+    ['Grind size matters', 'Fine grounds suit espresso, medium suits pour-over, and coarse grounds suit plungers and cold brew.'],
+    ['The golden ratio', 'A good starting point is about 1 gram of coffee to 15–17 grams of water.'],
+    ['Tasting like a pro', 'Coffee tasters slurp loudly to spray coffee across the tongue and pick up more flavour.'],
+    ['Aroma is half the taste', 'Much of what we “taste” in coffee is really smell. Try sipping while holding your nose — it’s much flatter!'],
+    ['Acidity is a good thing', 'In coffee, “acidity” means a bright, lively taste — like a crisp apple — not sourness.'],
+    ['Storage myth', 'The fridge isn’t the best place for beans: moisture and smells can sneak in. A cool cupboard is better.'],
+    ['Used grounds in the garden', 'Used coffee grounds can be mixed into compost. Add them a little at a time with other green waste.'],
+    ['Takeaway cups', 'Most takeaway cups have a plastic lining and can’t go in kerbside recycling. A reusable cup is a small, kind swap.'],
+    ['Plunger, a.k.a. French press', 'A plunger steeps coffee in water for about four minutes, then a mesh filter presses the grounds to the bottom.'],
+    ['Stovetop pressure', 'A stovetop moka pot uses steam pressure to push water up through the coffee into the top chamber.'],
+    ['Pour-over patience', 'Pour-over coffee is made by slowly pouring water in circles through a paper filter for a clean, light cup.'],
+    ['Milk alternatives', 'Oat milk steams especially well because it contains natural sugars and a little fat.'],
+    ['Why coffee smells so good', 'Roasting creates more than 800 aroma compounds — more than red wine.'],
+    ['A cuppa for the kids', 'A “fluffy” — frothed milk with a chocolate dusting and a marshmallow — is a Kiwi café treat with no coffee at all.'],
+    ['Sweet without sugar', 'A pinch of cinnamon in the grounds adds warmth and a hint of sweetness without sugar.'],
+    ['Coffee and sleep', 'Caffeine can stay in your body for hours, so many people enjoy their last coffee before early afternoon.']
+  ];
+  var CJ = [
+    ['Why did the flat white sit by the window?', 'It wanted a view of the latte-tude.'],
+    ['What did the barista say to the shy cup?', 'Don’t worry — you’re going to be grounded in no time.'],
+    ['Why did the coffee bean join the choir?', 'It had a rich, full-bodied voice.'],
+    ['What’s a coffee cup’s favourite Kiwi beach?', 'Mug-Bay. (Close enough to Mount Maunganui.)'],
+    ['Why was the plunger so good at its job?', 'It always pressed on, no matter what.'],
+    ['What did the milk say to the espresso?', 'You’re a shot above the rest.'],
+    ['Why did the coffee take a nap?', 'It was feeling a little drip-ped out.'],
+    ['How does a stovetop pot tell a secret?', 'It lets off a little steam.'],
+    ['Why did the kettle get a medal?', 'It always rose to the boil-casion.'],
+    ['What do you call a coffee that loves tramping?', 'A long walk black.'],
+    ['Why did the biscuit dive into the coffee?', 'It wanted to be dunk-ed into the deep end.'],
+    ['What’s the coffee bean’s favourite dance?', 'The roast-a-nova.'],
+    ['Why don’t coffee cups ever get lost?', 'They always follow the aroma home.'],
+    ['What did the mug say on Monday?', 'Fill me up — I’m running on empty.'],
+    ['Why was the cold brew so relaxed?', 'It took its time, all twelve hours of it.'],
+    ['How do coffee beans keep fit?', 'Daily grind, of course.'],
+    ['What did the sugar cube say before jumping in?', 'Here goes nothing — I’m dissolving my fears!'],
+    ['Why did the café hire a sheep?', 'For extra-woolly foam.'],
+    ['What did the pour-over say to the impatient customer?', 'Good things filter through slowly.'],
+    ['What’s a barista’s favourite game?', 'Hide and steam.'],
+    ['Why was the teaspoon always invited?', 'It knew how to stir up a good time.'],
+    ['What do you call a coffee with great manners?', 'A pour-lite brew.'],
+    ['Why did the latte blush?', 'Someone drew a heart on it.'],
+    ['How does a kiwi bird order coffee?', 'Very quietly, at night, with a long beak in the foam.'],
+    ['Why did the coffee refuse to argue?', 'It didn’t want things to get bitter.'],
+    ['What did one coffee bean say to the other on the farm?', 'Stick with me — we’re a pair from the same cherry.'],
+    ['Why did the espresso go to school?', 'To get a little more grounded.'],
+    ['What’s the café cat’s favourite drink?', 'A purr-over.'],
+    ['Why did the jandal visit the café?', 'For a quick flip and a flat white.'],
+    ['What did the empty mug say to the coffee pot?', 'I’ve missed you a hole lot.']
+  ];
   var KIWI_CAFE = [
-    ['Flat white', 'A Kiwi café favourite: espresso with velvety, finely textured milk and a thin layer of microfoam. Both New Zealand and Australia claim to have invented it in the 1980s.'],
-    ['Long black', 'Hot water first, then a double shot of espresso on top, keeping the crema. Stronger and smoother than an Americano.'],
-    ['Fluffy', 'A Kiwi kids’ café treat: frothed milk in a small cup, dusted with chocolate and often served with a marshmallow. (No coffee!)'],
-    ['Mochaccino', 'Espresso, chocolate and steamed milk — a popular sweet choice.'],
-    ['Ordering like a local', '“Can I grab a large flat white, trim, extra hot?” Trim means low-fat milk; many cafés also offer oat, almond and soy.'],
-    ['Café etiquette', 'Order at the counter, take your number to the table and wait for food to come to you. Tipping isn’t expected in New Zealand.'],
-    ['Takeaway cups', 'Most takeaway cups are lined with plastic and can’t go in kerbside recycling. Many cafés welcome reusable cups.'],
-    ['Small-town cafés', 'From roadside coffee caravans to historic main-street tearooms, a coffee stop is part of almost every Kiwi road trip.']
+    ['Flat white', 'Espresso with a thin layer of velvety microfoam. A Kiwi café classic — ask for it “extra hot” if you like it steaming.'],
+    ['Long black', 'Hot water first, then a double espresso poured on top so the crema stays. Bold and smooth.'],
+    ['Fluffy', 'Frothed milk with a chocolate dusting and usually a marshmallow on the side. The kids’ café favourite — no coffee at all.'],
+    ['Mochaccino', 'Espresso, chocolate and steamed milk. A sweet treat for a cold afternoon.'],
+    ['“Trim” and “extra shot”', 'Trim means low-fat milk. An extra shot adds more espresso. Oat, almond and soy milk are on most café menus.'],
+    ['How ordering works', 'Order and pay at the counter, take your table number and your food comes to you. Tipping isn’t expected.'],
+    ['Cheese scones and slices', 'A warm cheese scone or a piece of caramel slice beside a flat white is a much-loved café combo.'],
+    ['Road-trip stops', 'Coffee caravans, small-town bakeries and old tearooms make a cuppa part of almost every road trip.'],
+    ['Bring your own cup', 'Many cafés happily fill reusable cups — and some take a little off the price.'],
+    ['Weekend brunch', 'Eggs bene, smashed avo and a long queue on Sunday mornings — brunch is a Kiwi social sport.']
   ];
-  var JOKES = [
-    ['Why did the coffee file a police report?', 'It got mugged.'], ['What do you call a sad cup of coffee?', 'A depresso.'], ['How does a coffee bean say goodbye?', 'See you latte!'],
-    ['Why are coffee beans so good at school?', 'They’re full of good grounds.'], ['What’s a barista’s favourite exercise?', 'The French press.'], ['Why did the latte go to the doctor?', 'It was feeling a bit flat.'],
-    ['What do kiwis drink in the morning?', 'Kiwi-ccinos — a flat white with a hop in its step.'], ['How do you know your coffee is happy?', 'It’s full of bean.'], ['Why do coffee lovers make great friends?', 'They always espresso their feelings.'],
-    ['What did the sugar say to the coffee?', 'I’m sweet on you.'], ['Why did the cappuccino get a gold star?', 'It foamed its best.'], ['What do you call a cow that has just had a baby?', 'Decalfinated.'],
-    ['What’s the best day for a cuppa?', 'Brew-sday.'], ['Why was the coffee so calm?', 'It was decaf-inated from worry.'], ['How do you comfort a sad espresso?', 'Give it a little cream and a lot of time.'], ['What do coffee cups say when they meet?', 'Mug to meet you!']
+  var BREW = [
+    ['Plunger (French press)', './expansion/coffee-photos-1.webp', '4 min', ['Add 2 heaped tablespoons of coarse coffee per cup.', 'Pour in water just off the boil and stir gently.', 'Put the lid on and wait 4 minutes.', 'Press the plunger down slowly and pour straight away.'], 'Pour it all out so it doesn’t keep brewing and turn bitter.'],
+    ['Pour-over', './expansion/coffee-photos-2.webp', '3–4 min', ['Rinse a paper filter with hot water and tip the water out.', 'Add medium-ground coffee (about 15 g for a mug).', 'Pour a little water to wet the grounds and wait 30 seconds for the bloom.', 'Pour the rest slowly in small circles until you reach about 250 ml.'], 'A gooseneck kettle gives you more control, but any kettle works with a steady hand.'],
+    ['Stovetop pot', './expansion/coffee-photos-3.webp', '5 min', ['Fill the bottom chamber with hot water up to the valve.', 'Fill the basket with fine coffee and level it — don’t press down.', 'Screw it together and heat on medium.', 'Take it off the heat as soon as it starts to gurgle.'], 'Cool the base under a cold tap to stop it tasting burnt.'],
+    ['Espresso machine', './expansion/coffee-photos-0.webp', '30 sec', ['Grind fine and fill the basket (about 18 g for a double).', 'Tamp firmly and evenly.', 'Lock in and brew for about 25–30 seconds.', 'You’re aiming for about 36 g of espresso with golden crema.'], 'Too fast and sour? Grind finer. Too slow and bitter? Grind coarser.'],
+    ['Flat white at home', './coffee-posts/coffee-01.webp', '3 min', ['Make a double espresso or very strong stovetop coffee.', 'Heat milk to about 60 °C (too hot to hold for long).', 'Froth just a little to make silky microfoam, then tap and swirl.', 'Pour from low and close so the foam stays thin.'], 'No frother? Shake warm milk in a jar with the lid on, then microwave 20 seconds.'],
+    ['Cold brew', './coffee-posts/coffee-02.webp', '12–24 hr', ['Mix 1 cup of coarse coffee with 4 cups of cold water.', 'Cover and leave in the fridge overnight.', 'Strain through a sieve and paper filter.', 'Serve over ice, diluted with water or milk to taste.'], 'Keeps in the fridge for about a week — perfect for summer.'],
+    ['Iced latte', './coffee-posts/coffee-03.webp', '2 min', ['Fill a glass with ice.', 'Pour in cold milk, leaving room at the top.', 'Pour a double espresso or strong coffee over the top.', 'Stir, sweeten if you like and enjoy.'], 'Freeze leftover coffee in ice-cube trays so your drink never gets watery.']
   ];
-  var SECTIONS = [['fact', 'Did you know?'], ['facts', 'Fun facts'], ['quotes', 'Coffee quotes'], ['brew', 'Brew guide & coffee art'], ['kiwi', 'Kiwi café culture'], ['jokes', 'Coffee & a smile']];
-  function Sec(props) {
-    return h('section', { id: 'jx-coffee-' + props.id, className: 'jx-cat-sec' },
-      h('div', { className: 'jx-cat-sec-head' }, h('h2', null, props.title, props.isNew && h('span', { className: 'jx-new' }, 'New')), props.count != null && h('span', { className: 'jx-muted' }, props.count)),
-      h('p', { className: 'jx-cat-sec-intro' }, props.intro), props.children);
+  var CPICS = ['./coffee-posts/coffee-01.webp', './coffee-posts/coffee-02.webp', './coffee-posts/coffee-03.webp', './expansion/coffee-photos-0.webp', './expansion/coffee-photos-1.webp', './expansion/coffee-photos-2.webp', './expansion/coffee-photos-3.webp'];
+  function rndi(n, not) { var x = Math.floor(Math.random() * n); if (n > 1 && x === not) x = (x + 1) % n; return x; }
+  function SeeAll(props) {
+    var o = useState(false), open = o[0], setOpen = o[1];
+    return h('div', { className: 'jx-cs-all' },
+      h('button', { type: 'button', className: 'secondary', 'aria-expanded': open, onClick: function () { setOpen(!open); } }, open ? 'Hide the list' : '📜 See all ' + props.items.length),
+      open && h('ul', { className: 'jx-lift-list' }, props.items.map(function (x, i) {
+        return h('li', { key: i }, h('span', null, props.render(x)), h('span', { className: 'jx-lift-li-tools' }, h(JNZX.ShareMini, { title: props.title, text: props.share(x), label: 'Share' })));
+      })));
   }
-  try {
-    CoffeeCorner = function CoffeeSmile() {
-      var fs = useState(function () { return Math.floor(Math.random() * coffeeFacts.length); }), fi = fs[0], setFi = fs[1];
-      var q = useState(''), qq = q[0], setQ = q[1];
-      var pg = useState(0), page = pg[0], setPage = pg[1];
-      var js = useState({}), shown = js[0], setShown = js[1];
-      var only = useState('all'), sec = only[0], setSec = only[1];
-      var f = coffeeFacts[fi];
-      var facts = coffeeFacts.filter(function (x) { return !qq || (x.title + ' ' + x.text).toLowerCase().indexOf(qq.toLowerCase()) >= 0; });
-      var quotes = coffeeQuotes.filter(function (x) { return !qq || x.toLowerCase().indexOf(qq.toLowerCase()) >= 0; });
-      var per = 12, pages = Math.max(1, Math.ceil(quotes.length / per)), pq = quotes.slice(Math.min(page, pages - 1) * per, Math.min(page, pages - 1) * per + per);
-      function vis(id) { return sec === 'all' || sec === id; }
-      function jump(id) { setSec(id); setTimeout(function () { var el = document.getElementById('jx-coffee-' + id) || document.querySelector('.jx-cat-bar'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 30); }
-      return h('div', { className: 'jx-page jx-coffee' },
-        JNZX.Header('EVERYDAY JOY · COFFEE & A SMILE', 'Coffee & a smile.', coffeeFacts.length + ' sourced facts, ' + coffeeQuotes.length + ' original quotes, a brew guide, Kiwi café culture and a few terrible coffee jokes — for your next coffee break.'),
-        h('nav', { className: 'jx-cat-bar', 'aria-label': 'Coffee categories' },
-          h('button', { type: 'button', className: sec === 'all' ? 'is-on' : '', onClick: function () { setSec('all'); } }, 'All'),
-          SECTIONS.map(function (s) { return h('button', { key: s[0], type: 'button', className: sec === s[0] ? 'is-on' : '', onClick: function () { jump(s[0]); } }, s[1]); })),
-        h('div', { className: 'jx-row' }, h(JNZX.Search, { value: qq, onChange: function (v) { setQ(v); setPage(0); }, placeholder: 'Search facts and quotes' })),
-        vis('fact') && h(Sec, { id: 'fact', title: 'Did you know?', intro: 'One coffee fact at a time — perfect for a quick break.' },
-          h('div', { className: 'jx-card jx-coffee-feature jx-keep-colour' },
-            h('p', { className: 'eyebrow' }, 'FACT ' + (fi + 1) + ' OF ' + coffeeFacts.length), h('h3', null, f.title), h('p', null, f.text),
-            f.source && h('a', { href: f.source, target: '_blank', rel: 'noopener noreferrer' }, 'Source'),
-            h('div', { className: 'jx-row' },
-              h('button', { type: 'button', className: 'secondary', onClick: function () { setFi((fi - 1 + coffeeFacts.length) % coffeeFacts.length); } }, '← Previous'),
-              h('button', { type: 'button', className: 'primary', onClick: function () { setFi((fi + 1) % coffeeFacts.length); } }, 'Next fact →'),
-              h('button', { type: 'button', className: 'secondary', onClick: function () { setFi(Math.floor(Math.random() * coffeeFacts.length)); } }, '🎲 Surprise me'),
-              h(JNZX.ShareMini, { title: f.title, text: 'Did you know? ' + f.title + ' — ' + f.text })))),
-        vis('facts') && h(Sec, { id: 'facts', title: 'Fun facts', count: facts.length + ' facts', intro: 'Short, sourced facts about coffee plants, beans, brewing and history.' },
-          h('ul', { className: 'jx-cat-list' }, facts.map(function (x, i) { return h('li', { key: i }, h('strong', null, x.title), h('span', null, x.text), x.source && h('a', { href: x.source, target: '_blank', rel: 'noopener noreferrer' }, 'Source')); }))),
-        vis('quotes') && h(Sec, { id: 'quotes', title: 'Coffee quotes', count: quotes.length + ' quotes', intro: 'Original lines from The James NZ to share with a friend over a cuppa.' },
-          h('div', { className: 'jx-quote-grid' }, pq.map(function (x, i) { return h('figure', { key: i, className: 'jx-quote-card' }, h('blockquote', null, '“' + x + '”'), h('figcaption', null, 'The James NZ · original'), h(JNZX.ShareMini, { title: 'Coffee quote', text: '“' + x + '” — The James NZ' })); })),
-          pages > 1 && h('div', { className: 'jx-row' }, h('button', { type: 'button', className: 'secondary', disabled: page === 0, onClick: function () { setPage(page - 1); } }, '← Previous'), h('span', { className: 'jx-muted' }, 'Page ' + (Math.min(page, pages - 1) + 1) + ' of ' + pages), h('button', { type: 'button', className: 'secondary', disabled: page >= pages - 1, onClick: function () { setPage(page + 1); } }, 'Next →'))),
-        vis('brew') && h(Sec, { id: 'brew', title: 'Brew guide & coffee art', intro: 'Coffee types, brewing methods and preparation times, plus latte-art ideas and techniques. Open a guide to explore.' }, h(CoffeeGuide)),
-        vis('kiwi') && h(Sec, { id: 'kiwi', title: 'Kiwi café culture', isNew: true, count: KIWI_CAFE.length + ' entries', intro: 'Flat whites, fluffies and how to order like a local in Aotearoa.' },
-          h('ul', { className: 'jx-cat-list' }, KIWI_CAFE.map(function (x) { return h('li', { key: x[0] }, h('strong', null, x[0]), h('span', null, x[1])); }))),
-        vis('jokes') && h(Sec, { id: 'jokes', title: 'Coffee & a smile', isNew: true, count: JOKES.length + ' jokes', intro: 'Family-friendly coffee jokes. Tap a joke to see the punchline.' },
-          h('div', { className: 'jx-joke-grid' }, JOKES.map(function (j, i) { var on = shown[i]; return h('button', { key: i, type: 'button', className: 'jx-joke' + (on ? ' is-on' : ''), 'aria-expanded': !!on, onClick: function () { var o = Object.assign({}, shown); o[i] = !on; setShown(o); } }, h('strong', null, j[0]), h('span', null, on ? j[1] : 'Tap for the punchline ☕')); }))),
-        h('p', { className: 'small-note' }, 'Enjoy coffee in moderation. Children, and people who are pregnant or sensitive to caffeine, may need to limit it — a fluffy is a great café treat for little ones.'),
-        h(JNZX.ShareBar, { tab: 'Coffee corner' }));
-    };
-  } catch (e) { console.warn('[JNZX] coffee', e); }
+  var CTABS = [['quote', '☕ Quotes'], ['fact', '💡 Facts'], ['joke', '😄 Jokes'], ['brew', '🫖 How to brew'], ['kiwi', '🥝 Kiwi café']];
+  function CoffeeSmile() {
+    var t = JNZX.useStored('jnzx-coffee-tab', 'quote'), tab = t[0], setTab = t[1];
+    var qi = useState(function () { return rndi(CQ.length); }), fi = useState(function () { return rndi(CF.length); }), ji = useState(function () { return rndi(CJ.length); }), ki = useState(0), bi = useState(-1), pun = useState(false);
+    var q = CQ[qi[0]], f = CF[fi[0]], j = CJ[ji[0]], k = KIWI_CAFE[ki[0] % KIWI_CAFE.length];
+    var body;
+    if (tab === 'quote') body = h('div', null,
+      h('div', { className: 'jx-cs-photo' }, h(PhotoCard, { text: '“' + q + '”', credit: 'Coffee & a Smile · The James NZ', background: jAsset(CPICS[qi[0] % CPICS.length]), filename: 'TheJamesNZ-coffee-smile', kind: 'coffee' })),
+      h('div', { className: 'jx-row' }, h('button', { type: 'button', className: 'primary', onClick: function () { qi[1](rndi(CQ.length, qi[0])); } }, '🔄 Another quote')),
+      h(SeeAll, { items: CQ, title: 'Coffee & a Smile', render: function (x) { return x; }, share: function (x) { return '“' + x + '” — The James NZ'; } }));
+    else if (tab === 'fact') body = h('div', null,
+      h('div', { className: 'jx-cs-card jx-keep-colour' }, h('small', null, 'DID YOU KNOW? · ' + (fi[0] + 1) + ' OF ' + CF.length), h('h3', null, f[0]), h('p', null, f[1])),
+      h('div', { className: 'jx-row' }, h('button', { type: 'button', className: 'primary', onClick: function () { fi[1](rndi(CF.length, fi[0])); } }, '🔄 Another fact'), h(JNZX.ShareMini, { title: 'Coffee fact', text: 'Did you know? ' + f[0] + ': ' + f[1], label: 'Share' })),
+      h(SeeAll, { items: CF, title: 'Coffee fact', render: function (x) { return h(R.Fragment, null, h('strong', null, x[0] + '. '), x[1]); }, share: function (x) { return 'Did you know? ' + x[0] + ': ' + x[1]; } }));
+    else if (tab === 'joke') body = h('div', null,
+      h('div', { className: 'jx-cs-card jx-cs-joke jx-keep-colour' }, h('small', null, 'COFFEE JOKE'), h('h3', null, j[0]), pun[0] ? h('p', { className: 'jx-cs-pun' }, j[1]) : h('button', { type: 'button', className: 'secondary', onClick: function () { pun[1](true); } }, 'Show the punchline ☕')),
+      h('div', { className: 'jx-row' }, h('button', { type: 'button', className: 'primary', onClick: function () { ji[1](rndi(CJ.length, ji[0])); pun[1](false); } }, '🔄 Another joke'), h(JNZX.ShareMini, { title: 'Coffee joke', text: j[0] + ' … ' + j[1] + ' ☕', label: 'Share' })),
+      h(SeeAll, { items: CJ, title: 'Coffee joke', render: function (x) { return h(R.Fragment, null, h('strong', null, x[0] + ' '), x[1]); }, share: function (x) { return x[0] + ' … ' + x[1] + ' ☕'; } }));
+    else if (tab === 'brew') { var B = bi[0] >= 0 ? BREW[bi[0]] : null; body = B ? h('div', { className: 'jx-cs-brew' },
+      h('button', { type: 'button', className: 'secondary', onClick: function () { bi[1](-1); } }, '← All brew guides'),
+      h('img', { src: jAsset(B[1]), alt: B[0], className: 'jx-cs-brew-img' }),
+      h('h3', null, B[0], ' ', h('small', null, '· ' + B[2])),
+      h('ol', null, B[3].map(function (s, i) { return h('li', { key: i }, s); })),
+      h('p', { className: 'jx-cs-tip' }, '💡 ' + B[4]),
+      h(JNZX.ShareMini, { title: B[0] + ' — brew guide', text: B[0] + ' (' + B[2] + '):\n' + B[3].map(function (s, i) { return (i + 1) + '. ' + s; }).join('\n') + '\nTip: ' + B[4], label: 'Share this guide' }))
+      : h('div', { className: 'jx-cs-tiles' }, BREW.map(function (x, i) { return h('button', { key: i, type: 'button', className: 'jx-cs-tile', onClick: function () { bi[1](i); } }, h('img', { src: jAsset(x[1]), alt: '' }), h('strong', null, x[0]), h('small', null, x[2])); })); }
+    else body = h('div', null,
+      h('div', { className: 'jx-cs-card jx-keep-colour' }, h('small', null, 'KIWI CAFÉ CULTURE · ' + ((ki[0] % KIWI_CAFE.length) + 1) + ' OF ' + KIWI_CAFE.length), h('h3', null, k[0]), h('p', null, k[1])),
+      h('div', { className: 'jx-row' }, h('button', { type: 'button', className: 'primary', onClick: function () { ki[1](ki[0] + 1); } }, '🔄 Next'), h(JNZX.ShareMini, { title: 'Kiwi café culture', text: k[0] + ': ' + k[1], label: 'Share' })),
+      h(SeeAll, { items: KIWI_CAFE, title: 'Kiwi café culture', render: function (x) { return h(R.Fragment, null, h('strong', null, x[0] + '. '), x[1]); }, share: function (x) { return x[0] + ': ' + x[1]; } }));
+    return h('div', { className: 'jx-page jx-coffee jx-cs' },
+      JNZX.Header('EVERYDAY JOY · COFFEE & A SMILE', 'Coffee & a smile.', 'Pick one, enjoy it, share it. All written for The James NZ.'),
+      h('div', { className: 'jx-cs-tabs', role: 'tablist', 'aria-label': 'Coffee & a Smile' }, CTABS.map(function (x) {
+        return h('button', { key: x[0], type: 'button', role: 'tab', 'aria-selected': tab === x[0], className: tab === x[0] ? 'is-on' : '', onClick: function () { setTab(x[0]); bi[1](-1); } }, x[1]);
+      })),
+      h('div', { className: 'jx-cs-body', role: 'tabpanel' }, body),
+      h('p', { className: 'small-note' }, 'Enjoy coffee in moderation. A fluffy is a great café treat for little ones.'),
+      h(JNZX.ShareBar, { tab: 'Coffee corner' }));
+  }
+  try { CoffeeCorner = CoffeeSmile; } catch (e) { console.warn('[JNZX] coffee', e); }
 
   /* ---------------- Water Intake ---------------- */
   var DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -312,7 +444,7 @@
   }
   try {
     var baseCard = uProducePhoto;
-    uProducePhoto = function (props) { return h('div', { className: 'jx-produce-wrap' }, h(baseCard, props), h('p', { className: 'jx-produce-wit' }, wit(props.name))); };
+    uProducePhoto = function (props) { return h('div', { className: 'jx-produce-wrap' }, h(baseCard, props), h('p', { className: 'jx-produce-wit' }, wit(props.name)), h('div', { className: 'jx-produce-share' }, h(JNZX.ShareMini, { title: props.name + ' · Fresh Picks Today', text: '🥝 Fresh pick today: ' + props.name + ' — “' + wit(props.name) + '” #FreshPicksNZ', label: 'Share' })) ); };
     var baseSP = SeasonalProduce;
     SeasonalProduce = function FreshPicks() { return h(R.Fragment, null, h(baseSP), h(PicksShare)); };
     JNZX.ownShare['Today’s fruit & vege picks'] = 0;

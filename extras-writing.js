@@ -1,7 +1,6 @@
-/* The James NZ — Ask Mateo writing & grammar check (October 2026).
-   Local style rules run on this device. The optional LanguageTool check
-   sends the text to api.languagetool.org only when the person presses
-   "Check grammar online". */
+/* The James NZ — Ask Mateo (October 2026).
+   A simple chat and a writing buddy. Everything runs on this device;
+   nothing you type is sent anywhere. */
 (function () {
   'use strict';
   var R = import_react, h = jH, useState = R.useState, useMemo = R.useMemo;
@@ -156,146 +155,275 @@
   var EXP = { "can't": 'cannot', "won't": 'will not', "don't": 'do not', "doesn't": 'does not', "didn't": 'did not', "isn't": 'is not', "aren't": 'are not', "wasn't": 'was not', "weren't": 'were not', "haven't": 'have not', "hasn't": 'has not', "hadn't": 'had not', "couldn't": 'could not', "wouldn't": 'would not', "shouldn't": 'should not', "mustn't": 'must not', "it's": 'it is', "that's": 'that is', "there's": 'there is', "what's": 'what is', "let's": 'let us', "they're": 'they are', "we're": 'we are', "you're": 'you are', "i'm": 'I am', "i've": 'I have', "we've": 'we have', "they've": 'they have', "you've": 'you have', "i'll": 'I will', "we'll": 'we will', "they'll": 'they will', "you'll": 'you will', "i'd": 'I would', "they'd": 'they would', "we'd": 'we would', "he's": 'he is', "she's": 'she is' };
   function expand(w) { var k = w.toLowerCase().replace('’', "'"); var v = EXP[k]; if (!v) return null; return /^[A-Z]/.test(w) ? v[0].toUpperCase() + v.slice(1) : v; }
 
-  async function onlineCheck(text, mode) {
-    var body = new URLSearchParams({ text: text, language: 'en-NZ', level: mode === 'creative' ? 'default' : 'picky' });
-    var r = await fetch('https://api.languagetool.org/v2/check', { method: 'POST', body: body });
-    if (r.status === 429) throw Error('The online checker is busy (free limit reached). Wait a minute and try again.');
-    if (!r.ok) throw Error('The online grammar checker is unavailable right now. Local checks still ran.');
-    var d = await r.json();
-    return (d.matches || []).map(function (m) {
-      return { start: m.offset, end: m.offset + m.length, msg: m.message, fix: m.replacements && m.replacements[0] ? m.replacements[0].value : null, alts: (m.replacements || []).slice(0, 4).map(function (x) { return x.value; }), kind: (m.rule && m.rule.category && m.rule.category.name || 'grammar').toLowerCase(), src: 'LanguageTool' };
-    });
-  }
-  function dedupe(list) {
-    list.sort(function (a, b) { return a.start - b.start || (a.src === 'LanguageTool' ? -1 : 1); });
-    var out = [];
-    list.forEach(function (it) {
-      if (out.some(function (o) { return o.start === it.start && o.end === it.end && (o.fix === it.fix || o.msg === it.msg); })) return;
-      out.push(it);
-    });
-    return out;
-  }
-  function applyFix(text, it, fix) {
-    var v = fix === undefined ? it.fix : fix;
-    if (v === null || v === undefined) return text;
-    var before = text.slice(0, it.start), after = text.slice(it.end);
-    if (v === '') { before = before.replace(/ $/, ''); }
-    var next = before + v + after;
-    return next.replace(/ {2,}/g, ' ');
-  }
-
   var SAMPLES = {
     academic: 'Studies show that kids who read alot do better at school. I think this is really important and it\'s something schools should definately do more of!',
     business: 'Hi team, in order to move the needle on this project we just need to circle back ASAP. The report was written by the team and will be sent to the client in the near future.',
     email: 'per my last email i still havent got the invoice. can you send it',
     creative: 'All of a sudden she felt very scared. She heard the door creak slowly and she saw a shadow move quickly across the very dark room.',
-    improve: 'There are many people who think that the meeting was really very long and that it could of been shorter. Their going to ask for a shorter one next time.'
+    improve: 'there are many people who think that the meeting was really very long and that it could of been shorter. Their going to ask for a shorter one next time'
   };
 
-  function WritingCheck() {
-    var m = useState('improve'), mode = m[0], setMode = m[1];
-    var t = useState(''), text = t[0], setText = t[1];
-    var r = useState(null), res = r[0], setRes = r[1];
-    var b = useState(false), busy = b[0], setBusy = b[1];
-    var e = useState(''), err = e[0], setErr = e[1];
-    var o = JNZX.useStored('jnzx-lt-consent', false), online = o[0], setOnline = o[1];
-    var st = useMemo(function () { return stats(text); }, [text]);
-    async function run() {
-      setErr(''); setBusy(true);
-      var list = localCheck(text, mode);
-      if (online && text.trim()) {
-        try { list = list.concat(await onlineCheck(text.slice(0, 18000), mode)); }
-        catch (x) { setErr(x.message || 'The online checker could not be reached. Local checks still ran.'); }
-      }
-      setRes({ text: text, mode: mode, issues: dedupe(list) });
-      setBusy(false);
-    }
-    function fixOne(it, fix) {
-      var next = applyFix(text, it, fix);
-      setText(next);
-      // shift later issues, drop overlapping ones
-      var delta = next.length - text.length;
-      setRes(function (old) {
-        if (!old) return old;
-        return Object.assign({}, old, { text: next, issues: old.issues.filter(function (x) { return x !== it && (x.end <= it.start || x.start >= it.end); }).map(function (x) { return x.start >= it.end ? Object.assign({}, x, { start: x.start + delta, end: x.end + delta }) : x; }) });
+  /* ---------- fixing engine ---------- */
+  function applyFix(text, it, fix) {
+    var v = fix === undefined ? it.fix : fix;
+    if (v === null || v === undefined) return text;
+    var before = text.slice(0, it.start), after = text.slice(it.end);
+    if (v === '') { before = before.replace(/ $/, ''); }
+    return (before + v + after).replace(/ {2,}/g, ' ');
+  }
+  function tidy(text) {
+    var t = text.replace(/[ \t]+\n/g, '\n').replace(/^\s+|\s+$/g, '');
+    t = t.replace(/(^|[.!?]\s+|\n\s*)([a-z])/g, function (m, a, b) { return a + b.toUpperCase(); });
+    t = t.replace(/\s+([,.;:!?])/g, '$1');
+    if (t && !/[.!?…:"”)]$/.test(t) && !/\n/.test(t.slice(-40))) t += '.';
+    return t;
+  }
+  function fixText(text, mode) {
+    var cur = text, changes = [], tips = [], seenTip = {};
+    for (var pass = 0; pass < 3; pass++) {
+      var list = localCheck(cur, mode);
+      var fixable = list.filter(function (x) { return x.fix !== null && x.fix !== undefined && x.kind !== 'clarity' && x.kind !== 'voice'; }).sort(function (a, b) { return b.start - a.start; });
+      if (pass === 0) list.forEach(function (x) { if ((x.fix === null || x.fix === undefined || x.kind === 'clarity' || x.kind === 'voice') && !seenTip[x.msg]) { seenTip[x.msg] = 1; tips.push(x.msg); } });
+      if (!fixable.length) break;
+      var lastStart = Infinity, next = cur;
+      fixable.forEach(function (it) {
+        if (it.end <= lastStart) {
+          var was = cur.slice(it.start, it.end);
+          next = applyFix(next, it); lastStart = it.start;
+          changes.push({ from: was, to: it.fix, why: it.msg });
+        }
       });
+      cur = next;
     }
-    function fixAll() {
-      if (!res) return;
-      var list = res.issues.filter(function (x) { return x.fix !== null && x.fix !== undefined && x.kind !== 'clarity'; }).sort(function (a, b) { return b.start - a.start; });
-      var cur = text, lastStart = Infinity;
-      list.forEach(function (it) { if (it.end <= lastStart) { cur = applyFix(cur, it); lastStart = it.start; } });
-      setText(cur); setRes(null);
-    }
-    var stale = res && res.text !== text;
-    var modeInfo = MODES.find(function (x) { return x.id === mode; });
-    var issues = res ? res.issues : [];
-    var counts = {};
-    issues.forEach(function (x) { counts[x.kind] = (counts[x.kind] || 0) + 1; });
-    return h('section', { className: 'jx-page jx-writing', 'aria-labelledby': 'jx-writing-title' },
-      h('p', { className: 'eyebrow' }, 'ASK MATEO · WRITING HELPER'),
-      h('h2', { id: 'jx-writing-title' }, 'Check my writing'),
-      h('p', { className: 'jx-muted' }, 'Paste a paragraph, email or essay. Choose a style and Mateo will point out grammar slips and give style tips you can accept with one tap.'),
-      h(JNZX.Chips, { label: 'Writing style', options: MODES.map(function (x) { return { value: x.id, label: x.label }; }), value: mode, onChange: function (v) { setMode(v); setRes(null); } }),
-      h('p', { className: 'small-note' }, modeInfo.hint),
-      h('label', { className: 'jx-wide' }, 'Your text', h('textarea', { rows: 8, value: text, maxLength: 20000, onChange: function (ev) { setText(ev.target.value); }, placeholder: 'Type or paste your writing here…', spellCheck: true })),
-      h('div', { className: 'jx-row jx-wstats', 'aria-live': 'polite' },
-        h('span', null, st.words + ' words'), h('span', null, st.sentences + ' sentences'), h('span', null, 'Avg ' + st.avg.toFixed(1) + ' words/sentence'),
-        st.words > 20 && h('span', null, 'Readability ' + st.flesch + ' · ' + readLabel(st.flesch)), h('span', null, '≈ ' + st.minutes + ' min read')),
-      h('label', { className: 'jx-check' }, h('input', { type: 'checkbox', checked: online, onChange: function (ev) { setOnline(ev.target.checked); } }),
-        h('span', null, 'Also check grammar online with LanguageTool. Your text is sent to LanguageTool (languagetool.org) only when you press Check. Leave this off for private text.')),
-      h('div', { className: 'jx-row' },
-        h('button', { type: 'button', className: 'primary', disabled: busy || !text.trim(), onClick: run }, busy ? 'Checking…' : 'Check my writing'),
-        h('button', { type: 'button', className: 'secondary', onClick: function () { setText(SAMPLES[mode]); setRes(null); } }, 'Try an example'),
-        res && issues.some(function (x) { return x.fix !== null && x.fix !== undefined; }) && h('button', { type: 'button', className: 'secondary', onClick: fixAll }, 'Apply all suggested fixes'),
-        text && h('button', { type: 'button', className: 'secondary', onClick: function () { try { navigator.clipboard.writeText(text); } catch (x) {} } }, 'Copy text'),
-        text && h('button', { type: 'button', className: 'secondary', onClick: function () { setText(''); setRes(null); } }, 'Clear')),
-      err && h('p', { className: 'small-note', role: 'alert' }, err),
-      res && h('div', { className: 'jx-wresults' },
-        stale && h('p', { className: 'small-note' }, 'You have edited the text since the last check. Press Check again for fresh results.'),
-        h('h3', null, issues.length ? issues.length + ' suggestion' + (issues.length === 1 ? '' : 's') : 'Looks good! No issues found for this style.'),
-        issues.length > 0 && h('p', { className: 'jx-muted' }, Object.keys(counts).map(function (k) { return k + ': ' + counts[k]; }).join(' · ')),
-        h('ol', { className: 'jx-issues' }, issues.slice(0, 80).map(function (it, i) {
-          var snippet = res.text.slice(Math.max(0, it.start - 30), it.start) + '⟦' + res.text.slice(it.start, it.end) + '⟧' + res.text.slice(it.end, it.end + 30);
-          var opts = it.alts && it.alts.length ? it.alts : (it.fix !== null && it.fix !== undefined ? [it.fix] : []);
-          return h('li', { key: i, className: 'jx-issue jx-k-' + it.kind.replace(/\W/g, '') },
-            h('div', { className: 'jx-issue-top' }, h('strong', null, it.msg), h('small', null, it.kind + (it.src === 'LanguageTool' ? ' · LanguageTool' : ''))),
-            it.end > it.start && h('code', null, snippet.replace(/\n/g, ' ')),
-            !stale && opts.length > 0 && h('div', { className: 'jx-row' }, opts.map(function (f, j) {
-              return h('button', { key: j, type: 'button', className: 'secondary jx-fix', onClick: function () { fixOne(it, f); } }, f === '' ? 'Remove' : 'Use “' + f + '”');
-            })));
-        }))),
-      h('p', { className: 'small-note' }, 'Suggestions are guides, not rules. Read the result aloud before you send it. Online checking uses LanguageTool’s free service, which has daily limits.'));
+    var tidied = tidy(cur);
+    if (tidied !== cur.trim()) changes.push({ from: '', to: '', why: 'Capital letters and full stops tidied.' });
+    return { text: tidied, changes: changes.reverse(), tips: tips.slice(0, 4) };
   }
 
-  JNZX.WritingCheck = WritingCheck;
-  /* One Ask Mateo box: a "Writing helper" chip sits with the quick prompts and
-     opens the checker inside the same chat card. */
-  function MateoWritingDock() {
-    var hosts = useState(null), hs = hosts[0], setHs = hosts[1];
-    var o = useState(function () { try { return sessionStorage.getItem('jnzx-mateo-writing') === '1'; } catch (e) { return false; } }), open = o[0], setOpen = o[1];
-    R.useEffect(function () {
-      var chip, panel, stop = false;
-      function attach() {
-        if (stop) return;
-        var room = document.querySelector('section.m-chat'), prompts = room && room.querySelector('.m-chat-prompts');
-        if (!prompts) return;
-        if (!chip || !chip.isConnected) { chip = document.createElement('span'); chip.className = 'jx-mateo-chip-host'; prompts.insertBefore(chip, prompts.firstChild); }
-        if (!panel || !panel.isConnected) { panel = document.createElement('div'); panel.className = 'jx-mateo-writing-host'; prompts.parentNode.insertBefore(panel, prompts); }
-        setHs(function (cur) { return cur && cur.chip === chip && cur.panel === panel ? cur : { chip: chip, panel: panel }; });
-      }
-      attach();
-      var mo = new MutationObserver(attach); mo.observe(document.getElementById('root'), { childList: true, subtree: true });
-      return function () { stop = true; mo.disconnect(); if (chip) chip.remove(); if (panel) panel.remove(); };
-    }, []);
-    function toggle() { var v = !open; setOpen(v); try { sessionStorage.setItem('jnzx-mateo-writing', v ? '1' : '0'); } catch (e) {} }
-    if (!hs) return h(WritingCheck);
-    return h(R.Fragment, null,
-      import_react_dom.createPortal(h('button', { type: 'button', className: 'jx-mateo-chip' + (open ? ' is-on' : ''), 'aria-expanded': open, onClick: toggle }, '✍️ Writing helper'), hs.chip),
-      open && import_react_dom.createPortal(h('div', { className: 'jx-mateo-writing' }, h('button', { type: 'button', className: 'jx-x jx-mateo-close', 'aria-label': 'Close writing helper', onClick: toggle }, '×'), h(WritingCheck)), hs.panel));
-  }
-  var prevFriend = AIFriend;
-  AIFriend = function MateoWithWriting(props) {
-    return h(R.Fragment, null, h(prevFriend, props), h(MateoWritingDock));
+  var STYLES = [
+    { id: 'improve', label: 'Everyday' },
+    { id: 'email', label: 'Email' },
+    { id: 'business', label: 'Work' },
+    { id: 'academic', label: 'School & uni' },
+    { id: 'creative', label: 'Story' }
+  ];
+
+  /* ---------- "write it for me" drafts ---------- */
+  function first(s, d) { s = (s || '').trim(); return s || d; }
+  var KINDS = [
+    { id: 'thanks', label: '🙏 Thank you', about: 'What are you thanking them for?', eg: 'the lovely dinner on Saturday' },
+    { id: 'sorry', label: '💛 Sorry', about: 'What are you sorry about?', eg: 'missing your call yesterday' },
+    { id: 'invite', label: '🎉 Invitation', about: 'What are you inviting them to? (and when)', eg: 'a barbecue at ours on Saturday at 5 pm' },
+    { id: 'ask', label: '🙋 Ask for something', about: 'What do you need?', eg: 'a copy of the school newsletter' },
+    { id: 'followup', label: '⏰ Gentle reminder', about: 'What are you following up?', eg: 'the invoice I sent on 3 October' },
+    { id: 'congrats', label: '🌟 Congratulations', about: 'What are you celebrating?', eg: 'your new job' },
+    { id: 'getwell', label: '🌷 Get well soon', about: 'Anything to mention? (optional)', eg: 'your knee operation' },
+    { id: 'sympathy', label: '🕊️ Sympathy', about: 'Who has passed away? (optional)', eg: 'your dad' },
+    { id: 'decline', label: '🙅 Say no kindly', about: 'What are you saying no to?', eg: 'helping at the fair this weekend' },
+    { id: 'intro', label: '👋 Introduce myself', about: 'Who are you, in a few words?', eg: 'the new parent rep for Room 4' }
+  ];
+  var DRAFT = {
+    thanks: [
+      ['Thank you so much for {a}. It meant a lot to me.', 'I really appreciated your kindness and the time you gave.', 'I hope I can return the favour soon.'],
+      ['I just wanted to say a big thank you for {a}.', 'It made my week, and I’m still smiling about it.', 'You’re a treasure.'],
+      ['Thank you for {a}.', 'Your thoughtfulness made a real difference.', 'With warm thanks.']
+    ],
+    sorry: [
+      ['I’m sorry about {a}.', 'That wasn’t fair to you, and I understand if it was frustrating.', 'I’ll do better next time, and I’d love to make it up to you.'],
+      ['I owe you an apology for {a}.', 'There’s no excuse — I should have handled it better.', 'Thank you for your patience with me.'],
+      ['Please accept my apology for {a}.', 'I value our friendship and didn’t want this to sit between us.', 'Can we catch up soon?']
+    ],
+    invite: [
+      ['We’d love you to join us for {a}.', 'It will be relaxed — just good company and plenty of food.', 'Let me know if you can make it.'],
+      ['You’re invited to {a}!', 'Bring yourself and your appetite; we’ll sort the rest.', 'Please reply by the end of the week so we can plan.'],
+      ['Would you like to come to {a}?', 'It wouldn’t be the same without you.', 'No pressure — just let me know.']
+    ],
+    ask: [
+      ['Could you please help me with {a}?', 'It would make things much easier on my end.', 'Thank you in advance — I really appreciate it.'],
+      ['I was hoping you could help with {a}.', 'If now isn’t a good time, just let me know when suits you.', 'Many thanks.'],
+      ['Would it be possible to get {a}?', 'Happy to work around whatever is easiest for you.', 'Thanks so much.']
+    ],
+    followup: [
+      ['I’m following up on {a}.', 'I know things get busy, so this is just a friendly nudge.', 'Could you let me know when you’ve had a chance to look at it?'],
+      ['Just checking in about {a}.', 'If you need anything else from me, I’m happy to help.', 'Thanks for your time.'],
+      ['I wanted to touch base about {a}.', 'Could you give me an update when you can?', 'Thank you.']
+    ],
+    congrats: [
+      ['Congratulations on {a}!', 'You’ve worked so hard for this, and it’s wonderful to see.', 'Enjoy every moment — you deserve it.'],
+      ['What fantastic news about {a}!', 'I’m so proud of you.', 'Let’s celebrate soon.'],
+      ['Huge congratulations on {a}.', 'This is a big step and a well-earned one.', 'Wishing you every success.']
+    ],
+    getwell: [
+      ['I was sorry to hear about {a}.', 'I’m thinking of you and hoping each day is a little easier.', 'If there’s anything I can do — meals, errands, a chat — just say the word.'],
+      ['Sending you get-well wishes{A}.', 'Take all the time you need to rest.', 'We’re looking forward to seeing you back on your feet.'],
+      ['Just a note to say I’m thinking of you{A}.', 'Be gentle with yourself while you recover.', 'Here if you need anything.']
+    ],
+    sympathy: [
+      ['I’m so sorry for the loss of {a}.', 'Please know I’m thinking of you and your family.', 'If you’d like company or help with anything, I’m here.'],
+      ['My heart goes out to you as you grieve {a}.', 'I hope the love around you brings a little comfort.', 'With deepest sympathy.'],
+      ['I was so sad to hear about {a}.', 'There are no right words, but I wanted you to know I care.', 'Holding you in my thoughts and prayers.']
+    ],
+    decline: [
+      ['Thank you for thinking of me for {a}.', 'Unfortunately I can’t say yes this time.', 'I hope it goes really well, and please ask me again.'],
+      ['I’m sorry, but I won’t be able to manage {a}.', 'I’d rather say no now than let you down later.', 'Thanks for understanding.'],
+      ['I appreciate the offer of {a}.', 'I need to keep my plate a bit lighter right now, so I’ll pass.', 'Wishing you all the best with it.']
+    ],
+    intro: [
+      ['I’m {f}, {a}.', 'I wanted to say hello and let you know I’m happy to help with anything you need.', 'It’s lovely to meet you.'],
+      ['Let me introduce myself — I’m {f}, {a}.', 'Please feel free to get in touch any time.', 'I look forward to working with you.'],
+      ['My name is {f}, and I’m {a}.', 'I’m keen to get to know everyone and help where I can.', 'Feel free to say hi!']
+    ]
   };
+  var SUBJ = { thanks: 'Thank you', sorry: 'I’m sorry', invite: 'You’re invited', ask: 'A quick request', followup: 'Following up', congrats: 'Congratulations!', getwell: 'Thinking of you', sympathy: 'With sympathy', decline: 'Thank you for asking', intro: 'Hello from {f}' };
+  function makeDraft(kind, to, from, about, tone, n) {
+    var k = KINDS.find(function (x) { return x.id === kind; }) || KINDS[0];
+    var set = DRAFT[kind], v = set[n % set.length];
+    var a = first(about, k.id === 'getwell' ? 'you being unwell' : k.id === 'sympathy' ? 'your loved one' : k.eg);
+    var A = (about || '').trim() ? ' after ' + about.trim() : '';
+    var f = first(from, 'your name');
+    var body = v.map(function (s) { return s.replace(/\{a\}/g, a).replace(/\{A\}/g, A).replace(/\{f\}/g, f); });
+    if (tone === 'short') body = [body[0], body[2]];
+    var hi = tone === 'formal' ? 'Dear ' + first(to, 'Sir or Madam') + ',' : (first(to, '') ? 'Hi ' + to.trim() + ',' : 'Kia ora,');
+    var bye = tone === 'formal' ? 'Kind regards,' : kind === 'sympathy' ? 'With love,' : kind === 'intro' || kind === 'ask' || kind === 'followup' ? 'Thanks,' : 'Warmly,';
+    if (tone === 'formal') body = body.map(function (s) { return s.replace(/’s(?= )/g, ' is').replace(/I’m/g, 'I am').replace(/can’t/g, 'cannot').replace(/won’t/g, 'will not').replace(/I’d/g, 'I would').replace(/We’d/g, 'We would').replace(/I’ll/g, 'I will').replace(/You’re/g, 'You are').replace(/you’ve/g, 'you have').replace(/wasn’t/g, 'was not').replace(/didn’t/g, 'did not').replace(/isn’t/g, 'is not').replace(/wouldn’t/g, 'would not').replace(/There’s/g, 'There is').replace(/there’s/g, 'there is').replace(/!/g, '.'); });
+    return { subject: SUBJ[kind].replace('{f}', first(from, 'me')), text: hi + '\n\n' + body.join(' ') + '\n\n' + bye + '\n' + first(from, '[Your name]') };
+  }
+
+  function copyText(t, done) { try { navigator.clipboard.writeText(t).then(function () { done('Copied.'); }, function () { done('Select the text and copy it.'); }); } catch (e) { done('Select the text and copy it.'); } }
+
+  /* ---------- the writing buddy ---------- */
+  function WriteBuddy(props) {
+    var w = useState(props.start || 'fix'), way = w[0], setWay = w[1];
+    var m = JNZX.useStored('jnzx-wb-style', 'improve'), mode = m[0], setMode = m[1];
+    var t = JNZX.useStored('jnzx-wb-text', ''), text = t[0], setText = t[1];
+    var r = useState(null), res = r[0], setRes = r[1];
+    var msgS = useState(''), msg = msgS[0], setMsg = msgS[1];
+    var k = useState('thanks'), kind = k[0], setKind = k[1];
+    var to = useState(''), from = JNZX.useStored('jnzx-wb-from', ''), ab = useState(''), tn = useState('warm'), nn = useState(0);
+    var kinfo = KINDS.find(function (x) { return x.id === kind; });
+    var draft = makeDraft(kind, to[0], from[0], ab[0], tn[0], nn[0]);
+    var st = useMemo(function () { return stats(text); }, [text]);
+    function run() { setMsg(''); setRes(fixText(text, mode)); }
+    return h('div', { className: 'jx-wb' },
+      h('div', { className: 'jx-wb-way', role: 'tablist', 'aria-label': 'Writing help' },
+        [['fix', '✨ Fix my writing'], ['draft', '📝 Write it for me']].map(function (x) {
+          return h('button', { key: x[0], type: 'button', role: 'tab', 'aria-selected': way === x[0], className: way === x[0] ? 'is-on' : '', onClick: function () { setWay(x[0]); setMsg(''); } }, x[1]);
+        })),
+      way === 'fix' ? h('div', { className: 'jx-wb-pane' },
+        h(JNZX.Chips, { label: 'Kind of writing', options: STYLES.map(function (x) { return { value: x.id, label: x.label }; }), value: mode, onChange: function (v) { setMode(v); setRes(null); } }),
+        h('label', { className: 'jx-sr', htmlFor: 'jx-wb-text' }, 'Your writing'),
+        h('textarea', { id: 'jx-wb-text', rows: 6, value: text, maxLength: 20000, spellCheck: true, placeholder: 'Paste or type your writing here…', onChange: function (ev) { setText(ev.target.value); setRes(null); } }),
+        h('div', { className: 'jx-row' },
+          h('button', { type: 'button', className: 'primary', disabled: !text.trim(), onClick: run }, '✨ Fix it'),
+          !text && h('button', { type: 'button', className: 'secondary', onClick: function () { setText(SAMPLES[mode]); } }, 'Try an example'),
+          text && h('button', { type: 'button', className: 'secondary', onClick: function () { setText(''); setRes(null); } }, 'Clear'),
+          text && h('small', { className: 'jx-muted' }, st.words + ' words' + (st.words > 20 ? ' · ' + readLabel(st.flesch).toLowerCase() : ''))),
+        res && h('div', { className: 'jx-wb-out', 'aria-live': 'polite' },
+          h('p', { className: 'jx-wb-label' }, res.changes.length ? 'Here’s your polished version' : 'Looks good — nothing to fix.'),
+          res.changes.length > 0 && h('div', { className: 'jx-wb-result' }, res.text),
+          h('div', { className: 'jx-row' },
+            res.changes.length > 0 && h('button', { type: 'button', className: 'primary', onClick: function () { setText(res.text); setRes(null); setMsg('Done — your text is updated.'); } }, 'Use this'),
+            h('button', { type: 'button', className: 'secondary', onClick: function () { copyText(res.changes.length ? res.text : text, setMsg); } }, 'Copy')),
+          res.changes.length > 0 && h('details', { className: 'jx-wb-why' }, h('summary', null, 'What I changed (' + res.changes.length + ')'),
+            h('ul', null, res.changes.slice(0, 12).map(function (c, i) { return h('li', { key: i }, c.from ? h('span', null, h('s', null, c.from), ' → ', h('strong', null, c.to === '' ? '(removed)' : c.to), ' · ') : null, c.why); }))),
+          res.tips.length > 0 && h('div', { className: 'jx-wb-tips' }, h('strong', null, '💡 Tips'), h('ul', null, res.tips.map(function (x, i) { return h('li', { key: i }, x); })))),
+        msg && h('p', { className: 'small-note', role: 'status' }, msg))
+      : h('div', { className: 'jx-wb-pane' },
+        h(JNZX.Chips, { label: 'What do you want to write?', options: KINDS.map(function (x) { return { value: x.id, label: x.label }; }), value: kind, onChange: function (v) { setKind(v); nn[1](0); ab[1](''); } }),
+        h('div', { className: 'jx-wb-fields' },
+          h('label', null, 'To', h('input', { value: to[0], maxLength: 60, placeholder: 'e.g. Aunty Rose', onChange: function (e) { to[1](e.target.value); } })),
+          h('label', null, 'From', h('input', { value: from[0], maxLength: 60, placeholder: 'Your name', onChange: function (e) { from[1](e.target.value); } })),
+          h('label', { className: 'jx-wide' }, kinfo.about, h('input', { value: ab[0], maxLength: 160, placeholder: 'e.g. ' + kinfo.eg, onChange: function (e) { ab[1](e.target.value); } }))),
+        h(JNZX.Chips, { label: 'Tone', options: [{ value: 'warm', label: 'Warm' }, { value: 'formal', label: 'Formal' }, { value: 'short', label: 'Short' }], value: tn[0], onChange: tn[1] }),
+        h('div', { className: 'jx-wb-out' },
+          h('p', { className: 'jx-wb-label' }, 'Subject: ', h('strong', null, draft.subject)),
+          h('div', { className: 'jx-wb-result' }, draft.text),
+          h('div', { className: 'jx-row' },
+            h('button', { type: 'button', className: 'primary', onClick: function () { copyText(draft.text, setMsg); } }, 'Copy'),
+            h('button', { type: 'button', className: 'secondary', onClick: function () { nn[1](nn[0] + 1); setMsg(''); } }, '🔄 Another version'),
+            h('button', { type: 'button', className: 'secondary', onClick: function () { setText(draft.text); setMode('email'); setRes(null); setWay('fix'); } }, 'Edit it'))),
+        msg && h('p', { className: 'small-note', role: 'status' }, msg)));
+  }
+  JNZX.WriteBuddy = WriteBuddy;
+  JNZX.WritingCheck = WriteBuddy;
+
+  /* ---------- Ask Mateo: one simple box ---------- */
+  var MORE = {
+    calm: ['Breathe in for four, out for six. You don’t have to solve everything right now.', 'Put one worry on paper and leave it there for tonight.', 'Tough days are allowed. So are naps, cups of tea and asking for help.', 'You have got through every hard day so far. Today can be one more.'],
+    family: ['The dishes can wait; the bedtime story can’t.', 'A family is a team that keeps forgiving the referee.', 'Ten minutes of full attention beats an hour of half-listening.'],
+    goals: ['Done is better than perfect. Start with five minutes.', 'Small steps still cover distance.', 'You don’t need more motivation — just a smaller first step.'],
+    thanks: ['Say thank you out loud today. It costs nothing and warms two hearts.', 'Joy shared is joy doubled.', 'Count the good things first; the rest can queue.'],
+    healing: ['Rest is part of getting better, not a break from it.', 'Small improvements are still improvements.'],
+    grief: ['Grief is love with nowhere to go. Let it be gentle with you.', 'There’s no timetable for missing someone.'],
+    faith: ['Hope is a small light that never needs to be big to be enough.', 'Prayer can be as simple as “help” and “thank you”.'],
+    everyday: ['Be the reason someone smiles today.', 'A cup of tea and a kind word fix more than you’d think.', 'Ordinary days hold the best little surprises.', 'Make room for one thing that makes you smile.', 'Kindness is free — sprinkle it everywhere.']
+  };
+  var COFFEE = ['Coffee beans are really the seeds of a bright red fruit called a coffee cherry.', 'The flat white is a proud Kiwi–Aussie favourite — and both countries claim it.', 'Lighter roasts usually keep a little more caffeine than dark roasts.', 'Coffee tastes best within a few weeks of roasting. Keep beans airtight and away from light.', 'A splash of cold water on boiled water (about 92–96 °C) is the sweet spot for brewing.'];
+  var GREET = /^(hello|hi|hey|kia ora|morena|mōrena|good (morning|afternoon|evening)|yo)\b/i;
+  function pick(list, n) { return list[n % list.length]; }
+  function moodOf(q) { try { var keys = Object.keys(messages); for (var i = 0; i < keys.length; i++) if (keys[i] !== 'everyday' && messages[keys[i]].words.test(q)) return keys[i]; } catch (e) {} return 'everyday'; }
+  function reply(q, n) {
+    var s = q.trim(), low = s.toLowerCase();
+    if (/write|email|letter|essay|grammar|spell|proofread|check my|fix my|word(ing)?|message to|card/.test(low)) return { text: 'I’d love to help you write. Tap below and I’ll fix your text or start a draft for you.', write: /fix|check|proofread|grammar|spell/.test(low) ? 'fix' : 'draft' };
+    if (GREET.test(s)) return { text: 'Kia ora! I’m Mateo. I can share a little hope, a quiet prayer, a coffee thought — or help you write something. What would you like?' };
+    if (/^(thanks|thank you|cheers|ta)\b/i.test(s)) return { text: 'You’re very welcome. I’m always here for a little kindness.' };
+    if (/\btime\b/.test(low) && /what/.test(low)) return { text: 'In New Zealand it’s ' + new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', hour: 'numeric', minute: '2-digit' }).format(new Date()) + '.' };
+    if (/\b(date|day is it|today)\b/.test(low) && /what/.test(low)) return { text: 'In New Zealand it’s ' + new Intl.DateTimeFormat('en-NZ', { timeZone: 'Pacific/Auckland', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date()) + '.' };
+    if (/coffee|cuppa|latte|flat white|tea\b|break/.test(low)) return { text: '☕ Coffee thought: ' + pick(COFFEE, n) + '\n\nNow sit for a minute — you’ve earned it.' };
+    if (/joke|funny|laugh/.test(low)) return { text: pick(['Why did the kiwi cross the road? To prove it wasn’t chicken. 🥝', 'I told my coffee a joke. It didn’t laugh — it was too bitter.', 'What do you call a sheep with no legs? A cloud. ☁️'], n) };
+    var mood = moodOf(s), base = (messages && messages[mood]) || { quotes: [], prayer: '' };
+    if (/pray|prayer|amen|bless/.test(low)) return { text: '🙏 Here’s a short prayer you can make your own:\n\n' + (base.prayer || messages.everyday.prayer) };
+    var all = (base.quotes || []).concat(MORE[mood] || []);
+    var lead = mood === 'calm' ? 'That sounds heavy. Be gentle with yourself.' : mood === 'grief' ? 'I’m so sorry. I’m here with you.' : mood === 'healing' ? 'Sending you care.' : mood === 'thanks' ? 'I love that!' : 'Here’s a little lift for you.';
+    return { text: lead + '\n\n“' + pick(all, n) + '”' };
+  }
+  var IDEAS = [['🌤️', 'A little hope', 'Share a little hope for today.'], ['🙏', 'A quiet prayer', 'A prayer for my family, please.'], ['😮‍💨', 'Feeling overwhelmed', 'I am feeling overwhelmed.'], ['☕', 'Coffee break', 'Coffee break thought, please.'], ['😄', 'Make me smile', 'Tell me a joke.']];
+
+  function AskMateo() {
+    var v = useState('chat'), view = v[0], setView = v[1];
+    var wv = useState('fix'), wway = wv[0], setWway = wv[1];
+    var ms = useState([]), msgs = ms[0], setMsgs = ms[1];
+    var tx = useState(''), text = tx[0], setText = tx[1];
+    var end = R.useRef(null), count = R.useRef(0);
+    R.useEffect(function () { var log = end.current && end.current.parentElement; if (log && msgs.length) log.scrollTop = log.scrollHeight; }, [msgs]);
+    function say(q) {
+      q = (q || '').trim(); if (!q) return;
+      var r = reply(q, count.current++);
+      setMsgs(function (old) { return old.concat([{ who: 'me', text: q }, { who: 'mateo', text: r.text, write: r.write }]).slice(-30); });
+      setText('');
+    }
+    function speak(t) { try { var u = new SpeechSynthesisUtterance(t.replace(/[“”]/g, '')); u.lang = 'en-NZ'; speechSynthesis.cancel(); speechSynthesis.speak(u); } catch (e) {} }
+    function openWrite(way) { setWway(way || 'fix'); setView('write'); }
+    var canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window;
+    return h('section', { className: 'jx-mateo', 'aria-label': 'Ask Mateo' },
+      h('header', { className: 'jx-mateo-top' },
+        h('span', { className: 'jx-mateo-pic', role: 'img', 'aria-label': 'Mateo the Labrador', style: { backgroundImage: 'url("' + jAsset('./mateo-smile-clean.webp') + '")' } }),
+        h('div', null, h('h1', null, 'Ask Mateo'), h('p', null, 'A little kindness and help with writing.')),
+        h('div', { className: 'jx-mateo-switch', role: 'tablist', 'aria-label': 'Choose' },
+          h('button', { type: 'button', role: 'tab', 'aria-selected': view === 'chat', className: view === 'chat' ? 'is-on' : '', onClick: function () { setView('chat'); } }, '💬 Chat'),
+          h('button', { type: 'button', role: 'tab', 'aria-selected': view === 'write', className: view === 'write' ? 'is-on' : '', onClick: function () { openWrite(wway); } }, '✍️ Write'))),
+      view === 'chat' ? h('div', { className: 'jx-mateo-chat' },
+        h('div', { className: 'jx-mateo-log', role: 'log', 'aria-live': 'polite' },
+          h('div', { className: 'jx-bub mateo' }, 'Kia ora! Tap an idea or type to me.'),
+          msgs.map(function (m, i) {
+            return h('div', { key: i, className: 'jx-bub ' + m.who },
+              m.text,
+              m.who === 'mateo' && h('span', { className: 'jx-bub-tools' },
+                m.write && h('button', { type: 'button', className: 'primary', onClick: function () { openWrite(m.write); } }, '✍️ Open writing help'),
+                canSpeak && h('button', { type: 'button', className: 'jx-bub-btn', 'aria-label': 'Listen', onClick: function () { speak(m.text); } }, '🔊'),
+                h('button', { type: 'button', className: 'jx-bub-btn', 'aria-label': 'Copy', onClick: function () { copyText(m.text, function () {}); } }, '📋')));
+          }),
+          h('div', { ref: end })),
+        h('div', { className: 'jx-mateo-ideas' },
+          IDEAS.map(function (x) { return h('button', { key: x[1], type: 'button', onClick: function () { say(x[2]); } }, x[0] + ' ' + x[1]); }),
+          h('button', { type: 'button', className: 'is-write', onClick: function () { openWrite('fix'); } }, '✍️ Help me write')),
+        h('form', { className: 'jx-mateo-send', onSubmit: function (e) { e.preventDefault(); say(text); } },
+          h('label', { className: 'jx-sr', htmlFor: 'jx-mateo-in' }, 'Message Mateo'),
+          h('input', { id: 'jx-mateo-in', value: text, maxLength: 500, autoComplete: 'off', placeholder: 'Message Mateo…', onChange: function (e) { setText(e.target.value); } }),
+          h('button', { type: 'submit', className: 'primary', disabled: !text.trim() }, 'Send')))
+      : h(WriteBuddy, { key: wway, start: wway }),
+      h('p', { className: 'small-note jx-mateo-note' }, 'Mateo runs on your device — nothing you type leaves it. For urgent help, call or text 1737 (free, any time) or 111 in an emergency.'));
+  }
+  JNZX.AskMateo = AskMateo;
+  AIFriend = function AskMateoPage() { return h(AskMateo); };
 })();

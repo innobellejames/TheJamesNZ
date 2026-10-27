@@ -14,9 +14,9 @@
     '2-3': { focus: 'Play in short bursts of 2–5 minutes, side by side with a grown-up.', learn: ['Name colours, animals and body parts', 'Count 1 to 5 with fingers and toys', 'Big crayons and scribbling', 'Simple matching (4 memory cards)', 'Songs, rhymes and actions'], topics: 'Counting · Colouring · Focus games', screen: 'Screen time isn’t recommended for children under two; from two to five, keep it under an hour a day and share it with them.' },
     '3-5': { focus: 'Aim for 5–10 minutes, then move or play outside.', learn: ['First letter sounds: s, a, t, p, i, n', 'Count to 10, then 20', 'Cutting straight lines with child-safe scissors', 'Odd-one-out and simple patterns', 'Memory games with 6–8 cards'], topics: 'Phonics · Counting · Cutting · Crafts · Colouring · Focus games', screen: 'Keep screen time under an hour a day, and choose slow, interactive activities.' },
     '5-6': { focus: '10 minutes of focus, then a movement break.', learn: ['Blend three-letter words (c-a-t)', 'First sight words (the, and, is)', 'Numbers to 50; adding within 10', 'Patterns and sorting', 'Memory with 8–12 cards'], topics: 'Phonics · Sight words · Counting · Easy maths · Focus games', screen: 'For 5 to 17 year olds, guidelines suggest less than two hours of recreational screen time a day.' },
-    '6-8': { focus: '10–15 minutes, with a clear goal (“beat your best time”).', learn: ['Read short books aloud', 'More sight words and spelling patterns', 'Add and subtract within 20', 'Number grids (find 1 to 9)', 'Longer memory sequences'], topics: 'Sight words · Easy maths · Kumon-inspired learnings · Focus games', screen: 'Less than two hours of recreational screen time a day, and screens off an hour before bed.' },
-    '8-10': { focus: '15–20 minutes; let them set their own challenge.', learn: ['Times tables', 'Reading chapter books', 'Number grids to 16', 'Colour–word challenges (attention control)', '16-card memory'], topics: 'Easy maths · Kumon-inspired learnings · Focus games', screen: 'Less than two hours of recreational screen time a day. Balance with sport, outdoor play and sleep.' },
-    '10-12': { focus: '20 minutes; mix fast games with calm breathing.', learn: ['Mental maths strategies', 'Reading for pleasure and research', 'Number grids to 25', 'Fast Stroop and reaction games', 'Breathing to reset focus'], topics: 'Kumon-inspired learnings · Focus games', screen: 'Less than two hours of recreational screen time a day, plus plenty of movement and 9–11 hours of sleep.' }
+    '6-8': { focus: '10–15 minutes, with a clear goal (“beat your best time”).', learn: ['Read short books aloud', 'More sight words and spelling patterns', 'Add and subtract within 20', 'Number grids (find 1 to 9)', 'Longer memory sequences'], topics: 'Sight words · Easy maths · Step-by-step practice · Focus games', screen: 'Less than two hours of recreational screen time a day, and screens off an hour before bed.' },
+    '8-10': { focus: '15–20 minutes; let them set their own challenge.', learn: ['Times tables', 'Reading chapter books', 'Number grids to 16', 'Colour–word challenges (attention control)', '16-card memory'], topics: 'Easy maths · Step-by-step practice · Focus games', screen: 'Less than two hours of recreational screen time a day. Balance with sport, outdoor play and sleep.' },
+    '10-12': { focus: '20 minutes; mix fast games with calm breathing.', learn: ['Mental maths strategies', 'Reading for pleasure and research', 'Number grids to 25', 'Fast Stroop and reaction games', 'Breathing to reset focus'], topics: 'Step-by-step practice · Focus games', screen: 'Less than two hours of recreational screen time a day, plus plenty of movement and 9–11 hours of sleep.' }
   };
 
   var T = {
@@ -235,38 +235,41 @@
     var list = G.filter(function (g) { return (!a || (g.ages[0] <= a[4] && g.ages[1] >= a[3])) && (skill === 'All' || g.skill === skill); });
     var skills = ['All'].concat(Array.from(new Set(G.map(function (g) { return g.skill; }))));
     var bs = JNZX.useStored('jnzx-focus-best', {}), best = bs[0];
+    var mo = useState(false), more = mo[0], setMore = mo[1];
+    var shown = more ? list : list.slice(0, 12);
     return h('section', { className: 'jx-arcade' },
       h('div', { className: 'jx-cat-sec-head' }, h('h2', null, '🎮 Focus games'), h('span', { className: 'jx-muted' }, list.length + ' of ' + G.length + ' games for ' + (a ? a[2] : 'all ages'))),
-      h('p', { className: 'jx-cat-sec-intro' }, 'Short games that build attention, memory, patience and calm. Difficulty adjusts to the age you choose. Best scores are saved on this device.'),
       h(JNZX.Chips, { label: 'Skill', options: skills, value: skill, onChange: setSkill }),
       game && h(Player, { game: game, age: props.age, back: function () { setGame(null); } }),
-      h('div', { className: 'jx-game-cards' }, list.map(function (g) {
+      h('div', { className: 'jx-game-cards' }, shown.map(function (g) {
         var played = Object.keys(best).some(function (k) { return k.indexOf(g.id) === 0; });
         return h('button', { key: g.id, type: 'button', className: 'jx-game-card' + (game && game.id === g.id ? ' is-on' : ''), onClick: function () { setGame(g); } }, h('span', { className: 'jx-game-emoji', 'aria-hidden': true }, g.emoji), h('strong', null, g.name), h('small', null, g.skill + ' · ages ' + g.ages[0] + '–' + g.ages[1] + (played ? ' · ✓ played' : '')));
-      })));
+      })),
+      list.length > 12 && h('button', { type: 'button', className: 'secondary jx-more-games', onClick: function () { setMore(!more); } }, more ? 'Show fewer' : 'Show all ' + list.length + ' games'));
   }
   function AgeGuide(props) {
-    var a = AGES.find(function (x) { return x[0] === props.age; }), gd = GUIDE[props.age];
-    return h('div', { className: 'jx-card jx-age-guide' },
-      h('p', { className: 'eyebrow' }, 'FOR ' + a[1].toUpperCase() + ' · ' + a[2].toUpperCase()),
-      h('h3', null, 'Good things to try at this age'),
-      h('ul', null, gd.learn.map(function (x) { return h('li', { key: x }, x); })),
-      h('p', null, h('strong', null, 'Best topics below: '), gd.topics),
-      h('p', null, h('strong', null, 'Focus time: '), gd.focus),
-      h('p', { className: 'small-note' }, '📱 ' + gd.screen + ' (Ministry of Health guidelines for children and young people.) Every child grows at their own pace — follow your child’s interests.'));
+    var gd = GUIDE[props.age];
+    return h('div', { className: 'jx-age-guide-mini' },
+      h('strong', null, '✨ Try at this age: '), gd.learn.slice(0, 4).join(' · '),
+      h('small', null, ' ⏱️ ' + gd.focus));
   }
+  var AGE_EMO = { '2-3': '🧸', '3-5': '🖍️', '5-6': '🎒', '6-8': '📖', '8-10': '🧩', '10-12': '🚀' };
   try {
     var BaseKids = KidsLearning;
     KidsLearning = function LittleLearners() {
       var ag = JNZX.useStored('jnzx-kids-age', '3-5'), age = ag[0], setAge = ag[1];
+      var vw = JNZX.useStored('jnzx-kids-view', 'play'), view = vw[0], setView = vw[1];
       return h(Frag, null,
         h('div', { className: 'jx-page jx-little' },
           h('p', { className: 'eyebrow' }, 'LEARNING · LITTLE LEARNERS'),
-          h('h2', { className: 'jx-little-h' }, 'Choose your child’s age'),
-          h('div', { className: 'jx-age-row', role: 'group', 'aria-label': 'Age' }, AGES.map(function (a) { return h('button', { key: a[0], type: 'button', className: 'jx-age' + (age === a[0] ? ' is-on' : ''), 'aria-pressed': age === a[0], onClick: function () { setAge(a[0]); } }, h('strong', null, a[1]), h('small', null, a[2])); })),
+          h('h1', { className: 'jx-little-h' }, 'Little Learners'),
+          h('p', { className: 'jx-muted' }, 'Pick an age, then play or learn.'),
+          h('div', { className: 'jx-age-row', role: 'group', 'aria-label': 'Age' }, AGES.map(function (a) { return h('button', { key: a[0], type: 'button', className: 'jx-age' + (age === a[0] ? ' is-on' : ''), 'aria-pressed': age === a[0], onClick: function () { setAge(a[0]); } }, h('strong', null, AGE_EMO[a[0]] + ' ' + a[1]), h('small', null, a[2])); })),
           h(AgeGuide, { age: age }),
-          h(Arcade, { age: age })),
-        h(BaseKids),
+          h('div', { className: 'jx-cs-tabs', role: 'tablist', 'aria-label': 'Play or learn' },
+            [['play', '🎮 Focus games'], ['learn', '📚 Learn & make']].map(function (x) { return h('button', { key: x[0], type: 'button', role: 'tab', 'aria-selected': view === x[0], className: view === x[0] ? 'is-on' : '', onClick: function () { setView(x[0]); } }, x[1]); })),
+          view === 'play' && h(Arcade, { age: age })),
+        view === 'learn' && h('div', { className: 'jx-kids-base' }, h(BaseKids)),
         h('div', { className: 'jx-page jx-page-end' }, h(JNZX.ShareBar, { tab: 'Kids’ learning & activities' })));
     };
   } catch (e) { console.warn('[JNZX] kids', e); }

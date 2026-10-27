@@ -367,4 +367,178 @@
       h('button', { type: 'button', className: 'secondary', onClick: function () { props.navigate('x:speaking-time'); } }, '⏱ Speaking Time Calculator'),
       h('button', { type: 'button', className: 'secondary', onClick: function () { props.navigate('x:nzsl'); } }, '🤟 NZ Sign Language')));
   };
+
+  /* ---------- Speaking practice (original, Oct 27) ---------- */
+  var TOPICS = {
+    'Everyday': ['The best thing that happened to you this week', 'A small habit that makes your day better', 'Your perfect Saturday morning', 'Something you changed your mind about', 'The most useful thing in your kitchen', 'A skill you would love to learn', 'Your favourite way to unwind', 'A time you got lost', 'The best advice you have ever been given', 'Something that always makes you laugh'],
+    'Family': ['A family tradition worth keeping', 'What your grandparents taught you', 'The best family holiday you remember', 'A meal that tastes like home', 'How your family celebrates birthdays', 'One thing every child should learn by ten', 'A lesson your kids taught you', 'Your family in three words', 'The funniest thing a child has said to you', 'How to make a rainy day fun'],
+    'Kiwi life': ['Your favourite New Zealand beach or walk', 'Pineapple lumps or jaffas — make your case', 'What makes a perfect Kiwi barbecue', 'A place every visitor should see', 'The best thing about where you live', 'Jandals, sneakers or bare feet?', 'What “she’ll be right” means to you', 'Your favourite te reo Māori word and why', 'The great pavlova debate', 'A Kiwi invention you are proud of'],
+    'Faith & hope': ['A moment you felt grateful', 'Someone who shows kindness without being asked', 'What hope looks like on a hard day', 'A prayer or quote that stays with you', 'How you make time for quiet', 'A saint or hero you admire', 'Why small acts of kindness matter', 'What forgiveness taught you', 'A time a stranger helped you', 'Where you find peace'],
+    'Work & school': ['The best teacher or boss you have had', 'How you stay organised', 'A mistake that taught you something', 'What makes a great team', 'Your first job', 'How to give feedback kindly', 'A goal for this year', 'Working from home: love it or leave it?', 'The most important skill for the future', 'How to stay calm under pressure'],
+    'Just for fun': ['If you could have any superpower', 'The animal that best describes you', 'Your dream dinner guest', 'If you won a holiday tomorrow', 'The world’s most underrated vegetable', 'An invention the world still needs', 'If you were in charge for a day', 'The best smell in the world', 'Cats or dogs — convince me', 'Your theme song and why']
+  };
+  var DRILLS = [
+    ['⏸️ Power pause', 'Say one sentence, pause for two full seconds, then say the next. Pauses make you sound calm and give listeners time to think.', 'Try: “Today I want to share one idea. [pause] It changed how I start my mornings.”'],
+    ['🎯 One-breath point', 'Sum up your whole message in one breath. If you can’t, your point is still too big.', 'Try it with your last idea or the topic above.'],
+    ['🔁 Rule of three', 'Make your point with three examples. Three feels complete and is easy to remember.', 'Try: three reasons to visit your town.'],
+    ['📣 Voice ladder', 'Say “Good morning, everyone” softly, then normally, then to the back of the room. Find the middle step for most talks.', 'Notice how your breath changes.'],
+    ['🐢 Slow the start', 'Speak your first three sentences at half your normal speed. Nerves speed us up; slowing down reads as confident.', 'Record yourself and listen back.'],
+    ['🚫 Filler swap', 'Every time you want to say “um”, close your mouth and pause instead. Ask a friend to clap when they hear a filler.', 'Use the filler counter below.'],
+    ['👀 Eye-contact sweep', 'Pick three spots in the room — left, centre, right. Finish a whole sentence looking at one before you move.', 'At home, use three photos or cushions.'],
+    ['📖 Mini story', 'Tell a 60-second story: where you were, what went wrong, what you did, what changed.', 'End with the lesson in one line.'],
+    ['✋ Purposeful hands', 'Rest your hands loosely at waist height. Use them only to show size, number or direction.', 'Try counting “one, two, three” on your fingers.'],
+    ['🎬 Strong finish', 'End with a call to action or a picture, then stop and smile. Don’t trail off with “so… yeah”.', 'Write your last sentence first.'],
+    ['🗣️ Word painting', 'Describe your breakfast so well the listener can taste it. Use colour, sound and smell.', 'Swap “nice” for something specific.'],
+    ['🔄 Answer the question', 'Ask a friend for a surprise question. Answer with: point, reason, example, point again.', 'This works for interviews too.']
+  ];
+  var FILLERS = ['um', 'ah', 'like', 'so', 'you know', 'basically'];
+  var REVIEW = ['I had one clear message', 'My opening grabbed attention', 'I paused instead of using fillers', 'I looked at my listeners', 'My voice changed pace and volume', 'My hands helped, not distracted', 'I finished with a strong closing line', 'I kept to time'];
+
+  function SpeakTimer() {
+    var L = useState(2), len = L[0], setLen = L[1];
+    var S = useState(0), sec = S[0], setSec = S[1];
+    var R2 = useState(false), run = R2[0], setRun = R2[1];
+    R.useEffect(function () { if (!run) return; var id = setInterval(function () { setSec(function (x) { return x + 1; }); }, 1000); return function () { clearInterval(id); }; }, [run]);
+    var total = len * 60, light = sec >= total ? 'red' : sec >= total - 30 ? 'amber' : sec >= total * 0.5 ? 'green' : 'off';
+    var mm = Math.floor(sec / 60), ss = ('0' + (sec % 60)).slice(-2);
+    return h('div', { className: 'jx-card jx-sp-timer' },
+      h('h3', null, '⏱️ Practice timer'),
+      h(JNZX.Chips, { label: 'Speech length', options: [1, 2, 3, 5, 7].map(function (n) { return { value: n, label: n + ' min' }; }), value: len, onChange: function (v) { setLen(v); setSec(0); setRun(false); } }),
+      h('div', { className: 'jx-sp-light jx-sp-' + light, 'aria-live': 'polite' }, h('strong', null, mm + ':' + ss), h('span', null, light === 'off' ? (sec ? 'Keep going' : 'Ready when you are') : light === 'green' ? 'Halfway — you’re on track' : light === 'amber' ? '30 seconds left — start wrapping up' : 'Time! Finish your sentence')),
+      h('div', { className: 'jx-row' }, h('button', { type: 'button', className: 'primary', onClick: function () { setRun(!run); } }, run ? 'Pause' : sec ? 'Resume' : 'Start'), h('button', { type: 'button', className: 'secondary', onClick: function () { setRun(false); setSec(0); } }, 'Reset')));
+  }
+  function SpeakPractice() {
+    var c = useState('Everyday'), cat = c[0], setCat = c[1];
+    var n = useState(function () { return Math.floor(Math.random() * 10); }), idx = n[0], setIdx = n[1];
+    var f = useState({}), fills = f[0], setFills = f[1];
+    var d = useState(0), di = d[0], setDi = d[1];
+    var rv = JNZX.useStored('jnzx-speak-review', {}), rev = rv[0], setRev = rv[1];
+    var o = JNZX.useStored('jnzx-speak-outline', { hook: '', p1: '', p2: '', p3: '', close: '' }), ol = o[0], setOl = o[1];
+    var topic = TOPICS[cat][idx % TOPICS[cat].length];
+    var totalF = Object.keys(fills).reduce(function (a, k) { return a + fills[k]; }, 0);
+    var score = REVIEW.filter(function (x) { return rev[x]; }).length;
+    var outline = ['Opening: ' + (ol.hook || '…'), 'Point 1: ' + (ol.p1 || '…'), 'Point 2: ' + (ol.p2 || '…'), 'Point 3: ' + (ol.p3 || '…'), 'Closing: ' + (ol.close || '…')].join('\n');
+    function field(k, label, ph) { return h('label', { key: k }, label, h('input', { value: ol[k], maxLength: 140, placeholder: ph, onChange: function (e) { var x = Object.assign({}, ol); x[k] = e.target.value; setOl(x); } })); }
+    return h('div', { className: 'jx-sp' },
+      h('p', { className: 'jx-muted' }, 'Pick a topic, set the timer and speak. Short, regular practice builds confidence fast.'),
+      h(JNZX.Tabs, { id: 'speak-practice', label: 'Speaking practice', items: [
+        { id: 'topic', label: '🎲 Quick talk', render: function () { return h('div', null,
+          h(JNZX.Chips, { label: 'Topic type', options: Object.keys(TOPICS), value: cat, onChange: function (v) { setCat(v); setIdx(Math.floor(Math.random() * 10)); } }),
+          h('div', { className: 'jx-card jx-sp-topic' }, h('small', null, cat.toUpperCase() + ' · TALK FOR 1–2 MINUTES'), h('p', null, topic),
+            h('div', { className: 'jx-row' }, h('button', { type: 'button', className: 'secondary', onClick: function () { setIdx(idx + 1 + Math.floor(Math.random() * 3)); } }, '🔄 Another topic'), h(JNZX.ShareMini, { title: 'Speaking topic', text: 'Can you talk for one minute on: “' + topic + '”?', label: 'Share' }))),
+          h('p', { className: 'small-note' }, 'Quick plan: one point, one example, one closing line. Take a breath, smile, begin.'),
+          h(SpeakTimer)); } },
+        { id: 'build', label: '🧱 Speech builder', render: function () { return h('div', { className: 'jx-card jx-sp-build' },
+          h('p', { className: 'jx-muted' }, 'Fill in five lines and you have a speech.'),
+          field('hook', 'Opening — a question, story or surprising fact', 'Have you ever…?'),
+          field('p1', 'Point 1', 'My first reason or idea'), field('p2', 'Point 2', 'An example or story'), field('p3', 'Point 3', 'What it means for the listener'),
+          field('close', 'Closing — what should they do or remember?', 'So next time you…'),
+          h('pre', { className: 'jx-sp-outline' }, outline),
+          h('div', { className: 'jx-row' }, h(JNZX.ShareMini, { title: 'My speech outline', text: outline, label: 'Share outline' }), h('button', { type: 'button', className: 'secondary', onClick: function () { setOl({ hook: '', p1: '', p2: '', p3: '', close: '' }); } }, 'Clear'))); } },
+        { id: 'drills', label: '💪 Drills', render: function () { var x = DRILLS[di % DRILLS.length]; return h('div', null,
+          h('div', { className: 'jx-card jx-sp-topic' }, h('small', null, 'DRILL ' + ((di % DRILLS.length) + 1) + ' OF ' + DRILLS.length), h('h3', null, x[0]), h('p', null, x[1]), h('p', { className: 'jx-muted' }, x[2]),
+            h('div', { className: 'jx-row' }, h('button', { type: 'button', className: 'secondary', onClick: function () { setDi(di + 1); } }, '🔄 Next drill'))),
+          h('div', { className: 'jx-card' }, h('h3', null, '🔢 Filler counter'), h('p', { className: 'jx-muted' }, 'Ask a listener to tap each time they hear one.'),
+            h('div', { className: 'jx-sp-fill' }, FILLERS.map(function (w) { return h('button', { key: w, type: 'button', className: 'secondary', onClick: function () { var x2 = Object.assign({}, fills); x2[w] = (x2[w] || 0) + 1; setFills(x2); } }, w + ' · ' + (fills[w] || 0)); })),
+            h('p', null, h('strong', null, totalF + ' filler' + (totalF === 1 ? '' : 's')), ' ', totalF ? h('button', { type: 'button', className: 'secondary jx-fix', onClick: function () { setFills({}); } }, 'Reset') : null))); } },
+        { id: 'review', label: '✅ Self-review', render: function () { return h('div', { className: 'jx-card' },
+          h('p', { className: 'jx-muted' }, 'After you speak, tick what went well.'),
+          REVIEW.map(function (x) { return h('label', { key: x, className: 'jx-check' }, h('input', { type: 'checkbox', checked: !!rev[x], onChange: function (e) { var y = Object.assign({}, rev); y[x] = e.target.checked; setRev(y); } }), h('span', null, x)); }),
+          h('p', null, h('strong', null, score + ' / ' + REVIEW.length), ' — ', score >= 7 ? 'Brilliant! Try a longer talk next.' : score >= 4 ? 'Good progress. Pick one item to work on next time.' : 'Every speaker starts here. Try one drill today.'),
+          h('button', { type: 'button', className: 'secondary', onClick: function () { setRev({}); } }, 'Start a new review')); } }
+      ] }));
+  }
+  JNZX.SpeakPractice = SpeakPractice;
+
+  /* ---------- My Kiwi Adventures: 10+ ideas for every city and town ---------- */
+  var CITY = {
+    'Auckland': ['Walk up Maungawhau / Mt Eden for city views', 'Take the ferry to Devonport or Waiheke Island', 'Explore Auckland Museum in the Domain', 'Try fresh fish and chips at Mission Bay', 'Spot gannets at Muriwai on the west coast'],
+    'Whangārei': ['See Whangārei Falls and the loop walk', 'Wander the Town Basin marina and art galleries', 'Climb Mt Manaia at Whangārei Heads', 'Try a local kūmara dish or fresh Northland citrus'],
+    'Hamilton': ['Explore the themed Hamilton Gardens', 'Walk or bike the Waikato River paths', 'Visit Hamilton Zoo', 'Grab brunch on Hood Street'],
+    'Tauranga': ['Climb Mauao (Mount Maunganui) at sunrise', 'Swim at Main Beach or the hot salt-water pools', 'Pick up fresh kiwifruit from a roadside stall', 'Walk The Strand waterfront'],
+    'Rotorua': ['Watch the geysers and mud pools at a geothermal park', 'Walk among the giant trees of the Redwoods', 'Enjoy a hāngī at a cultural evening', 'Ride the gondola and luge', 'Soak in a natural hot pool'],
+    'Taupō': ['See the roaring Huka Falls', 'Walk the lakefront and spot the snowy volcanoes', 'Soak in the free Spa Park hot stream', 'Try trout-shaped treats at a local bakery'],
+    'Gisborne': ['Be among the first in the world to see the sunrise', 'Swim or surf at Wainui Beach', 'Walk up Titirangi / Kaiti Hill', 'Taste fresh local citrus and seasonal fruit'],
+    'Napier': ['Take an Art Deco walk through the city', 'Stroll Marine Parade and the sunken gardens', 'Visit the National Aquarium', 'Try a fresh fruit ice cream from Hawke’s Bay'],
+    'Hastings': ['Climb Te Mata Peak for huge views', 'Visit the Hawke’s Bay Farmers’ Market', 'Pick your own berries in summer', 'Explore Splash Planet with the kids'],
+    'New Plymouth': ['Walk the Coastal Walkway to Te Rewa Rewa Bridge', 'Visit Pukekura Park and its lights in summer', 'See the Len Lye Centre', 'View Taranaki Maunga on a clear day'],
+    'Whanganui': ['Ride the historic Durie Hill elevator', 'Paddle or cruise on the Whanganui River', 'Visit the Sarjeant Gallery', 'Explore Virginia Lake'],
+    'Palmerston North': ['Walk the Manawatū River pathway', 'Visit Te Manawa museum and science centre', 'Explore the Victoria Esplanade gardens', 'Catch a game at the Arena'],
+    'Wellington': ['Ride the Cable Car to the Botanic Garden', 'Explore Te Papa museum (free entry)', 'Walk up Mount Victoria lookout', 'Try a flat white in a Cuba Street café', 'Spot seals on the south coast'],
+    'Lower Hutt': ['Walk the Hutt River trail', 'Visit the Dowse Art Museum', 'Picnic at Percy Scenic Reserve', 'Explore Eastbourne’s bays'],
+    'Upper Hutt': ['Explore Kaitoke Regional Park and its swing bridge', 'Walk Harcourt Park', 'Visit Staglands wildlife reserve', 'Try a local berry farm in summer'],
+    'Porirua': ['Walk Te Ara Piko at Pāuatahanui Inlet', 'Visit Pātaka Art + Museum', 'Swim at Plimmerton Beach', 'Climb up to Colonial Knob'],
+    'Masterton': ['Visit Pūkaha National Wildlife Centre', 'Explore Queen Elizabeth Park', 'Take a trip to Castlepoint lighthouse', 'Try a Wairarapa market treat'],
+    'Nelson': ['Walk to the Centre of New Zealand lookout', 'Visit the Saturday market', 'Swim at Tāhunanui Beach', 'Explore local art studios'],
+    'Blenheim': ['Visit the Omaka Aviation Heritage Centre', 'Bike through the Marlborough countryside', 'Try fresh green-lipped mussels', 'Walk the Taylor River reserve'],
+    'Christchurch': ['Wander the Botanic Gardens and Hagley Park', 'Ride a punt on the Avon River', 'Take the gondola up the Port Hills', 'Explore the Riverside Market'],
+    'Timaru': ['Swim at Caroline Bay and its playground', 'Watch little blue penguins at dusk', 'Visit the Aigantighe Art Gallery', 'Try a South Canterbury cheese'],
+    'Dunedin': ['See albatross and penguins on the Otago Peninsula', 'Walk up Baldwin Street, one of the world’s steepest', 'Visit Larnach Castle', 'Explore the Otago Museum'],
+    'Invercargill': ['Spend time in Queens Park', 'Visit Bluff for the signpost and oysters in season', 'See the tuatara at the local museum', 'Explore Oreti Beach'],
+    'Queenstown': ['Ride the Skyline gondola', 'Walk the Queenstown Hill Time Walk', 'Take a lake cruise on Whakatipu', 'Try a famous gourmet burger'],
+    'Wānaka': ['Photograph the Wānaka tree', 'Climb Roys Peak or Mt Iron', 'Swim at Glendhu Bay', 'Explore Puzzling World'],
+    'Whakatāne': ['Walk the Kōhī Point track', 'Visit Ōhope Beach', 'See the Wairaka statue', 'Look out to Moutohorā Island'],
+    'Richmond': ['Bike the Great Taste Trail', 'Visit Washbourn Gardens', 'Pick fruit in the Waimea Plains', 'Explore Rabbit Island beach'],
+    'Greymouth': ['Visit Shantytown heritage park', 'See the Pancake Rocks at Punakaiki', 'Walk the floodwall at sunset', 'Try West Coast whitebait in season'],
+    'Oamaru': ['Explore the Victorian precinct', 'Watch the blue penguins come ashore', 'Visit the Steampunk HQ', 'See the Moeraki Boulders nearby'],
+    'Ashburton': ['Walk the Ashburton Domain', 'Visit the Ashburton Art Gallery', 'Explore the Hakatere river mouth', 'Try a farmers’ market treat'],
+    'Cambridge': ['Walk Lake Te Koo Utu', 'Bike the Te Awa river ride', 'Visit Maungakawa scenic reserve', 'Browse the town’s antique shops'],
+    'Tokoroa': ['Walk Lake Moana-Nui', 'See the Talking Poles', 'Explore the Kinleith forest trails', 'Visit Lake Arapuni'],
+    'Pukekohe': ['Visit a market garden stand for fresh vegetables', 'Walk Pukekohe Hill', 'Explore the Waiuku forest', 'Pick strawberries in summer'],
+    'Kaitaia': ['Drive to Cape Rēinga lighthouse', 'Explore Ninety Mile Beach', 'Slide down the Te Paki sand dunes', 'Try fresh local seafood'],
+    'Kerikeri': ['Visit the Stone Store, NZ’s oldest stone building', 'Walk to Rainbow Falls', 'Explore the Waitangi Treaty Grounds nearby', 'Taste local citrus and chocolate']
+  };
+  var CITY_GENERIC = [
+    ['Go to', 'A local library — free events, books and holiday programmes'],
+    ['Go to', 'The best playground in town for a family picnic'],
+    ['Food to try', 'A pie from the local bakery — rate it out of ten'],
+    ['Food to try', 'Fish and chips eaten on the beach or by the river'],
+    ['Must experience', 'A weekend farmers’ market'],
+    ['Must experience', 'A sunset walk at a local lookout'],
+    ['Must experience', 'A free community event or festival'],
+    ['Go to', 'The local i-SITE for maps and hidden gems']
+  ];
+  try {
+    xCityDefault = function (city) {
+      var own = (CITY[city] || ['Choose a local park, museum or public garden', 'Find a walking track near town', 'Visit the local museum or gallery']).map(function (t, i) { return { kind: i === CITY[city] && CITY[city].length - 1 ? 'Food to try' : /try|taste|grab|brunch|pie|treat|mussels|oyster|whitebait|seafood|burger/i.test(t) ? 'Food to try' : i % 2 ? 'Must experience' : 'Go to', text: t, done: false }; });
+      var extra = CITY_GENERIC.map(function (g) { return { kind: g[0], text: g[1], done: false }; });
+      return own.concat(extra).slice(0, Math.max(10, own.length + extra.length));
+    };
+  } catch (e) {}
+
+  /* ---------- Smart Little Savings: one tip at a time, share any tip ---------- */
+  try {
+    var SAVE_PIC = { 'Groceries': './photo-share/savings-groceries.webp', 'Money habits': './photo-share/savings-money.webp', 'Home & bills': './photo-share/savings-home.webp' };
+    SavingTips = function SmartSavings() {
+      var all = expandedSavingTips, cats = ['All tips'].concat(savingCategories);
+      var f = useState('All tips'), filter = f[0], setFilter = f[1];
+      var q = useState(''), qq = q[0], setQ = q[1];
+      var pg = useState(0), page = pg[0], setPage = pg[1];
+      var pool = all.filter(function (t) { return filter === 'All tips' || t.category === filter; });
+      var ix = useState(function () { return Math.floor(Math.random() * all.length); }), i = ix[0], setI = ix[1];
+      var cur = pool[i % pool.length] || all[0];
+      var list = pool.filter(function (t) { return !qq || (t.title + ' ' + t.text).toLowerCase().indexOf(qq.toLowerCase()) >= 0; });
+      var per = 12, pages = Math.max(1, Math.ceil(list.length / per)), p = Math.min(page, pages - 1);
+      var pic = SAVE_PIC[cur.category] || './photo-share/savings-home.webp', src; try { src = jAsset(pic); } catch (e) { src = pic; }
+      function another() { var n = i; if (pool.length > 1) while (n % pool.length === i % pool.length) n = Math.floor(Math.random() * pool.length); setI(n); }
+      return h('div', { className: 'jx-page jx-save' },
+        JNZX.Header('MODERN & LIFESTYLE · SMART LITTLE SAVINGS', 'Small savings, big smiles.', all.length + ' original money-saving ideas for groceries, money habits and home & bills.'),
+        h(JNZX.Chips, { label: 'Category', options: cats.map(function (c) { return { value: c, label: c === 'All tips' ? 'All' : c }; }), value: filter, onChange: function (v) { setFilter(v); setPage(0); setI(Math.floor(Math.random() * 100)); } }),
+        h('div', { className: 'jx-save-hero', style: { backgroundImage: 'linear-gradient(90deg,rgba(10,30,25,.82),rgba(10,30,25,.35)),url("' + src + '")' } },
+          h('small', null, '💡 ' + cur.category.toUpperCase()), h('h2', null, cur.title), h('p', null, cur.text)),
+        h('div', { className: 'jx-row' },
+          h('button', { type: 'button', className: 'primary', onClick: another }, '🔄 Another tip'),
+          h(JNZX.ShareMini, { title: 'Saving tip: ' + cur.title, text: '💰 Saving tip — ' + cur.title + ': ' + cur.text + ' (The James NZ)', label: 'Share this tip' })),
+        h('h3', { className: 'jx-save-h' }, 'Browse all tips'),
+        h(JNZX.Search, { value: qq, onChange: function (v) { setQ(v); setPage(0); }, placeholder: 'Search bills, lunch, goals…' }),
+        h('p', { className: 'small-note' }, list.length + ' tips · page ' + (p + 1) + ' of ' + pages),
+        h('ul', { className: 'jx-lift-list' }, list.slice(p * per, p * per + per).map(function (t) {
+          return h('li', { key: t.id }, h('span', null, h('strong', null, t.title + '. '), t.text, h('small', null, ' · ' + t.category)),
+            h('span', { className: 'jx-lift-li-tools' }, h(JNZX.ShareMini, { title: 'Saving tip: ' + t.title, text: '💰 Saving tip — ' + t.title + ': ' + t.text + ' (The James NZ)', label: 'Share' })));
+        })),
+        pages > 1 && h('div', { className: 'jx-row' }, h('button', { type: 'button', className: 'secondary', disabled: p === 0, onClick: function () { setPage(p - 1); } }, '← Previous'), h('button', { type: 'button', className: 'secondary', disabled: p >= pages - 1, onClick: function () { setPage(p + 1); } }, 'Next →')),
+        h(JNZX.ShareBar, { tab: 'Saving tips' }));
+    };
+    JNZX.ownShare['Saving tips'] = 1;
+  } catch (e) { console.warn('[JNZX] savings', e); }
 })();

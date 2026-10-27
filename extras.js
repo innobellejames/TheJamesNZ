@@ -48,6 +48,7 @@
     Icons: Icons,
     icon: icon,
     register: function (name, comp) { pages[name] = comp; },
+    has: function (name) { return !!pages[name]; },
     page: function (tab, navigate, canEdit) {
       if (typeof tab !== 'string') return null;
       JNZX._nav = navigate; JNZX._tab = tab;
@@ -78,7 +79,6 @@
       overview('Everyday Joy'),
       keep('Inspiration', 'A Little Lift', 'Enjoy the everyday'),
       keep('Coffee corner', 'Coffee & a Smile'),
-      add('x:personal-improvement', 'Personal Improvement', Icons.target, 'Personal Improvement'),
       keep('Focus time', 'Focus'),
       keep('Workouts', 'Move Your Way'),
       keep('Water tracker', 'Water Intake')
@@ -231,9 +231,9 @@
 
   /* ---------- links and sharing ---------- */
   JNZX.pageUrl = function (tab) {
-    var base = 'https://thejamesnz.com/';
-    try { if (/^https?:/.test(location.protocol) && location.hostname && location.hostname !== 'thejamesnz.com') base = location.origin + location.pathname; } catch (e) {}
-    return base + '#section=' + encodeURIComponent(tab);
+    var base = 'https://www.thejamesnz.com/';
+    try { if (/^https?:/.test(location.protocol) && location.hostname && !/thejamesnz\.com$/.test(location.hostname) && !/github\.io$/.test(location.hostname)) base = location.origin + location.pathname; } catch (e) {}
+    return base + '#section=' + encodeURIComponent(tab === 'Mateo · AI friend' ? 'Ask Mateo' : tab);
   };
 
   function ShareBar(props) {
@@ -317,8 +317,24 @@
   };
   /* Cached JSON loader for the data/ folder */
   var cache = {};
+  /* Data files ship as root-level scripts (data-elements.js, data-dict-a.js …) so they
+     load on any static host; the JSON copies in /data are only a fallback. */
+  function dataScriptName(path) { return './data-' + path.replace(/^\.\/data\//, '').replace(/\.json$/, '').replace(/\//g, '-') + '.js?v=20261027'; }
+  function loadScriptData(path) {
+    return new Promise(function (ok, bad) {
+      var store = window.JNZDATA = window.JNZDATA || {};
+      if (store[path]) return ok(store[path]);
+      var s = document.createElement('script');
+      s.src = dataScriptName(path); s.async = true;
+      s.onload = function () { if (store[path]) ok(store[path]); else bad(Error('empty')); };
+      s.onerror = function () { bad(Error('Could not load ' + path)); };
+      document.head.appendChild(s);
+    });
+  }
   JNZX.load = function (path) {
-    if (!cache[path]) cache[path] = fetch(path, { cache: 'force-cache' }).then(function (r) { if (!r.ok) throw Error('Could not load ' + path); return r.json(); });
+    if (!cache[path]) cache[path] = loadScriptData(path).catch(function () {
+      return fetch(path, { cache: 'force-cache' }).then(function (r) { if (!r.ok) throw Error('Could not load ' + path); return r.json(); });
+    });
     cache[path].catch(function () { delete cache[path]; });
     return cache[path];
   };
@@ -446,15 +462,17 @@
     var first = items[0];
     function card(it, k) {
       var info = TOPIC[it.name] || [null, ''], Ico = it.icon || Icons.grid, img = info[0];
+      var drawn = JNZX.cover && JNZX.cover(it.name), witty = JNZX.coverLine ? JNZX.coverLine(it.name) : '';
+      var src = drawn || (img ? jAsset(img) : null);
       return h('button', { key: it.name, type: 'button', className: 'jx-shop-card', onClick: function () { props.navigate(it.name); } },
-        h('span', { className: 'jx-shop-img', style: img ? null : { background: TILE[k % TILE.length] } }, img ? h('img', { src: jAsset(img), alt: '', loading: 'lazy' }) : h(Ico, { size: 44 })),
-        h('span', { className: 'jx-shop-body' }, h('strong', null, it.displayName || it.name), info[1] && h('span', { className: 'jx-shop-desc' }, info[1]), h('span', { className: 'jx-shop-go' }, 'Open →')));
+        h('span', { className: 'jx-shop-img' + (drawn ? ' is-drawn' : ''), style: src ? null : { background: TILE[k % TILE.length] } }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : h(Ico, { size: 44 })),
+        h('span', { className: 'jx-shop-body' }, h('strong', null, it.displayName || it.name), info[1] && h('span', { className: 'jx-shop-desc' }, info[1]), witty && h('em', { className: 'jx-shop-witty' }, '“' + witty + '”'), h('span', { className: 'jx-shop-go' }, 'Open →')));
     }
     var found = qq.trim() ? items.filter(function (it) { return ((it.displayName || it.name) + ' ' + ((TOPIC[it.name] || [])[1] || '')).toLowerCase().indexOf(qq.toLowerCase()) >= 0; }) : null;
     var k = 0;
     return h('div', { className: 'jx-page jx-landing jx-shop' },
       h('header', { className: 'jx-shop-hero' },
-        h('div', { className: 'jx-shop-hero-media' }, h('img', { src: jAsset(g.image), alt: '', className: 'jx-shop-hero-img' })),
+        h('div', { className: 'jx-shop-hero-media' }, h('img', { src: (JNZX.heroCover && JNZX.heroCover(title)) || jAsset(g.image), alt: '', className: 'jx-shop-hero-img' + (JNZX.heroCover && JNZX.heroCover(title) ? ' is-drawn' : '') })),
         h('div', { className: 'jx-shop-hero-txt' }, h('p', { className: 'eyebrow' }, 'THE JAMES NZ · ' + title.toUpperCase()), h('h1', null, title), h('p', null, g.blurb),
           first && h('button', { type: 'button', className: 'primary', onClick: function () { props.navigate(first.name); } }, 'Start with ' + (first.displayName || first.name) + ' →'))),
       h('div', { className: 'jx-shop-tools' },

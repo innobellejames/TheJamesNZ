@@ -228,11 +228,11 @@
   ];
   JNZX.register('x:science', function SciencePage(props) {
     return h('div', null,
-      JNZX.Header('LEARNING · SCIENCE', 'Science: elements and chemistry.', 'All 118 elements in an interactive table, plus chemistry tools — balance equations, work out molar masses, moles, concentrations and gas laws, with a calculator and step-by-step guides. Tap an element to learn about it, colour the table by category, state or electronegativity, and test yourself with the element quiz.'),
+      JNZX.Header('LEARNING · SCIENCE', 'Science: elements and chemistry.', 'All 118 elements, an element quiz and chemistry tools with step-by-step guides.'),
       h(JNZX.Tabs, { id: 'science', label: 'Science', items: [
         { id: 'table', label: '⚛️ Periodic table', render: function () { return h(PeriodicTable); } },
-        { id: 'basics', label: 'How the table works', render: function () { return h(JNZX.Accordion, { openFirst: true, items: SCI_BASICS.map(function (b) { return { title: b[0], body: function () { return h('ul', null, b[1].map(function (x, i) { return h('li', { key: i }, x); })); } }; }) }); } },
-        { id: 'quiz', label: 'Element quiz', render: function () { return h(ElementQuiz); } }
+        { id: 'quiz', label: '🧠 Element quiz', render: function () { return h(ElementQuiz); } },
+        { id: 'basics', label: 'How the table works', render: function () { return h(JNZX.Accordion, { openFirst: true, items: SCI_BASICS.map(function (b) { return { title: b[0], body: function () { return h('ul', null, b[1].map(function (x, i) { return h('li', { key: i }, x); })); } }; }) }); } }
       ].concat(JNZX.chemTabs || []) }),
       h(JNZX.ShareBar, { tab: props.tab }));
   });

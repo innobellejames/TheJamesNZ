@@ -1,7 +1,7 @@
 /* The James NZ — Learning › Leadership: Essential Leadership & Assertive Skills
    (original self-paced course), 30-question assessment and a downloadable
    learning completion record (PDF/PNG) made on the learner's own device.
-   October 2026. Not affiliated with or endorsed by NZIM or any provider. */
+   October 2026. Original material. */
 (function () {
   'use strict';
   var R = import_react, h = jH, useState = R.useState, useEffect = R.useEffect, useRef = R.useRef, useMemo = R.useMemo;
@@ -152,7 +152,7 @@
     detail('DATE', rec.dateLong, 210);
     detail('RECORD', rec.ref.slice(0, 8).toUpperCase() + '-' + rec.ref.slice(9, 13).toUpperCase(), 492);
     // footer
-    text('Self-assessed, non-accredited course record. Not an NZQA qualification, not on the NZQCF and carries no credits. Not endorsed by NZQA or NZIM.', 351, 446, px(6.2) + 'px ' + sans, soft);
+    text('Self-assessed, non-accredited course record. Not an NZQA qualification, not on the NZQCF and carries no credits. Not endorsed by NZQA.', 351, 446, px(6.2) + 'px ' + sans, soft);
     text('thejamesnz.com · name entered by the learner and kept on their device', 351, 458, px(6.2) + 'px ' + sans, soft);
     g.textAlign = 'left';
   }
@@ -243,7 +243,7 @@
         { id: 'quiz', label: '📝 Assessment & record', render: function () { return h(Assessment); } },
         { id: 'practice', label: '💬 Lead with Heart practice', render: function () { return h('div', { className: 'jx-card' }, h('h3', null, 'Lead with Heart practice'), h('p', null, 'Short daily leadership prompts and reflections to keep building the habit.'), h('button', { type: 'button', className: 'primary', onClick: function () { props.navigate('Leadership practice'); } }, 'Open Lead with Heart practice →')); } },
         { id: 'about', label: 'About this course', render: function () { return h('div', null,
-          h('p', null, 'This course is original material written by The James NZ. Its learning outcomes cover the same core skills as many workplace assertiveness and personal-impact programmes, including the NZIM “Personal Impact and Assertive Skills” course. The James NZ is not affiliated with, and this course is not endorsed by, the New Zealand Institute of Management & Leadership (NZIM).'),
+          h('p', null, 'This course is original material written by The James NZ. It covers everyday leadership skills: speaking up with confidence, listening well, giving feedback and handling tricky conversations calmly.'),
           h('h4', null, 'About the completion record'), h('ul', null, ['It records a self-assessed, unproctored quiz result calculated in your browser.', 'It is not an NZQA-approved qualification, micro-credential or training scheme, is not listed on the New Zealand Qualifications and Credentials Framework (NZQCF), and carries no credits.', 'Identity, supervision and workplace competence are not verified, and there is no public verification register.', 'The course and record are free. Nothing is sold, and no claims are made about employment or professional outcomes.'].map(function (x, i) { return h('li', { key: i }, x); })),
           h('h4', null, 'Your privacy'), h('p', null, 'No account is needed. Your answers, progress and name are processed only in your browser and saved on your device (local storage). They are never sent to The James NZ. Clear them at any time by starting the assessment again or clearing your browser data. This approach is designed to respect the information privacy principles in the Privacy Act 2020.'),
           h('p', { className: 'small-note' }, 'This information is general and is not legal advice.')); } }
