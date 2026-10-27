@@ -18,7 +18,7 @@
   try {
     jDownloadHTML = function (name, title, body) {
       var qr = __jamesEmbedded['./october/website-qr.png'];
-      var html = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + jEscape(title) + '</title><style>body{font:19px/1.7 system-ui;color:#17352e;background:#fff9ee;max-width:850px;margin:auto;padding:28px}h1,h2{line-height:1.2}section{break-after:page;margin:30px 0;padding:24px;background:white;border-radius:18px}img.illustration{width:100%;max-height:480px;object-fit:contain}table{width:100%;border-collapse:collapse}th,td{padding:10px;border:1px solid #ccd8ce;text-align:left}svg{width:100%;max-height:480px}footer{display:flex;align-items:center;gap:12px;margin-top:24px;font-size:15px}footer img{width:56px;height:56px}a{color:#12644a}@media print{body{padding:0;background:white}section{border-radius:0}}</style><h1>' + jEscape(title) + '</h1>' + body + '<footer><a href="' + jURL + '"><img src="' + qr + '" alt="QR code linking to TheJamesNZ.com"></a><a href="' + jURL + '">TheJamesNZ.com</a></footer></html>';
+      var html = '<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' + jEscape(title) + '</title><style>body{font:19px/1.7 system-ui;color:#17352e;background:#fff9ee;max-width:850px;margin:auto;padding:28px}h1,h2{line-height:1.2}section{break-after:page;margin:30px 0;padding:24px;background:white;border-radius:18px}img.illustration{width:100%;max-height:480px;object-fit:contain}table{width:100%;border-collapse:collapse}th,td{padding:10px;border:1px solid #ccd8ce;text-align:left}svg{width:100%;max-height:480px}footer{display:flex;align-items:center;gap:12px;margin-top:24px;font-size:15px}footer img{width:56px;height:56px}a{color:#12644a}@media print{body{padding:0;background:white}section{border-radius:0}}</style><h1>' + jEscape(title) + '</h1>' + body + '<footer><a href="' + jURL + '"><img src="' + qr + '" alt="QR code linking to www.thejamesnz.com"></a><a href="' + jURL + '">www.thejamesnz.com</a></footer></html>';
       savePhotoFile(new File([html], name + '.html', { type: 'text/html' }));
     };
   } catch (e) {}
@@ -289,7 +289,7 @@
         g.lineWidth = 1.4; g.strokeStyle = t.ink; g.stroke(p); g.restore();
       }
     });
-    g.textAlign = 'center'; g.fillStyle = t.ink; g.font = '26px Arial, sans-serif'; g.fillText((prefs.name ? prefs.name + ' · ' : '') + 'Water Intake · The James NZ · thejamesnz.com', W / 2, H - 80);
+    g.textAlign = 'center'; g.fillStyle = t.ink; g.font = '26px Arial, sans-serif'; g.fillText((prefs.name ? prefs.name + ' · ' : '') + 'Water Intake · The James NZ · www.thejamesnz.com', W / 2, H - 80);
   }
   function WaterIntake() {
     var rs = useState(function () { return jWaterLoad(); }), rec = rs[0], setRec = rs[1];
@@ -428,7 +428,7 @@
     g.fillStyle = '#2f6b3a'; g.font = 'italic 44px Georgia, serif';
     var words = q.split(' '), lines = [], cur = ''; words.forEach(function (w) { var t = cur ? cur + ' ' + w : w; if (g.measureText(t).width > W - 160 && cur) { lines.push(cur); cur = w; } else cur = t; }); lines.push(cur);
     var y0 = 1050 - (lines.length - 1) * 28; lines.forEach(function (l, i) { g.fillText((i === 0 ? '“' : '') + l + (i === lines.length - 1 ? '”' : ''), W / 2, y0 + i * 58); });
-    g.fillStyle = '#6b5f55'; g.font = '26px Arial, sans-serif'; g.fillText('Fresh Picks Today · The James NZ · thejamesnz.com', W / 2, H - 50);
+    g.fillStyle = '#6b5f55'; g.font = '26px Arial, sans-serif'; g.fillText('Fresh Picks Today · The James NZ · www.thejamesnz.com', W / 2, H - 50);
   }
   function PicksShare() {
     var p = todayPicks(), qi = useState(0), qIdx = qi[0], setQ = qi[1], ref = useRef(null), sh = useState(null), sheet = sh[0], setSheet = sh[1];

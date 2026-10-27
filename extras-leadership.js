@@ -153,7 +153,7 @@
     detail('RECORD', rec.ref.slice(0, 8).toUpperCase() + '-' + rec.ref.slice(9, 13).toUpperCase(), 492);
     // footer
     text('Self-assessed, non-accredited course record. Not an NZQA qualification, not on the NZQCF and carries no credits. Not endorsed by NZQA.', 351, 446, px(6.2) + 'px ' + sans, soft);
-    text('thejamesnz.com · name entered by the learner and kept on their device', 351, 458, px(6.2) + 'px ' + sans, soft);
+    text('www.thejamesnz.com · name entered by the learner and kept on their device', 351, 458, px(6.2) + 'px ' + sans, soft);
     g.textAlign = 'left';
   }
   function uuid() { try { return crypto.randomUUID(); } catch (e) { return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) { var r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }); } }

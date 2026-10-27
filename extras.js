@@ -89,7 +89,8 @@
       keep('Today’s fruit & vege picks', 'Fresh Picks Today'),
       keep('NZ bucket lists', 'My Kiwi Adventures', 'Explore & discover'),
       keep('NZ quiz', 'How Kiwi Are You?'),
-      keep('NZ safety & know-how', 'Safety & Know-how')
+      keep('NZ safety & know-how', 'Safety & Know-how'),
+      add('x:world-clock', 'World Clock', Icons.timer)
     ] },
     { title: 'Family Together', blurb: 'Stories, home life, food and money, growing families, love and connection, projects and celebrations.', image: './story-pages/story-02-middle.webp', items: [
       overview('Family Together'),
@@ -229,11 +230,26 @@
     return out;
   };
 
+
+  /* The printed/shared QR code used to point at the bare domain. Redraw it for www so every scan opens the site. */
+  try {
+    (function () {
+      var qr = qrcode(0, 'M'); qr.addData('https://www.thejamesnz.com/'); qr.make();
+      var n = qr.getModuleCount(), pad = 4, cell = 8, W = (n + pad * 2) * cell, c = document.createElement('canvas'); c.width = c.height = W;
+      var g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, W, W); g.fillStyle = '#102a21';
+      for (var r = 0; r < n; r++) for (var k = 0; k < n; k++) if (qr.isDark(r, k)) g.fillRect((k + pad) * cell, (r + pad) * cell, cell, cell);
+      var url = c.toDataURL('image/png');
+      if (window.THE_JAMES_MEDIA) window.THE_JAMES_MEDIA['./october/website-qr.png'] = url;
+    })();
+  } catch (e) { console.warn('[JNZX] qr', e); }
   /* ---------- links and sharing ---------- */
   JNZX.pageUrl = function (tab) {
+    // Every page gets its own address (?p=…) so link previews never reuse an old cached copy.
     var base = 'https://www.thejamesnz.com/';
     try { if (/^https?:/.test(location.protocol) && location.hostname && !/thejamesnz\.com$/.test(location.hostname) && !/github\.io$/.test(location.hostname)) base = location.origin + location.pathname; } catch (e) {}
-    return base + '#section=' + encodeURIComponent(tab === 'Mateo · AI friend' ? 'Ask Mateo' : tab);
+    var key = tab === 'Mateo · AI friend' ? 'Ask Mateo' : tab;
+    var slug = String(tab === 'Home' ? 'home' : JNZX.label ? JNZX.label(tab) : key).toLowerCase().replace(/^group:/, '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'home';
+    return base + '?p=' + slug + (tab === 'Home' ? '' : '#section=' + encodeURIComponent(key));
   };
 
   function ShareBar(props) {
@@ -313,7 +329,7 @@
         return h('button', { key: t.id, type: 'button', role: 'tab', 'aria-selected': t.id === item.id, className: 'jx-tab' + (t.id === item.id ? ' is-on' : ''),
           onClick: function () { setCur(t.id); try { sessionStorage.setItem(key, t.id); } catch (e) {} } }, t.label);
       })),
-      h('div', { className: 'jx-tabpanel', role: 'tabpanel' }, item.render()));
+      h('div', { className: 'jx-tabpanel', role: 'tabpanel', key: 'panel-' + item.id }, item.render()));
   };
   /* Cached JSON loader for the data/ folder */
   var cache = {};
@@ -396,6 +412,7 @@
     'Today’s fruit & vege picks': ['./oct13/produce-sheet.png', 'What’s in season and good value this week.'],
     'NZ bucket lists': ['./family-seaside-consistent.webp', 'A family bucket list and poster for Aotearoa.'],
     'NZ quiz': ['./family-play-consistent.webp', 'Test your Kiwi knowledge with a fun quiz.'],
+    'x:world-clock': [null, 'Spin the globe: the time anywhere, next to NZ time.'],
     'NZ safety & know-how': ['./oct15/preparedness.png', 'Be prepared: first aid, sun, road and emergencies.'],
     'Reading nook': ['./story-pages/story-02-middle.webp', 'Original family stories as page-turning flip-books.'],
     'Family tips': ['./family-home-clothes.png', 'Practical tips that make home life easier.'],
@@ -475,6 +492,7 @@
         h('div', { className: 'jx-shop-hero-media' }, h('img', { src: (JNZX.heroCover && JNZX.heroCover(title)) || jAsset(g.image), alt: '', className: 'jx-shop-hero-img' + (JNZX.heroCover && JNZX.heroCover(title) ? ' is-drawn' : '') })),
         h('div', { className: 'jx-shop-hero-txt' }, h('p', { className: 'eyebrow' }, 'THE JAMES NZ · ' + title.toUpperCase()), h('h1', null, title), h('p', null, g.blurb),
           first && h('button', { type: 'button', className: 'primary', onClick: function () { props.navigate(first.name); } }, 'Start with ' + (first.displayName || first.name) + ' →'))),
+      title === 'Kiwi Adventures' && JNZX.WorldGlobe ? h(JNZX.WorldGlobe, { compact: true }) : null,
       h('div', { className: 'jx-shop-tools' },
         h('nav', { className: 'jx-cat-bar', 'aria-label': title + ' sections' }, sections.map(function (sec, si) { return h('button', { key: si, type: 'button', onClick: function () { setQ(''); setTimeout(function () { var el = document.getElementById('jx-shop-' + si); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 20); } }, sec.heading + ' (' + sec.items.length + ')'); })),
         h(JNZX.Search, { value: qq, onChange: setQ, placeholder: 'Search ' + items.length + ' topics in ' + title })),

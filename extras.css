@@ -828,3 +828,34 @@ main .l-care-card img.l-card-photo{height:160px!important;max-height:160px!impor
 html body main section img.x-banner.x-banner{height:200px!important;max-height:200px!important;width:100%!important;aspect-ratio:auto!important;object-fit:cover!important}
 html body main .checklist-panel img.x-banner.x-banner{height:150px!important;max-height:150px!important}
 @media (min-width:900px){html body main section img.x-banner.x-banner{height:240px!important;max-height:240px!important}}
+/* ---- catchy lines ---- */
+.jx-catchy{display:block;margin:6px 0 8px!important;font-style:italic;color:#9a5b12!important;font-size:.95rem!important;line-height:1.4!important}
+html[data-reading-theme=dark] .jx-catchy{color:#f3c27a!important}
+li > .jx-catchy{margin:2px 0 0!important;font-size:.85rem!important}
+/* ---- World clock globe ---- */
+.jx-globe{border:1px solid var(--jx-line);border-radius:22px;background:var(--jx-card);padding:16px;margin:16px 0}
+.jx-globe-head h2{margin:0!important;font-size:1.4rem!important}
+.jx-globe-head p{margin:4px 0 10px!important}
+.jx-globe-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-items:start}
+.jx-globe-stage{display:flex;flex-direction:column;align-items:center}
+.jx-globe-canvas{width:100%;max-width:360px;aspect-ratio:1;touch-action:none;cursor:grab;border-radius:50%;background:radial-gradient(circle,#0b2544 60%,transparent 71%)}
+.jx-globe-canvas:active{cursor:grabbing}
+.jx-globe-ctl{justify-content:center;margin-top:8px}
+.jx-globe-card{border-radius:16px;padding:12px 14px;margin-bottom:10px;display:flex;flex-direction:column;gap:2px}
+.jx-globe-card small{font-weight:700;letter-spacing:.06em;font-size:.75rem}
+.jx-globe-card strong{font-size:1.25rem}
+.jx-globe-card.is-there{background:#fff6d6;color:#3b3210}
+.jx-globe-card.is-nz{background:#e3f2ff;color:#123049}
+html[data-reading-theme=dark] .jx-globe-card.is-there{background:#2a2410;color:#ffe9a8}
+html[data-reading-theme=dark] .jx-globe-card.is-nz{background:#10243a;color:#cfe6ff}
+.jx-globe-list{display:flex;flex-wrap:wrap;gap:6px;max-height:190px;overflow-y:auto;margin-top:8px;padding:2px}
+.jx-globe-list .jx-chip{font-size:.85rem}
+@media (max-width:760px){.jx-globe-body{grid-template-columns:1fr}}
+.jx-kids-base .filters button.jx-best-age{box-shadow:0 0 0 2px #c99400 inset}.jx-kids-base .filters button.jx-best-age::after{content:" ★";color:#c99400}
+.jx-hg{margin:0 0 18px}.jx-hg h2{margin:4px 0 10px!important}.jx-hg-card{background:#eef7ea!important;border-color:#cfe5c6!important;color:#1f3a1a!important}.jx-hg-card small{color:#3f7a33!important}html[data-reading-theme=dark] .jx-hg-card{background:#14240f!important;color:#dff0d6!important;border-color:#2c4a22!important}html[data-reading-theme=dark] .jx-hg-card small{color:#9fd88a!important}
+/* flip-books in dark mode: keep the paper light and the words dark so pages stay readable */
+html[data-reading-theme=dark] .jx-fb-face:not(.jx-fb-cover),html[data-reading-theme=dark] .jx-fb-back{background:#fbf6ea!important;color:#2b211a!important}
+html[data-reading-theme=dark] .jx-fb-face:not(.jx-fb-cover) :is(p,span,h1,h2,h3,h4,small,strong,em,b,i,li,div,blockquote,figcaption){color:#2b211a!important}
+html[data-reading-theme=dark] .jx-fb-face:not(.jx-fb-cover) .jx-fb-num{color:#7a6a5a!important}
+html[data-reading-theme=dark] .jx-fb-face.jx-fb-end :is(h2,p,small){color:#2b211a!important}
+.jx-os{display:inline-flex;border:1px solid var(--jx-line);border-radius:999px;padding:3px;background:var(--jx-tint);gap:3px}.jx-os button{border:0;background:transparent;border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;color:var(--jx-ink);cursor:pointer}.jx-os button.is-on{background:var(--jx-card);box-shadow:0 1px 4px rgba(0,0,0,.15)}

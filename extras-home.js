@@ -109,7 +109,7 @@
     return ref;
   }
   function footer(g, t, W, y, line) {
-    g.fillStyle = hexA(t.ink, 0.6); g.font = '22px ' + SANS; g.textAlign = 'left'; g.fillText(line || 'The James NZ · thejamesnz.com', 64, y); g.textAlign = 'left';
+    g.fillStyle = hexA(t.ink, 0.6); g.font = '22px ' + SANS; g.textAlign = 'left'; g.fillText(line || 'The James NZ · www.thejamesnz.com', 64, y); g.textAlign = 'left';
   }
   JNZX.poster = { THEMES: THEMES, ThemePicker: ThemePicker, ExportBar: ExportBar, wrap: wrap, rr: rr, themeOf: themeOf, pdfFromCanvas: pdfFromCanvas };
 
@@ -174,7 +174,7 @@
         if (draw) { g.strokeStyle = hexA(t.accent, 0.5); g.lineWidth = 2; rr(g, M, y, W - 2 * M, th, 20); g.stroke(); }
         var yy = y + 46; tip.concat(al).forEach(function (l) { if (draw) { g.fillStyle = t.ink; g.fillText(l, M + 32, yy); } yy += 36; });
         y += th + 60;
-        if (draw) { g.fillStyle = t.accent; g.fillRect(0, y - 6, W, 4); footer(g, t, W, y + 40, 'From Our Kitchen · The James NZ · thejamesnz.com'); }
+        if (draw) { g.fillStyle = t.accent; g.fillRect(0, y - 6, W, 4); footer(g, t, W, y + 40, 'From Our Kitchen · The James NZ · www.thejamesnz.com'); }
         return y + 72;
       }
       c.width = W; c.height = 3000; var H = pass(false); c.height = H; pass(true);
@@ -250,7 +250,7 @@
         cols[ci] += b.h + 26;
       });
       y = Math.max(cols[0], cols[1]) + 10;
-      if (draw) { g.fillStyle = t.accent; rr(g, M, y, W - 2 * M, 64, 14); g.fill(); g.fillStyle = isDarkHex(t.accent) ? '#fff' : '#111'; g.font = '25px ' + SANS; g.textAlign = 'center'; g.fillText('Good food, smart choices, happy budget ♥  ·  thejamesnz.com', W / 2, y + 42); g.textAlign = 'left'; }
+      if (draw) { g.fillStyle = t.accent; rr(g, M, y, W - 2 * M, 64, 14); g.fill(); g.fillStyle = isDarkHex(t.accent) ? '#fff' : '#111'; g.font = '25px ' + SANS; g.textAlign = 'center'; g.fillText('Good food, smart choices, happy budget ♥  ·  www.thejamesnz.com', W / 2, y + 42); g.textAlign = 'left'; }
       return y + 104;
     }
     c.width = W; c.height = 4000; var H = pass(false); c.height = Math.max(H, 600); pass(true);
@@ -381,7 +381,7 @@
     [['Budget', M + 24], ['Planned', M + 420], ['Actual', M + 680], ['Status', M + 940]].forEach(function (hd) { g.fillText(hd[0], hd[1], ty + 42); });
     var all = [['Income', T.income.plan, T.income.actual, null, 'income']].concat(rows);
     all.forEach(function (r, i) { var y = ty + 64 + i * 62 + 42; g.fillStyle = i % 2 ? hexA(t.accent, 0.06) : 'transparent'; if (i % 2) g.fillRect(M, y - 42, W - 2 * M, 62); g.fillStyle = t.ink; g.font = '26px ' + SANS; g.fillText(r[0], M + 24, y); g.fillText(money(r[1]), M + 420, y); g.fillText(money(r[2]), M + 680, y); var ok = r[4] === 'savings' || r[4] === 'income' ? r[2] >= r[1] : r[2] <= r[1]; g.fillStyle = ok ? '#2e8b57' : '#c0392b'; g.font = 'bold 30px ' + SANS; g.fillText(r[1] || r[2] ? (ok ? '✓' : '✗') : '—', M + 960, y); });
-    var fy = ty + 64 + all.length * 62 + 60; g.fillStyle = hexA(t.ink, 0.55); g.font = '21px ' + SANS; g.fillText('Household plan in NZD. A personal record, not financial advice. · thejamesnz.com', M, fy);
+    var fy = ty + 64 + all.length * 62 + 60; g.fillStyle = hexA(t.ink, 0.55); g.font = '21px ' + SANS; g.fillText('Household plan in NZD. A personal record, not financial advice. · www.thejamesnz.com', M, fy);
   }
   try {
     BudgetTracker = function MoneyPlan() {
@@ -493,7 +493,7 @@
     });
     var done = items.filter(function (i) { return i.done; }).length;
     g.textAlign = 'center'; g.fillStyle = design === 'night' ? '#f4f1e8' : ink; g.font = 'bold 30px ' + SANS; g.fillText(done + ' of ' + n + ' done', W / 2, H - 92);
-    g.font = '22px ' + SANS; g.fillStyle = design === 'night' ? 'rgba(244,241,232,.7)' : hexA(ink, 0.6); g.fillText('My Kiwi Adventures · The James NZ · thejamesnz.com', W / 2, H - 52); g.textAlign = 'left';
+    g.font = '22px ' + SANS; g.fillStyle = design === 'night' ? 'rgba(244,241,232,.7)' : hexA(ink, 0.6); g.fillText('My Kiwi Adventures · The James NZ · www.thejamesnz.com', W / 2, H - 52); g.textAlign = 'left';
   }
   try {
     var BaseBucket = NZBucket;
@@ -550,7 +550,7 @@
     return -1;
   }
   function isBible(i) { try { return jBibleData.some(function (b) { return b.index === i; }); } catch (e) { return false; } }
-  function bookUrl(i) { return JNZX.pageUrl('x:book') + '&story=' + i; }
+  function bookUrl(i) { return JNZX.pageUrl('x:book').replace(/\?p=[^#]*/, '?p=story-' + (i + 1)) + '&story=' + i; }
   function FlipShare(props) {
     var i = props.index, s = stories[i];
     var o = useState(false), open = o[0], setOpen = o[1];
@@ -599,7 +599,7 @@
     if (p.kind === 'pic') return h('div', { className: 'jx-fb-face jx-fb-pic' }, h('img', { src: p.img, alt: p.alt, loading: 'lazy' }));
     if (p.kind === 'text') return h('div', { className: 'jx-fb-face jx-fb-text' }, h('p', null, p.text), h('span', { className: 'jx-fb-num' }, p.n));
     if (p.kind === 'combo') return h('div', { className: 'jx-fb-face jx-fb-combo' }, h('img', { src: p.img, alt: p.alt, loading: 'lazy' }), h('p', null, p.text), h('span', { className: 'jx-fb-num' }, p.n));
-    return h('div', { className: 'jx-fb-face jx-fb-end' }, h('h2', null, p.title), h('p', null, p.sub), h('p', null, '✿'), h('small', null, 'thejamesnz.com'));
+    return h('div', { className: 'jx-fb-face jx-fb-end' }, h('h2', null, p.title), h('p', null, p.sub), h('p', null, '✿'), h('small', null, 'www.thejamesnz.com'));
   }
   function FlipBook(props) {
     var mq = useState(function () { try { return matchMedia('(max-width: 720px)').matches; } catch (e) { return false; } }), single = mq[0], setSingle = mq[1];

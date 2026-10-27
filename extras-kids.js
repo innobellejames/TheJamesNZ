@@ -259,6 +259,19 @@
     KidsLearning = function LittleLearners() {
       var ag = JNZX.useStored('jnzx-kids-age', '3-5'), age = ag[0], setAge = ag[1];
       var vw = JNZX.useStored('jnzx-kids-view', 'play'), view = vw[0], setView = vw[1];
+      // When the age changes, the Learn tab jumps to the best topic for that age and marks the good ones
+      useEffect(function () {
+        if (view !== 'learn') return;
+        var tm = setTimeout(function () {
+          var gd = GUIDE[age], want = (gd && gd.topics || '').split('·').map(function (x) { return x.trim(); }).filter(Boolean);
+          var btns = Array.prototype.slice.call(document.querySelectorAll('.jx-kids-base .filters button'));
+          btns.forEach(function (b) { b.classList.toggle('jx-best-age', want.indexOf(b.textContent.trim()) >= 0); });
+          var first = btns.find(function (b) { return b.textContent.trim() === want[0]; });
+          if (first && !first.classList.contains('selected')) first.click();
+          setTimeout(function () { Array.prototype.forEach.call(document.querySelectorAll('.jx-kids-base .filters button'), function (b) { b.classList.toggle('jx-best-age', want.indexOf(b.textContent.trim()) >= 0); }); }, 200);
+        }, 60);
+        return function () { clearTimeout(tm); };
+      }, [age, view]);
       return h(Frag, null,
         h('div', { className: 'jx-page jx-little' },
           h('p', { className: 'eyebrow' }, 'LEARNING · LITTLE LEARNERS'),
@@ -268,7 +281,7 @@
           h(AgeGuide, { age: age }),
           h('div', { className: 'jx-cs-tabs', role: 'tablist', 'aria-label': 'Play or learn' },
             [['play', '🎮 Focus games'], ['learn', '📚 Learn & make']].map(function (x) { return h('button', { key: x[0], type: 'button', role: 'tab', 'aria-selected': view === x[0], className: view === x[0] ? 'is-on' : '', onClick: function () { setView(x[0]); } }, x[1]); })),
-          view === 'play' && h(Arcade, { age: age })),
+          view === 'play' && h(Arcade, { key: 'arcade-' + age, age: age })),
         view === 'learn' && h('div', { className: 'jx-kids-base' }, h(BaseKids)),
         h('div', { className: 'jx-page jx-page-end' }, h(JNZX.ShareBar, { tab: 'Kids’ learning & activities' })));
     };

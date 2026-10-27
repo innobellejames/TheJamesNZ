@@ -120,6 +120,39 @@
       ['Windows and apps', [['Alt+Tab', 'Switch between apps'], ['Win+Tab', 'Task View'], ['Win+Arrow keys', 'Snap windows to the sides or maximise'], ['Win+Ctrl+D', 'New virtual desktop'], ['Ctrl+Shift+Esc', 'Task Manager'], ['Win+R', 'Run'], ['Win+P', 'Project to a second screen'], ['F2', 'Rename the selected file'], ['Ctrl+Shift+N', 'New folder in File Explorer']]]
     ]
   };
+
+  // Mac versions (Microsoft 365 for Mac and macOS). '—' means there is no direct Mac shortcut.
+  var MAC = {
+    'All Office apps|F12': 'Cmd+Shift+S', 'All Office apps|Ctrl+F2': 'Cmd+P', 'All Office apps|Ctrl+Y': 'Cmd+Y or Cmd+Shift+Z', 'All Office apps|Ctrl+H': 'Ctrl+H or Cmd+Shift+H',
+    'All Office apps|F7': 'Cmd+Option+L', 'All Office apps|Alt': '—', 'All Office apps|Alt+Q': '—', 'All Office apps|F1': 'Cmd+/', 'All Office apps|Ctrl+F1': 'Cmd+Option+R', 'All Office apps|F6': '—',
+    'Word|Ctrl+Space': 'Ctrl+Space', 'Word|Shift+F3': 'Fn+Shift+F3', 'Word|Ctrl+Enter': 'Cmd+Return', 'Word|Ctrl+Alt+M': 'Cmd+Option+A', 'Word|Alt+Ctrl+F': 'Cmd+Option+F', 'Word|Alt+Ctrl+D': 'Cmd+Option+E',
+    'Word|Alt+Shift+D': 'Ctrl+Shift+D', 'Word|Alt+Shift+T': 'Ctrl+Shift+T', 'Word|Ctrl+Alt+C / T / R': 'Option+G / Option+2 / Option+R', 'Word|Shift+F7': 'Fn+Shift+F7', 'Word|Ctrl+Shift+8': 'Cmd+8',
+    'Word|Ctrl+G': 'Cmd+Option+G', 'Word|Ctrl+Home / Ctrl+End': 'Cmd+Fn+← / Cmd+Fn+→', 'Word|Ctrl+Backspace / Ctrl+Delete': 'Option+Delete / Option+Fn+Delete', 'Word|F4': 'Cmd+Y',
+    'Excel|Ctrl+Space': 'Ctrl+Space', 'Excel|Ctrl+Home / Ctrl+End': 'Fn+Ctrl+← / Fn+Ctrl+→', 'Excel|Ctrl+Page Up / Page Down': 'Option+← / Option+→', 'Excel|Ctrl+G or F5': 'Ctrl+G',
+    'Excel|F2': 'Ctrl+U', 'Excel|Alt+Enter': 'Ctrl+Option+Return', 'Excel|Ctrl+Enter': 'Ctrl+Return', 'Excel|Ctrl+E': 'Ctrl+E', 'Excel|Ctrl+;': 'Ctrl+;', 'Excel|Ctrl+Shift+;': 'Cmd+;',
+    'Excel|Ctrl+Alt+V': 'Cmd+Ctrl+V', 'Excel|Alt+=': 'Cmd+Shift+T', 'Excel|F4': 'Cmd+T', 'Excel|Ctrl+`': 'Ctrl+`', 'Excel|F9': 'Cmd+=', 'Excel|Shift+F3': 'Fn+Shift+F3', 'Excel|Ctrl+Shift+U': 'Ctrl+Shift+U',
+    'Excel|Ctrl+Shift+$': 'Ctrl+Shift+$', 'Excel|Ctrl+Shift+%': 'Ctrl+Shift+%', 'Excel|Ctrl+Shift+!': 'Ctrl+Shift+!', 'Excel|Ctrl+Shift+#': 'Ctrl+Shift+#', 'Excel|Ctrl+Shift+&': 'Cmd+Option+0', 'Excel|Ctrl+Shift+_': 'Cmd+Option+-',
+    'Excel|Ctrl+T': 'Ctrl+T', 'Excel|Ctrl+Shift+L': 'Cmd+Shift+F', 'Excel|Ctrl++ / Ctrl+-': 'Cmd+Shift++ / Cmd+-', 'Excel|Ctrl+9 / Ctrl+0': 'Ctrl+9 / Ctrl+0', 'Excel|Shift+F11': 'Fn+Shift+F11', 'Excel|Alt+F1': 'Fn+Option+F1', 'Excel|F11': 'Fn+F11',
+    'PowerPoint|Ctrl+M': 'Cmd+Shift+N', 'PowerPoint|Ctrl+G / Ctrl+Shift+G': 'Cmd+Option+G / Cmd+Option+Shift+G', 'PowerPoint|Ctrl + drag': 'Option + drag', 'PowerPoint|Alt+F9': '—',
+    'PowerPoint|F5': 'Cmd+Shift+Return', 'PowerPoint|Shift+F5': 'Cmd+Return', 'PowerPoint|Alt+F5': 'Option+Return', 'PowerPoint|Number + Enter': 'Number + Return', 'PowerPoint|Ctrl+H': 'Ctrl+H',
+    'Outlook|Ctrl+Y': '—', 'Outlook|Ctrl+E or F3': 'Cmd+Option+F', 'Outlook|Ctrl+Shift+M': 'Cmd+N (in Mail)', 'Outlook|Ctrl+F': 'Cmd+J', 'Outlook|Alt+S': 'Cmd+Return', 'Outlook|Ctrl+K': 'Ctrl+Cmd+C',
+    'Outlook|Ctrl+Shift+B': '—', 'Outlook|Ctrl+Q / Ctrl+U': 'Cmd+T / Cmd+Shift+T', 'Outlook|Insert': '—', 'Outlook|Backspace': '—', 'Outlook|Ctrl+D or Delete': 'Delete', 'Outlook|Ctrl+Shift+V': 'Cmd+Shift+M',
+    'Outlook|F9': 'Cmd+K', 'Outlook|Ctrl+Shift+A': 'Cmd+N (in Calendar)', 'Outlook|Ctrl+Shift+Q': '—', 'Outlook|Ctrl+G': '—', 'Outlook|Alt+1 … Alt+0': '—',
+    'OneNote|Alt+Shift+D': 'Cmd+D', 'OneNote|Alt+Shift+F': 'Cmd+Shift+D', 'OneNote|Ctrl+E': 'Cmd+Option+F',
+    'Windows|Win': 'Cmd+Space', 'Windows|Win+E': 'Cmd+Option+Space', 'Windows|Win+D': 'Cmd+F3', 'Windows|Win+L': 'Ctrl+Cmd+Q', 'Windows|Win+I': '—', 'Windows|Win+V': '—', 'Windows|Win+.': 'Ctrl+Cmd+Space',
+    'Windows|Win+H': 'Fn Fn', 'Windows|Win+Shift+S': 'Cmd+Shift+4', 'Windows|Win+PrtScn': 'Cmd+Shift+3', 'Windows|Alt+Tab': 'Cmd+Tab', 'Windows|Win+Tab': 'Ctrl+↑', 'Windows|Win+Arrow keys': 'Fn+Ctrl+Arrow keys',
+    'Windows|Win+Ctrl+D': '—', 'Windows|Ctrl+Shift+Esc': 'Cmd+Option+Esc', 'Windows|Win+R': 'Cmd+Space', 'Windows|Win+P': 'Cmd+F1', 'Windows|F2': 'Return', 'Windows|Ctrl+Shift+N': 'Cmd+Shift+N'
+  };
+  var MAC_DESC = { 'Windows|Win': 'Spotlight search (open apps and files)', 'Windows|Win+E': 'Finder search window', 'Windows|Win+I': 'Apple menu › System Settings', 'Windows|Win+V': 'No built-in clipboard history',
+    'Windows|Win+H': 'Dictation (press Fn twice)', 'Windows|Win+Tab': 'Mission Control', 'Windows|Win+Arrow keys': 'Tile windows (macOS Sequoia and later)', 'Windows|Win+Ctrl+D': 'Add a desktop in Mission Control',
+    'Windows|Ctrl+Shift+Esc': 'Force Quit apps', 'Windows|Win+R': 'Open an app with Spotlight', 'Windows|Win+P': 'Mirror displays', 'Windows|F2': 'Rename the selected file (Finder)', 'Windows|Ctrl+Shift+N': 'New folder in Finder',
+    'All Office apps|Alt': 'Use the menu bar instead of ribbon key tips', 'All Office apps|Alt+Q': 'Click the search box at the top of the window', 'Outlook|Ctrl+Y': 'Use the folder list', 'Outlook|Ctrl+G': 'Use the mini calendar' };
+  function toMac(app, k) {
+    var key = app + '|' + k;
+    if (Object.prototype.hasOwnProperty.call(MAC, key)) return MAC[key];
+    return k.replace(/Ctrl\+/g, 'Cmd+').replace(/Ctrl \+/g, 'Cmd +').replace(/Alt\+/g, 'Option+').replace(/\bWin\b/g, 'Cmd').replace(/\bEnter\b/g, 'Return').replace(/\bBackspace\b/g, 'Delete');
+  }
+  JNZX.macKeys = toMac;
   function Keys(props) { return h('span', { className: 'jx-keys' }, props.k.split(' / ').map(function (combo, i) { return h(R.Fragment, { key: i }, i > 0 && h('span', { className: 'jx-or' }, ' / '), combo.split(' or ').map(function (c, j) { return h(R.Fragment, { key: j }, j > 0 && h('span', { className: 'jx-or' }, ' or '), c.split(/\+(?!$)/).map(function (k, n) { return h(R.Fragment, { key: n }, n > 0 && '+', h('kbd', null, k.trim())); })); })); })); }
   JNZX.register('x:shortcuts', function ShortcutsPage(props) {
     var a = useState('All apps'), app = a[0], setApp = a[1];
@@ -129,19 +162,20 @@
     var shown = (app === 'All apps' ? apps : [app]).map(function (ap) {
       return [ap, SC[ap].map(function (sec) { return [sec[0], sec[1].filter(function (r) { return !qq || (r[0] + ' ' + r[1]).toLowerCase().indexOf(qq.toLowerCase()) >= 0; })]; }).filter(function (sec) { return sec[1].length; })];
     }).filter(function (x) { return x[1].length; });
-    function macify(k) { if (!mac) return k; return k.replace(/Ctrl\+/g, 'Cmd+').replace(/Alt\+/g, 'Option+').replace(/\bWin\b/g, 'Cmd'); }
+    function macify(k, ap) { return mac ? toMac(ap, k) : k; }
     var total = apps.reduce(function (n, ap) { return n + SC[ap].reduce(function (m2, s) { return m2 + s[1].length; }, 0); }, 0);
     return h('div', null,
-      JNZX.Header('MODERN & LIFESTYLE · OFFICE SHORTCUTS', 'Work faster with keyboard shortcuts.', total + ' tried-and-true shortcuts for Word, Excel, PowerPoint, Outlook, Teams, OneNote and Windows. Search, print a cheat sheet or share this page with your team.'),
+      JNZX.Header('MODERN & LIFESTYLE · OFFICE SHORTCUTS', 'Work faster with keyboard shortcuts.', total + ' tried-and-true shortcuts for Word, Excel, PowerPoint, Outlook, Teams, OneNote and Windows — with Mac keys too. Search, print a cheat sheet or share this page with your team.'),
       h(JNZX.ShareBar, { tab: props.tab, printable: true, label: 'Share this page', text: 'Keyboard shortcuts for Word, Excel, PowerPoint, Outlook and Teams' }),
       h('div', { className: 'jx-row jx-noprint' }, h(JNZX.Search, { value: qq, onChange: setQ, placeholder: 'Search, e.g. date, paste, mute' }),
-        h('label', { className: 'jx-check' }, h('input', { type: 'checkbox', checked: mac, onChange: function (e) { setMac(e.target.checked); } }), h('span', null, 'Show Mac keys (approximate)'))),
+        h('div', { className: 'jx-os', role: 'group', 'aria-label': 'Computer' }, h('button', { type: 'button', className: !mac ? 'is-on' : '', 'aria-pressed': !mac, onClick: function () { setMac(false); } }, '🪟 Windows'), h('button', { type: 'button', className: mac ? 'is-on' : '', 'aria-pressed': mac, onClick: function () { setMac(true); } }, '🍎 Mac'))),
+      mac && h('p', { className: 'small-note jx-mac-note' }, '🍎 Showing Mac keys for Microsoft 365 for Mac and macOS. Cmd = ⌘ Command · Option = ⌥ · Ctrl = ⌃ Control · Shift = ⇧. On laptops, F-keys may need Fn.'),
       h(JNZX.Chips, { label: 'App', options: ['All apps'].concat(apps), value: app, onChange: setApp }),
       shown.map(function (ap) {
-        return h('section', { key: ap[0], className: 'jx-sc-app' }, h('h2', null, ap[0]),
+        return h('section', { key: ap[0], className: 'jx-sc-app' }, h('h2', null, mac && ap[0] === 'Windows' ? 'macOS (instead of Windows)' : ap[0]),
           h('div', { className: 'jx-sc-grid' }, ap[1].map(function (sec) {
             return h('div', { key: sec[0], className: 'jx-card jx-sc-card' }, h('h3', null, sec[0]),
-              h('table', null, h('tbody', null, sec[1].map(function (r) { return h('tr', { key: r[0] + r[1] }, h('td', { className: 'jx-sc-k' }, h(Keys, { k: macify(r[0]) })), h('td', null, r[1])); }))));
+              h('table', null, h('tbody', null, sec[1].map(function (r) { var mk = macify(r[0], ap[0]), md = mac && MAC_DESC[ap[0] + '|' + r[0]]; return h('tr', { key: r[0] + r[1] }, h('td', { className: 'jx-sc-k' }, mk === '—' ? h('span', { className: 'jx-muted' }, 'Not on Mac') : h(Keys, { k: mk })), h('td', null, md || r[1])); }))));
           })));
       }),
       !shown.length && h('p', null, 'No shortcuts match “' + qq + '”.'),

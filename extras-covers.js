@@ -47,6 +47,7 @@
     'Today’s fruit & vege picks': ['garden', 'green', '🥝', ['🍎', '🥕', '🥦'], 'An apple a day keeps the doctor away.'],
     'NZ bucket lists': ['mountains', 'sky', '🗺️', ['⛺', '🚐', '🥾'], 'Life’s short. Take the scenic route.'],
     'NZ quiz': ['sea', 'sun', '❓', ['🐑', '🏉', '🥝'], 'Sweet as — let’s see how Kiwi you are.'],
+    'x:world-clock': ['sea', 'sky', '🌏', ['⏰', '✈️', '📞'], 'Somewhere it’s always coffee o’clock.'],
     'NZ safety & know-how': ['hills', 'mint', '🩹', ['🧴', '🔦', '🚗'], 'She’ll be right — once the first-aid kit is packed.'],
     // Family Together
     'Reading nook': ['night', 'night', '📚', ['⭐', '🧸', '🌙'], 'Once upon a time is the best time.'],

@@ -541,4 +541,57 @@
     };
     JNZX.ownShare['Saving tips'] = 1;
   } catch (e) { console.warn('[JNZX] savings', e); }
+
+  /* ---------- Home & Green: one tip at a time with 🔄 Another ---------- */
+  var HG = [
+    ['⏰ Time', 'Pick three must-dos for today and let the rest be bonus points.'], ['⏰ Time', 'Set a 10-minute timer and race it — tidying feels shorter with a deadline.'],
+    ['⏰ Time', 'Do the two-minute jobs straight away: hang the towel, rinse the cup.'], ['⏰ Time', 'Lay out tomorrow’s clothes and bags tonight. Future you says thanks.'],
+    ['⏰ Time', 'Batch the errands: post shop, pharmacy and supermarket in one loop.'], ['⏰ Time', 'Keep one “home admin” half-hour a week for bills, forms and emails.'],
+    ['⏰ Time', 'Leave a 15-minute buffer between plans for traffic, toddlers and surprises.'], ['⏰ Time', 'Make the bed first thing — one win before breakfast.'],
+    ['⏰ Time', 'Cook once, eat twice: double the dinner and freeze half.'], ['⏰ Time', 'Put a basket at the bottom of the stairs for things that live upstairs.'],
+    ['🌱 Garden', 'Plant herbs near the kitchen door so you actually use them.'], ['🌱 Garden', 'Water the roots in the early morning, not the leaves at midday.'],
+    ['🌱 Garden', 'Mulch around plants to keep moisture in and weeds out.'], ['🌱 Garden', 'Sow a short row of lettuce every few weeks for a steady supply.'],
+    ['🌱 Garden', 'Grow mint in a pot — in the garden it takes over the neighbourhood.'], ['🌱 Garden', 'Save egg cartons for seedlings and plant the whole cup later.'],
+    ['🌱 Garden', 'Feed the soil with compost and it will feed you back.'], ['🌱 Garden', 'Plant flowers among the veges to invite bees and helpful insects.'],
+    ['🌱 Garden', 'In spring, plant tomatoes after the last frost in your area.'], ['🌱 Garden', 'In autumn, plant garlic, broad beans and winter greens.'],
+    ['🌱 Garden', 'Let kids own a small patch — strawberries and sunflowers are winners.'], ['🌱 Garden', 'Collect rainwater in a barrel for the garden in summer.'],
+    ['🧽 Cleaning', 'Clean top to bottom: dust shelves first, then the floor.'], ['🧽 Cleaning', 'A squeegee after each shower keeps glass and tiles mould-free.'],
+    ['🧽 Cleaning', 'Wipe the microwave by heating a bowl of water and lemon for two minutes.'], ['🧽 Cleaning', 'Open windows for 10 minutes a day to dry out damp air.'],
+    ['🧽 Cleaning', 'Wash pillows and the doormat more often than you think.'], ['🧽 Cleaning', 'Never mix bleach with vinegar or ammonia — the fumes are dangerous.'],
+    ['🧽 Cleaning', 'Keep a caddy with cloths and spray in the bathroom for quick wipes.'], ['🧽 Cleaning', 'One load of washing a day beats a mountain on Saturday.'],
+    ['🧽 Cleaning', 'Baking soda on a damp cloth lifts marks from sinks and stovetops.'], ['🧽 Cleaning', 'Vacuum the fridge coil once a year — it runs cheaper.'],
+    ['🏡 Warm & dry', 'Close curtains at dusk in winter to hold in the day’s warmth.'], ['🏡 Warm & dry', 'Dry washing outside or in a ventilated space to cut indoor damp.'],
+    ['🏡 Warm & dry', 'Use extractor fans while cooking and showering, and for 10 minutes after.'], ['🏡 Warm & dry', 'Block draughts under doors with a rolled towel or a snake.'],
+    ['🏡 Warm & dry', 'Wipe condensation off windows each morning to stop mould.'], ['🏡 Warm & dry', 'Aim for a comfortable 18–20 °C in living areas in winter.'],
+    ['🏡 Warm & dry', 'Move furniture a little away from outside walls so air can circulate.'], ['🏡 Warm & dry', 'Test smoke alarms monthly and change batteries when needed.'],
+    ['♻️ Green', 'Check your council’s recycling rules — they differ around the country.'], ['♻️ Green', 'Rinse containers before recycling; dirty items can spoil a whole load.'],
+    ['♻️ Green', 'Keep a bag in the car for shopping and a cup for takeaway coffee.'], ['♻️ Green', 'Start a compost bin or worm farm for food scraps.'],
+    ['♻️ Green', 'Fix before you replace: a loose button or wobbly chair is often a 5-minute job.'], ['♻️ Green', 'Swap clothes and toys with friends instead of buying new.'],
+    ['♻️ Green', 'Turn off lights and switch off at the wall when you leave a room.'], ['♻️ Green', 'Wash clothes in cold water — it saves power and colours.'],
+    ['♻️ Green', 'Plan meals to waste less food, and freeze leftovers early.'], ['♻️ Green', 'Walk or bike short trips — better for you and the planet.'],
+    ['♻️ Green', 'Take soft plastics to a drop-off point if your area has one.'], ['♻️ Green', 'Choose a refill station for soap and cleaning products.'],
+    ['🧺 Organise', 'One in, one out: when something new comes home, something old leaves.'], ['🧺 Organise', 'Label shelves and boxes so everyone knows where things live.'],
+    ['🧺 Organise', 'Keep a donate bag in the wardrobe for clothes that no longer fit.'], ['🧺 Organise', 'Give every room a five-minute reset before bed.'],
+    ['🧺 Organise', 'Hooks by the door for keys, bags and jackets save the morning hunt.'], ['🧺 Organise', 'Store like with like: batteries together, tape together, chargers together.']
+  ];
+  try {
+    var BaseHG = HomeGarden;
+    HomeGarden = function HomeGreen() {
+      var ix = useState(function () { return Math.floor(Math.random() * HG.length); }), i = ix[0], setI = ix[1];
+      var c = useState('All'), cat = c[0], setCat = c[1];
+      var cats = ['All'].concat(HG.map(function (x) { return x[0]; }).filter(function (x, k, a) { return a.indexOf(x) === k; }));
+      var pool = HG.filter(function (x) { return cat === 'All' || x[0] === cat; }), cur = pool[i % pool.length];
+      function another() { var n = i; if (pool.length > 1) while (n % pool.length === i % pool.length) n = Math.floor(Math.random() * 1000); setI(n); }
+      return h(R.Fragment, null,
+        h('section', { className: 'jx-hg' },
+          h('p', { className: 'eyebrow' }, 'COMMUNITY · HOME & GREEN'),
+          h('h2', null, 'A little tip for your home'),
+          h(JNZX.Chips, { label: 'Tip type', options: cats, value: cat, onChange: function (v) { setCat(v); setI(Math.floor(Math.random() * 1000)); } }),
+          h('div', { className: 'jx-cs-card jx-hg-card jx-keep-colour' }, h('small', null, cur[0].toUpperCase()), h('p', null, cur[1])),
+          h('div', { className: 'jx-row' },
+            h('button', { type: 'button', className: 'primary', onClick: another }, '🔄 Another tip'),
+            h(JNZX.ShareMini, { title: 'Home & Green tip', text: '🏡 ' + cur[1] + ' (The James NZ)', label: 'Share this tip' }))),
+        h(BaseHG));
+    };
+  } catch (e) { console.warn('[JNZX] home green', e); }
 })();
