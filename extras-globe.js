@@ -363,7 +363,7 @@
     var cvRef = useRef(null), dotsRef = useRef([]), viewRef = useRef({ lat: -15, lon: 150 }), drag = useRef(null), spin = useRef(true), frame = useRef(0);
     var st = useState(18), sel = st[0], setSel = st[1];
     var nw = useState(Date.now()), now = nw[0], setNow = nw[1];
-    var q = useState(''), qq = q[0], setQ = q[1];
+    var go = useState(function () { try { return window.matchMedia('(min-width: 900px)').matches; } catch (e) { return false; } }), globeOpen = go[0], setGlobeOpen = go[1];
     var dark = (function () { try { return document.documentElement.getAttribute('data-reading-theme') === 'dark'; } catch (e) { return false; } })();
     useEffect(function () { var id = setInterval(function () { setNow(Date.now()); }, 15000); return function () { clearInterval(id); }; }, []);
     useEffect(function () {
@@ -372,6 +372,7 @@
       function draw() { dotsRef.current = render(cv, viewRef.current, selRef.current, dark); }
       function loop() {
         if (!alive) return;
+        if (cv.offsetParent === null) { frame.current = requestAnimationFrame(loop); return; }
         var v = viewRef.current;
         if (target) {
           var dl = ((target.lon - v.lon + 540) % 360) - 180, dp = target.lat - v.lat;
@@ -408,28 +409,37 @@
     function choose(i) { setSel(i); if (cvRef.current && cvRef.current._goto) cvRef.current._goto(i); }
     var P = PLACES[sel], date = new Date(now), nz = show(date, 'Pacific/Auckland'), there = show(date, P[5]);
     var shareText = P[1] + ' ' + P[0] + ' (' + P[2] + '; capital ' + P[6] + '): ' + there + '\n🇳🇿 ' + nzLabel(date) + ': ' + nz + '\nMoney: ' + P[8] + ' (' + P[7] + ')';
-    return h('section', { className: 'jx-globe' + (props.compact ? ' is-compact' : '') },
-      h('div', { className: 'jx-globe-head' }, h('h2', null, '🌏 World clock'), h('p', { className: 'jx-muted' }, 'Spin the globe and tap a dot: local time, NZ time, the capital and a money converter.')),
-      h('div', { className: 'jx-globe-body' },
+    var T1 = tparts(date, P[5]), T0 = tparts(date, 'Pacific/Auckland');
+    var placeName = /\(/.test(P[0]) ? placeLabel(P).split(' · ')[0] : P[2];
+    return h('section', { className: 'jx-globe jx-wc' + (props.compact ? ' is-compact' : '') },
+      h('div', { className: 'jx-wc-times', 'aria-live': 'polite' },
+        h('div', { className: 'jx-wc-t is-there' }, h('p', { className: 'jx-wc-where' }, P[1] + ' ' + placeName + (placeName !== countryOf(P) ? ', ' + countryOf(P) : '')), h('p', { className: 'jx-wc-clock' }, T1.time), h('p', { className: 'jx-wc-day' }, T1.day)),
+        h('div', { className: 'jx-wc-diff' }, h('span', null, sel === 0 ? 'Home' : diffText(date, P[5]).replace(' New Zealand', ' NZ'))),
+        h('div', { className: 'jx-wc-t is-nz' }, h('p', { className: 'jx-wc-where' }, '🇳🇿 New Zealand · ' + nzLabel(date)), h('p', { className: 'jx-wc-clock' }, T0.time), h('p', { className: 'jx-wc-day' }, T0.day))),
+      h('p', { className: 'jx-wc-facts' }, '🏛️ Capital: ' + P[6] + '  ·  💵 ' + P[8] + ' (' + P[7] + ')' + (P[9] ? '  ·  ✨ ' + P[9] : '')),
+      h(Picker, { sel: sel, choose: choose }),
+      h('div', { className: 'jx-row jx-wc-actions' }, h(JNZX.ShareMini, { title: 'Time in ' + placeName, text: shareText, label: 'Share these times' })),
+      h('details', { className: 'jx-wc-more' }, h('summary', null, '💱 Money converter'), h(CurrencyBox, { key: 'cur-' + sel, place: P })),
+      h('details', { className: 'jx-wc-more', open: globeOpen, onToggle: function (e) { setGlobeOpen(e.currentTarget.open); } }, h('summary', null, '🌏 Spin the globe'),
         h('div', { className: 'jx-globe-stage' },
           h('canvas', { ref: cvRef, width: 360, height: 360, className: 'jx-globe-canvas', role: 'img', 'aria-label': 'Globe showing ' + P[0], onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: function () { drag.current = null; } }),
           h('div', { className: 'jx-row jx-globe-ctl' },
             h('button', { type: 'button', className: 'secondary', onClick: function () { spin.current = !spin.current; } }, '⟳ Spin'),
-            h('button', { type: 'button', className: 'secondary', onClick: function () { choose(0); } }, '🇳🇿 Home'))),
-        h('div', { className: 'jx-globe-info', 'aria-live': 'polite' },
-          h(Picker, { sel: sel, choose: choose }),
-          h('div', { className: 'jx-globe-card is-there' }, h('small', null, P[1] + ' ' + P[0].toUpperCase()), h('strong', null, there), h('span', null, '🕰️ ' + P[2] + ' · 🏛️ Capital: ' + P[6])),
-          h('div', { className: 'jx-globe-card is-nz' }, h('small', null, '🇳🇿 ' + nzLabel(date) + ' · NEW ZEALAND'), h('strong', null, nz), h('span', null, sel === 0 ? 'You’re home!' : diffText(date, P[5]))),
-          h(CurrencyBox, { key: 'cur-' + sel, place: P }),
-          h('div', { className: 'jx-row' }, h(JNZX.ShareMini, { title: 'Time in ' + P[0], text: shareText, label: 'Share these times' })),
-          null)));
+            h('button', { type: 'button', className: 'secondary', onClick: function () { choose(0); } }, '🇳🇿 Home')),
+          h('p', { className: 'jx-muted jx-wc-hint' }, 'Drag to turn the globe and tap a dot to choose a place.'))));
+  }
+  function tparts(date, tz) {
+    try {
+      return { time: new Intl.DateTimeFormat('en-NZ', { timeZone: tz, hour: 'numeric', minute: '2-digit', hour12: true }).format(date).replace(/\s?([ap])\.?m\.?/i, function (m, a) { return ' ' + a.toLowerCase() + 'm'; }),
+        day: new Intl.DateTimeFormat('en-NZ', { timeZone: tz, weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(date) };
+    } catch (e) { return { time: show(date, tz), day: '' }; }
   }
   function Picker(props) {
     var sel = props.sel, P = PLACES[sel], country = countryOf(P), sub = BYC[country] || [sel];
     var q = useState(''), text = q[0], setText = q[1];
     var labels = useMemo(function () { return PLACES.map(function (p) { var c = countryOf(p), l = placeLabel(p); return l === c ? c : c + ' — ' + l; }); }, []);
     var recent = recentGet().map(function (n) { return PLACES.findIndex(function (p) { return p[0] === n; }); }).filter(function (i) { return i >= 0; });
-    var quick = recent.concat(QUICK.map(function (n) { return PLACES.findIndex(function (p) { return p[0] === n; }); })).filter(function (i, k, a) { return i >= 0 && a.indexOf(i) === k; }).slice(0, 6);
+    var quick = recent.concat(QUICK.map(function (n) { return PLACES.findIndex(function (p) { return p[0] === n; }); })).filter(function (i, k, a) { return i >= 0 && a.indexOf(i) === k; }).slice(0, 5);
     function pick(i) { if (i >= 0) { recentAdd(i); props.choose(i); } }
     function typed(v) { setText(v); var k = labels.indexOf(v); if (k < 0) { var lv = v.trim().toLowerCase(); if (lv.length > 2) k = labels.findIndex(function (l) { return l.toLowerCase() === lv || l.toLowerCase().split(' — ').pop().split(' · ')[0] === lv; }); } if (k >= 0) { pick(k); setText(''); } }
     var countries = {}; REGIONS.forEach(function (r) { countries[r] = []; });
@@ -443,10 +453,9 @@
             REGIONS.filter(function (r) { return countries[r] && countries[r].length; }).map(function (r) { return h('optgroup', { key: r, label: r }, countries[r].map(function (c) { var f = PLACES[BYC[c][0]][1]; return h('option', { key: c, value: c }, f + ' ' + c + (BYC[c].length > 1 ? ' (' + BYC[c].length + ')' : '')); })); }))),
         sub.length > 1 && h('label', { className: 'jx-gp-field' }, h('span', null, '📍 City or region'),
           h('select', { value: sel, onChange: function (e) { pick(+e.target.value); } }, sub.map(function (i) { return h('option', { key: i, value: i }, placeLabel(PLACES[i]) + (PLACES[i][2] === PLACES[i][6] ? ' (capital)' : '')); })))),
-      h('label', { className: 'jx-gp-field jx-gp-search' }, h('span', null, '🔎 Or type a place'),
+      h('label', { className: 'jx-gp-field jx-gp-search' }, h('span', null, '🔎 Search'),
         h('input', { type: 'search', list: 'jx-gp-list', value: text, placeholder: 'e.g. Kerala, Indore, Cebu, Paris', onChange: function (e) { typed(e.target.value); } }),
         h('datalist', { id: 'jx-gp-list' }, labels.map(function (l, i) { return h('option', { key: i, value: l }); }))),
-      P[9] && h('p', { className: 'jx-gp-note' }, '✨ ' + P[9]),
       h('p', { className: 'jx-muted jx-gp-count' }, PLACES.length + ' places in ' + Object.keys(BYC).length + ' countries and territories.'));
   }
   JNZX.WorldGlobe = WorldGlobe;
@@ -455,7 +464,18 @@
   });
 
   (function () {
-    var css = '.jx-gp{display:grid;gap:12px;margin:0 0 12px;padding:14px;border-radius:16px;background:#f1f6f3;color:#1f2a2a;border:1px solid #dbe5df}' +
+    var css = '.jx-wc{display:grid;gap:14px;max-width:900px}.jx-wc .jx-gp{margin:0}' +
+      '.jx-wc-times{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}' +
+      '.jx-wc-t{border-radius:18px;padding:16px 18px;background:#fff;border:1px solid #e1e8e4;text-align:center;display:flex;flex-direction:column;justify-content:center}' +
+      '.jx-wc-t.is-there{background:#fffaf0;border-color:#f0e2bf}.jx-wc-t.is-nz{background:#f2f8ff;border-color:#d4e5f7}' +
+      '.jx-wc-where{margin:0;font-weight:700;font-size:.95rem;color:#3b4a46}.jx-wc-clock{margin:6px 0 2px;font-size:clamp(2rem,7vw,3rem);font-weight:800;letter-spacing:-.01em;line-height:1.05;font-variant-numeric:tabular-nums;color:#1b2a28}.jx-wc-day{margin:0;font-size:.95rem;color:#55625f}' +
+      '.jx-wc-diff{display:flex;align-items:center;justify-content:center}.jx-wc-diff span{background:#245a45;color:#fff;border-radius:999px;padding:6px 12px;font-weight:700;font-size:.85rem;text-align:center;max-width:120px}' +
+      '.jx-wc-facts{margin:0;font-size:.98rem;line-height:1.6;color:#3b4a46;text-align:center}.jx-wc-actions{justify-content:center}' +
+      '.jx-wc-more{border:1px solid #e1e8e4;border-radius:16px;padding:10px 14px;background:#fff}.jx-wc-more summary{cursor:pointer;font-weight:700;min-height:32px;display:flex;align-items:center}.jx-wc-more .jx-globe-card{margin:10px 0 0}.jx-wc-more .jx-globe-canvas{max-width:300px;margin-top:10px}.jx-wc-hint{text-align:center;font-size:.85rem;margin:6px 0 0}' +
+      '@media (max-width:600px){.jx-wc-times{grid-template-columns:1fr}.jx-wc-diff span{max-width:none}}' +
+      'html[data-reading-theme="dark"] .jx-wc-t,html[data-reading-theme="dark"] .jx-wc-more{background:#18211f;border-color:#33433f}html[data-reading-theme="dark"] .jx-wc-t.is-there{background:#2a2410;border-color:#4a3f1a}html[data-reading-theme="dark"] .jx-wc-t.is-nz{background:#10243a;border-color:#23405f}' +
+      'html[data-reading-theme="dark"] .jx-wc-where,html[data-reading-theme="dark"] .jx-wc-facts,html[data-reading-theme="dark"] .jx-wc-day{color:#d7e2de}html[data-reading-theme="dark"] .jx-wc-clock{color:#fff}html[data-reading-theme="dark"] .jx-wc-diff span{background:#7fc4a2;color:#0f1a17}' +
+      '.jx-gp{display:grid;gap:12px;margin:0 0 12px;padding:14px;border-radius:16px;background:#f1f6f3;color:#1f2a2a;border:1px solid #dbe5df}' +
       '.jx-gp-quick{display:flex;flex-wrap:wrap;gap:6px}.jx-gp-chip{border:1px solid #cfdad3;background:#fff;color:#1f2a2a;border-radius:999px;padding:7px 12px;font:inherit;font-size:14px;font-weight:600;cursor:pointer;min-height:38px}.jx-gp-chip.is-on{background:#1f4d3a;border-color:#1f4d3a;color:#fff}' +
       '.jx-gp-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}.jx-gp-field{display:grid;gap:4px;font-weight:700;font-size:14px}' +
       '.jx-gp-field select,.jx-gp-field input{font:inherit;font-size:16px;font-weight:500;padding:10px 12px;border-radius:12px;border:1px solid #c6d3cb;background:#fff;color:#1f2a2a;width:100%;box-sizing:border-box;min-height:46px}' +

@@ -95,17 +95,11 @@
       add('x:world-clock', 'World Clock', Icons.timer),
       add('x:citizenship', 'Mock Citizenship Test', Icons.award, 'Becoming a Kiwi')
     ] },
-    { title: 'Family Together', blurb: 'Stories and play, home and kitchen, baby and toddler, love and connection, and celebrations.', image: './story-pages/story-02-middle.webp', items: [
+    { title: 'Family Together', blurb: 'Stories and play, family cooking, baby and toddler, love and connection, and celebrations.', image: './story-pages/story-02-middle.webp', items: [
       overview('Family Together'),
       keep('Reading nook', 'The Story Nook', 'Stories & play'),
       add('x:holidays', 'School Holiday Fun', Icons.puzzle),
-      add('x:diy', 'DIY Home Projects', Icons.hammer),
-      keep('Homemade recipes', 'From Our Kitchen', 'Home & kitchen'),
-      keep('Grocery list', 'Shopping Made Simple'),
-      keep('Budget tracker', 'My Money Plan'),
-      add('x:hometips', 'Home Tips & Checklists', Icons.grid),
-      keep('Family tips', 'Family Life, Made Easier', undefined, { hidden: true }),
-      keep('Family checklists', 'Family Checklists', undefined, { hidden: true }),
+      keep('Homemade recipes', 'From Our Kitchen', 'Kitchen'),
       add('x:baby', 'Baby & Toddler', Icons.star, 'Family life & love'),
       keep('Pregnancy & baby age', 'Bump & Baby Milestones', undefined, { hidden: true }),
       keep('Pregnancy quotes & tips', 'Growing a Little Life', undefined, { hidden: true }),
@@ -148,11 +142,17 @@
       add('x:faith-formation', 'Faith Formation Library', Icons.library),
       add('x:bible-dictionary', 'Bible Dictionary', Icons.scroll)
     ] },
-    { title: 'Modern & Lifestyle', blurb: 'Creative tools, digital skills and smart money ideas for modern life.', image: './photo-share/inspiration.webp', items: [
+    { title: 'Modern & Lifestyle', blurb: 'Creative tools, digital skills, money and shopping, and home and DIY ideas for modern life.', image: './photo-share/inspiration.webp', items: [
       overview('Modern & Lifestyle'),
       add('x:design', 'Design Studio', Icons.palette, 'Create & work smarter'),
       add('x:shortcuts', 'Office Shortcuts', Icons.keyboard),
-      keep('Saving tips', 'Smart Little Savings', 'Money & lifestyle')
+      keep('Saving tips', 'Smart Little Savings', 'Money & shopping'),
+      keep('Budget tracker', 'My Money Plan'),
+      keep('Grocery list', 'Shopping Made Simple'),
+      add('x:hometips', 'Home Tips & Checklists', Icons.grid, 'Home & living'),
+      keep('Family tips', 'Family Life, Made Easier', undefined, { hidden: true }),
+      keep('Family checklists', 'Family Checklists', undefined, { hidden: true }),
+      add('x:diy', 'DIY Home Projects', Icons.hammer)
     ] },
     { title: 'Community', blurb: 'Our story, local makers, website help and greener living.', image: './oct13/about-storybook-texture.png', items: [
       overview('Community'),
@@ -214,7 +214,7 @@
 
   /* ---------- hub pages: short menus, related topics grouped together ---------- */
   var HUBS = {
-    'x:hometips': { kicker: 'FAMILY TOGETHER · HOME TIPS & CHECKLISTS', title: 'Home tips & checklists.', blurb: 'Practical ideas that make home life easier, and ready-made checklists for big family moments.', kids: ['Family tips', 'Family checklists'] },
+    'x:hometips': { kicker: 'MODERN & LIFESTYLE · HOME TIPS & CHECKLISTS', title: 'Home tips & checklists.', blurb: 'Practical ideas that make home life easier, and ready-made checklists for big family moments.', kids: ['Family tips', 'Family checklists'] },
     'x:baby': { kicker: 'FAMILY TOGETHER · BABY & TODDLER', title: 'Baby & toddler.', blurb: 'From bump to big kid: milestones, pregnancy, feeding, potty training and parenting — all in one place.', kids: ['Pregnancy & baby age', 'Pregnancy quotes & tips', 'Breastfeeding quotes & tips', 'x:potty', 'Parenting quotes & tips'] },
     'x:love': { kicker: 'FAMILY TOGETHER · LOVE & CONNECTION', title: 'Love & connection.', blurb: 'Little ways to stay close — date ideas, love notes and memories to treasure.', kids: ['Partnership quotes & tips', 'Husband & wife quotes & tips', 'Parent–child & child–parent'] }
   };
@@ -257,13 +257,13 @@
       async function copy(msg) { try { await nav.clipboard.writeText(text); return msg || 'Copied: the intro and link are ready to paste.'; } catch (e) { return uCopyLink(url, nav); } }
       if (withImage) {
         var file = null; try { file = lGetPageBannerFile(); } catch (e) {}
-        if (file && nav.share && nav.canShare && nav.canShare({ files: [file], text: text })) {
-          try { try { await nav.clipboard.writeText(text); } catch (e) {} await nav.share({ files: [file], title: 'The James NZ', text: text }); return 'Shared! The intro and link were also copied — paste them under the picture if your app drops the text.'; }
+        if (file && nav.share && nav.canShare && nav.canShare({ files: [file] })) {
+          try { JNZX.copyText(text).catch(function () {}); await nav.share({ files: [file], title: 'The James NZ', text: text }); return 'Shared! The intro and link were also copied — paste them under the picture if your app drops the text.'; }
           catch (e) { if (e && e.name === 'AbortError') return ''; }
         }
         return copy('Pictures can’t be shared from this browser, so the intro and link were copied instead.');
       }
-      if (nav.share) { try { await nav.share({ title: 'The James NZ', text: intro, url: url }); return 'Link sharing menu opened.'; } catch (e) { if (e && e.name === 'AbortError') return ''; } }
+      if (nav.share) { try { await nav.share({ title: 'The James NZ', text: intro + '\n' + url }); return 'Sharing menu opened.'; } catch (e) { if (e && e.name === 'AbortError') return ''; } }
       return copy();
     };
     uCopyLink = (function (base) { return async function (url, nav) { nav = nav || navigator; try { await nav.clipboard.writeText(JNZX.shareIntro() + '\n' + url); return 'Intro and link copied.'; } catch (e) { return base(url, nav); } }; })(uCopyLink);
@@ -330,12 +330,12 @@
     var o = useState(false), open = o[0], setOpen = o[1];
     function copy() {
       var done = function () { setMsg('Link copied.'); };
-      try { navigator.clipboard.writeText(url).then(done, function () { setMsg('Copy this link: ' + url); }); } catch (e) { setMsg('Copy this link: ' + url); }
+      JNZX.copyText(url).then(done, function () { setMsg('Copy this link: ' + url); });
     }
     async function share() {
       if (props.getInfo) { var d2 = props.getInfo(); title = d2.title || title; text = d2.text || text; }
       if (navigator.share) {
-        try { await navigator.share({ title: title, text: text, url: url }); setMsg(''); return; }
+        try { await navigator.share({ title: title, text: text + '\n\n' + url }); setMsg(''); return; }
         catch (e) { if (e && e.name === 'AbortError') return; }
       }
       setOpen(true);
@@ -366,21 +366,80 @@
     return h('div', { key: 'jx-end-' + tab, className: 'jx-page jx-page-end' }, h(ShareBar, { tab: tab, getInfo: function () { var v = viewing(), base = JNZX.label(tab); return { title: v.length ? base + ' — ' + v.join(' · ') : base, text: (v.length ? base + ' — ' + v.join(' · ') : base) + ' · The James NZ' }; } }));
   };
   /* Small share button for one item on a page (an activity, a project, a workout). */
+  /* ---------- sharing that works on every device ----------
+     Phones and tablets (iPhone, iPad, Android) use the device's own share menu.
+     Computers and in-app browsers without one get a simple menu: picture,
+     WhatsApp, email, text message and copy. The words always travel inside the
+     message, with a link that opens just this post. */
+  JNZX.copyText = function (text) {
+    return new Promise(function (ok, bad) {
+      function legacy() {
+        try { var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;font-size:16px'; document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, text.length); var done = document.execCommand('copy'); document.body.removeChild(ta); done ? ok() : bad(Error('copy')); } catch (e) { bad(e); }
+      }
+      try { if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(ok, legacy); else legacy(); } catch (e) { legacy(); }
+    });
+  };
+  JNZX.postLink = function (title, body) { try { return q7ShareURL({ title: title, text: body, credit: 'The James NZ' }); } catch (e) { return JNZX.pageUrl(JNZX._tab || 'Home'); } };
+  JNZX.sharePost = async function (o) {
+    // o: {title, text, url} → shares text with the link inside it (apps that ignore a separate url still get everything)
+    var msg = o.text + '\n\n' + o.url;
+    if (navigator.share) {
+      try { await navigator.share({ title: o.title, text: msg }); return 'shared'; }
+      catch (e) { if (e && e.name === 'AbortError') return 'cancelled'; }
+    }
+    return 'menu';
+  };
+  JNZX.makePicture = function (o) {
+    return createPhotoPost({ title: o.title, text: o.text, credit: o.credit || 'Shared with love from The James NZ', background: o.bg || jAsset('./photo-share/inspiration.webp'), filename: 'TheJamesNZ-' + String(o.title || 'post').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) });
+  };
+  JNZX.sendPicture = async function (file, o) {
+    // called straight from a tap so phones (especially iPhone and iPad) allow the share
+    var msg = o.text + '\n\n' + o.url;
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+      JNZX.copyText(msg).catch(function () {});
+      try { await navigator.share({ files: [file], title: o.title, text: msg }); return 'Shared! The words and link were also copied, in case your app only sends the picture.'; }
+      catch (e) { if (e && e.name === 'AbortError') return ''; }
+    }
+    savePhotoFile(file); JNZX.copyText(msg).catch(function () {});
+    return 'Picture saved to your device. Attach it in any app — the words and link are copied too.';
+  };
+  function ShareSheet(props) {
+    var o = props.o, enc = encodeURIComponent, msg = o.text + '\n\n' + o.url;
+    var st = useState(''), note = st[0], setNote = st[1], bz = useState(false), busy = bz[0], setBusy = bz[1], pc = useState(null), pic = pc[0], setPic = pc[1];
+    var ref = useRef(null);
+    useEffect(function () { return function () { if (pic && pic.url) URL.revokeObjectURL(pic.url); }; }, [pic]);
+    useEffect(function () { var b = ref.current && ref.current.querySelector('button'); if (b) b.focus(); function k(e) { if (e.key === 'Escape') props.onClose(); } document.addEventListener('keydown', k); return function () { document.removeEventListener('keydown', k); }; }, []);
+    var ios = /iP(hone|ad|od)/.test(navigator.userAgent) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
+    var sms = 'sms:' + (ios ? '&' : '?') + 'body=' + enc(msg);
+    function act(fn) { return function () { setBusy(true); setNote(''); Promise.resolve(fn()).then(function (r) { setBusy(false); if (r) setNote(r); }, function (e) { setBusy(false); setNote((e && e.message) || 'Something went wrong — try Copy instead.'); }); }; }
+    return typeof import_react_dom !== "undefined" && import_react_dom.createPortal ? import_react_dom.createPortal(h('div', { className: 'jx-ssheet-back', onClick: function (e) { if (e.target === e.currentTarget) props.onClose(); } },
+      h('div', { className: 'jx-ssheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Share ' + o.title, ref: ref },
+        h('div', { className: 'jx-ssheet-head' }, h('strong', null, 'Share'), h('button', { type: 'button', className: 'jx-ssheet-x', 'aria-label': 'Close', onClick: props.onClose }, '✕')),
+        pic ? h('img', { className: 'jx-ssheet-img', src: pic.url, alt: 'Picture of this post' }) : h('p', { className: 'jx-ssheet-preview' }, o.text.length > 220 ? o.text.slice(0, 220) + '…' : o.text),
+        h('div', { className: 'jx-ssheet-grid' },
+          navigator.share && h('button', { type: 'button', disabled: busy, onClick: act(function () { return JNZX.sharePost(o).then(function (r) { if (r === 'shared') props.onClose(); return ''; }); }) }, h('span', null, '📤'), 'Share to an app'),
+          pic ? h('button', { type: 'button', className: 'is-ready', onClick: act(function () { return JNZX.sendPicture(pic.file, o); }) }, h('span', null, '🖼️'), 'Send the picture') :
+            h('button', { type: 'button', disabled: busy, onClick: act(function () { return JNZX.makePicture(o).then(function (f) { setPic({ file: f, url: URL.createObjectURL(f) }); return 'Picture ready — tap “Send the picture”.'; }); }) }, h('span', null, '🖼️'), busy ? 'Preparing…' : 'Make a picture'),
+          h('a', { href: 'https://wa.me/?text=' + enc(msg), target: '_blank', rel: 'noopener noreferrer' }, h('span', null, '💬'), 'WhatsApp'),
+          h('a', { href: 'https://www.facebook.com/sharer/sharer.php?u=' + enc(o.url) + '&quote=' + enc(o.text), target: '_blank', rel: 'noopener noreferrer' }, h('span', null, '📘'), 'Facebook'),
+          h('a', { href: 'mailto:?subject=' + enc(o.title + ' · The James NZ') + '&body=' + enc(msg) }, h('span', null, '✉️'), 'Email'),
+          h('a', { href: sms }, h('span', null, '📱'), 'Text message'),
+          h('button', { type: 'button', onClick: act(function () { return JNZX.copyText(msg).then(function () { return '✅ Copied — paste it anywhere.'; }, function () { return 'Press and hold the text above to copy it.'; }); }) }, h('span', null, '📋'), 'Copy words & link')),
+        note && h('p', { className: 'jx-ssheet-note', role: 'status' }, note))), document.body) : null;
+  }
+  JNZX.ShareSheet = ShareSheet;
   JNZX.ShareMini = function ShareMini(props) {
-    var st = useState(''), msg = st[0], setMsg = st[1];
-    /* Share the post itself: its words plus a link that opens just this post. */
-    async function go(ev) {
+    var sh = useState(null), sheet = sh[0], setSheet = sh[1];
+    function build(ev) {
       var body = props.text || props.title;
       var line = JNZX.catchyFor ? JNZX.catchyFor(ev && ev.currentTarget, props.title, body) : '';
       if (line && body.indexOf(line) < 0) body += '\n\n' + line;
-      var url = props.url;
-      if (!url) { try { url = q7ShareURL({ title: props.title, text: body, credit: 'The James NZ' }); } catch (e) { url = JNZX.pageUrl(JNZX._tab || 'Home'); } }
-      var text = body + '\n\n' + url;
-      if (navigator.share) { try { await navigator.share({ title: props.title + ' · The James NZ', text: body + '\n', url: url }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
-      try { await navigator.clipboard.writeText(text); setMsg('Copied — paste it into a message.'); } catch (e) { setMsg('Copy this: ' + text); }
-      setTimeout(function () { setMsg(''); }, 4000);
+      return { title: props.title, text: body, url: props.url || JNZX.postLink(props.title, body), bg: props.bg };
     }
-    return h('span', { className: 'jx-sharemini' }, h('button', { type: 'button', className: 'secondary jx-sharemini-btn', onClick: go, 'aria-label': 'Share ' + props.title }, h(Icons.share, { size: 15 }), props.label || 'Share'), msg && h('span', { className: 'small-note', role: 'status' }, msg));
+    function go(ev) { setSheet(build(ev)); }
+    return h('span', { className: 'jx-sharemini' },
+      h('button', { type: 'button', className: 'secondary jx-sharemini-btn', onClick: go, 'aria-label': 'Share ' + props.title, 'aria-haspopup': 'dialog' }, h(Icons.share, { size: 15 }), props.label || 'Share'),
+      sheet && h(ShareSheet, { o: sheet, onClose: function () { setSheet(null); } }));
   };
 
   /* ---------- shared building blocks ---------- */

@@ -150,8 +150,8 @@
       var p = ctx.post, url = '';
       try { url = q7ShareURL(p); } catch (e) {}
       var text = (p.title ? p.title + '\n' : '') + (p.text || '') + (url ? '\n\n' + url : '');
-      try { await nav.clipboard.writeText(text); } catch (e) {}
-      if (file && nav.share && nav.canShare && nav.canShare({ files: [file], text: text })) {
+      JNZX.copyText ? JNZX.copyText(text).catch(function () {}) : null;
+      if (file && nav.share && nav.canShare && nav.canShare({ files: [file] })) {
         try { await nav.share({ files: [file], title: (p.title || 'The James NZ'), text: text }); return { kind: 'shared', message: 'Shared! The words and link were also copied.' }; }
         catch (e) { if (e && e.name === 'AbortError') return { kind: 'cancelled', message: 'Sharing cancelled. Your picture is still ready.' }; }
       }

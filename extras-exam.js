@@ -168,7 +168,7 @@
     var starts = {}; sents.forEach(function (s) { var w = (s.match(/[A-Za-z']+/) || [''])[0].toLowerCase(); starts[w] = (starts[w] || 0) + 1; });
     var sameStart = Object.keys(starts).filter(function (w) { return starts[w] >= 3 && starts[w] / sents.length > 0.3; });
     var fix = JNZX._fix ? JNZX._fix(text, kind === 'essay' || kind === 'summary' || kind === 'report' || kind === 'proposal' ? 'academic' : kind === 'letter' || kind === 'email' ? 'email' : 'improve') : { changes: [], tips: [], text: text };
-    var errs = (JNZX._expand ? JNZX._expand(fix.changes) : fix.changes).filter(function (c) { return c.from && !/tidied|Extra space|space/i.test(c.why) && !/^Avoid|Informal|Personal pronoun|Hedge|Intensifier|Filler|Wordy|Contraction/i.test(c.why); });
+    var errs = (JNZX._expand ? JNZX._expand(fix.changes) : fix.changes).filter(function (c) { return c.from && !/tidied|Extra space|space/i.test(c.why) && !/^(Avoid|Informal|Personal pronoun|Hedge|Intensifier|Filler|Wordy|Contraction|Polish)/i.test(c.why); });
     var contractions = (text.match(/\b\w+(n't|'re|'ll|'ve|'d|’re|’ll|’ve|’d|n’t)\b/gi) || []).length;
     var formalTask = /essay|summary|report|proposal/.test(kind) || task.scale === 'ielts' && kind !== 'letter';
 

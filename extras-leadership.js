@@ -137,22 +137,22 @@
     g.strokeStyle = '#fff'; g.lineWidth = px(1.5); g.beginPath(); g.arc(px(60), px(70), px(4.2), 0, Math.PI * 2); g.stroke();
     for (var k = 0; k < 8; k++) { var a = k * Math.PI / 4; g.beginPath(); g.moveTo(px(60) + Math.cos(a) * px(6.5), px(70) + Math.sin(a) * px(6.5)); g.lineTo(px(60) + Math.cos(a) * px(9.3), px(70) + Math.sin(a) * px(9.3)); g.stroke(); }
     text('The James NZ', 80, 68, 'bold ' + px(12) + 'px ' + sans, ink, 'left');
-    text('Learning · Leadership', 80, 82, px(7.5) + 'px ' + sans, soft, 'left');
+    text(rec.sub || 'Learning · Leadership', 80, 82, px(7.5) + 'px ' + sans, soft, 'left');
     // title
     text('Certificate of Completion', 351, 150, px(31) + 'px ' + serif, ink);
     text('Presented to', 351, 192, px(11) + 'px ' + sans, soft);
     var size = 30; do { g.font = px(size) + 'px ' + serif; size -= 0.5; } while (g.measureText(rec.name).width > px(560) && size > 12);
     g.fillStyle = teal; g.textAlign = 'center'; g.fillText(rec.name, px(351), px(236));
     g.strokeStyle = 'rgba(27,107,99,.25)'; g.lineWidth = px(0.8); g.beginPath(); g.moveTo(px(201), px(250)); g.lineTo(px(501), px(250)); g.stroke();
-    text('for completing the online course', 351, 276, px(11) + 'px ' + sans, soft);
-    text(TOPIC, 351, 304, 'bold ' + px(16) + 'px ' + serif, ink);
-    text('Assessment score: ' + rec.score + ' / ' + TOTAL + ' (' + rec.pct + '%)', 351, 330, px(10) + 'px ' + sans, soft);
+    text(rec.line || 'for completing the online course', 351, 276, px(11) + 'px ' + sans, soft);
+    text(rec.topic || TOPIC, 351, 304, 'bold ' + px(16) + 'px ' + serif, ink);
+    text('Assessment score: ' + rec.score + ' / ' + (rec.total || TOTAL) + ' (' + rec.pct + '%)', 351, 330, px(10) + 'px ' + sans, soft);
     // details row
     function detail(label, value, x) { text(label, x, 384, 'bold ' + px(6.5) + 'px ' + sans, soft); text(value, x, 401, px(11) + 'px ' + sans, ink); }
     detail('DATE', rec.dateLong, 210);
     detail('RECORD', rec.ref.slice(0, 8).toUpperCase() + '-' + rec.ref.slice(9, 13).toUpperCase(), 492);
     // footer
-    text('Self-assessed, non-accredited course record. Not an NZQA qualification, not on the NZQCF and carries no credits. Not endorsed by NZQA.', 351, 446, px(6.2) + 'px ' + sans, soft);
+    text(rec.foot || 'Self-assessed, non-accredited course record. Not an NZQA qualification, not on the NZQCF and carries no credits. Not endorsed by NZQA.', 351, 446, px(6.2) + 'px ' + sans, soft);
     text('www.thejamesnz.com · name entered by the learner and kept on their device', 351, 458, px(6.2) + 'px ' + sans, soft);
     g.textAlign = 'left';
   }
@@ -163,6 +163,7 @@
   }
   function download(blob, name) { var a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1500); }
 
+  JNZX.certKit = { draw: function (c, r) { return drawRecord(c, r); }, pdf: function (b, w, hh, i) { return pdfFromJpeg(b, w, hh, i); }, uuid: function () { return uuid(); }, nz: function (d) { return nzParts(d); }, download: function (b, n) { return download(b, n); } };
   function Certificate(props) {
     var att = props.attempt;
     var nm = JNZX.useStored('jnzx-lead-name-remember', ''), remembered = nm[0], setRemembered = nm[1];

@@ -125,7 +125,7 @@
     var areas = ['All'].concat(Array.from(new Set(DIY.map(function (d) { return d[2]; }))));
     var rows = DIY.filter(function (d) { return (area === 'All' || d[2] === area) && (d[1] + ' ' + d[8].join(' ')).toLowerCase().indexOf(qq.toLowerCase()) >= 0; });
     return h('div', null,
-      JNZX.Header('FAMILY TOGETHER · DIY HOME PROJECTS', 'Simple home projects, done safely.', 'Step-by-step guides for small jobs most households can tackle in a weekend, with New Zealand safety and legal notes for each one.'),
+      JNZX.Header('MODERN & LIFESTYLE · DIY HOME PROJECTS', 'Simple home projects, done safely.', 'Step-by-step guides for small jobs most households can tackle in a weekend, with New Zealand safety and legal notes for each one.'),
       h('div', { className: 'jx-note warn' }, h('strong', null, 'Before you start: '),
         'In New Zealand, electrical work (beyond very limited homeowner tasks), gasfitting and most plumbing and drainlaying must be done by licensed or authorised tradespeople. Some building work needs a building consent, even when the work itself is simple. If a project involves structure, wet areas, wiring, gas or drains, check with your council or a qualified tradesperson first. Watch for asbestos (common in homes built or renovated between about 1940 and 2000) and lead paint (common before the 1980s).'),
       h('div', { className: 'jx-row' }, h(JNZX.Search, { value: qq, onChange: setQ, placeholder: 'Search projects or tools' })),

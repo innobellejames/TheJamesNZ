@@ -191,11 +191,12 @@
     'clean', 'wash', 'open', 'close', 'visit', 'move', 'use', 'enjoy', 'travel', 'arrive', 'decide', 'happen', 'listen', 'learn', 'remember', 'change', 'wait', 'stop', 'plan', 'shop', 'drop',
     'laugh', 'smile', 'jump', 'dance', 'climb', 'pray', 'bake', 'paint', 'fix', 'push', 'pull', 'hope', 'share', 'care', 'thank', 'agree', 'believe', 'pass', 'miss', 'kiss', 'reply', 'text',
     'email', 'order', 'book', 'pick', 'join', 'turn', 'show', 'follow', 'save', 'invite', 'attend', 'receive', 'explain', 'prepare', 'complete', 'return', 'check', 'park', 'rest', 'relax', 'hug', 'worry', 'tidy',
+    'solve', 'damage', 'destroy', 'repair', 'design', 'discover', 'invent', 'produce', 'create', 'develop', 'establish', 'publish', 'release', 'postpone', 'approve', 'reject', 'require', 'replace', 'remove', 'injure', 'kill', 'arrest', 'report', 'print', 'translate', 'record', 'recycle', 'measure', 'increase', 'decrease', 'reduce', 'hurry', 'inform', 'announce', 'introduce', 'confirm', 'cancel', 'arrange', 'remind', 'warn', 'allow', 'encourage', 'present', 'perform', 'treat', 'serve', 'paint', 'decorate', 'clean', 'fill', 'pour', 'mix', 'boil', 'fry', 'grill', 'roast', 'bake', 'chop', 'slice', 'wrap', 'pack', 'post', 'mail', 'type', 'sign', 'test', 'mark', 'grade', 'train', 'coach', 'guide', 'lift', 'carry', 'load', 'deliver', 'own', 'belong', 'contain', 'deserve', 'recognise', 'recognize', 'seem', 'exist', 'appear', 'disappear', 'occur', 'die', 'emerge',
     'suggest', 'improve', 'apply', 'complain', 'recommend', 'discuss', 'depend', 'mind', 'avoid', 'consider', 'imagine', 'practise', 'describe', 'reach', 'cross', 'fill', 'earn', 'borrow', 'rent', 'deliver', 'contact', 'note', 'notice', 'collect', 'protect', 'offer', 'manage', 'organise', 'celebrate', 'graduate', 'marry', 'hate', 'prefer', 'promise', 'refuse', 'expect', 'intend', 'afford', 'continue', 'stay'];
   var VERB = {};
   function regForms(b) {
     var third = /(s|sh|ch|x|z|o)$/.test(b) ? b + 'es' : /[^aeiou]y$/.test(b) ? b.slice(0, -1) + 'ies' : b + 's';
-    var dbl = /^(stop|plan|shop|drop|hug|travel|prefer)$/.test(b);
+    var dbl = /^(stop|plan|shop|drop|hug|travel|prefer|occur|cancel|refer|admit|commit|permit|regret|label|model|signal|control|patrol|jog|chop|grab|rob|nod|beg|pat|rub|plug|stir|swap|trip|wrap|skip|ship|slip|tap|chat|fit|clap)$/.test(b);
     var past = /e$/.test(b) ? b + 'd' : /[^aeiou]y$/.test(b) ? b.slice(0, -1) + 'ied' : dbl ? b + b.slice(-1) + 'ed' : b + 'ed';
     var ing = /ie$/.test(b) ? b.slice(0, -2) + 'ying' : /[^e]e$/.test(b) && !/(see|agree)$/.test(b) ? b.slice(0, -1) + 'ing' : dbl ? b + b.slice(-1) + 'ing' : b + 'ing';
     return [third, past, ing, past];
@@ -395,6 +396,135 @@
   ];
   GRAM_PRE.push.apply(GRAM_PRE, PUNCT.filter(function (r) { return r[2]; }));
 
+  /* ---------- advanced grammar: tenses, passives, clauses, connectives, punctuation ---------- */
+  function pp(v) { var b = FORM[v.toLowerCase()]; return b && VERB[b] ? VERB[b][3] : v; }
+  function pastOf(v) { var b = FORM[v.toLowerCase()]; return b && VERB[b] ? VERB[b][1] : v; }
+  function adverb(a) { var x = a.toLowerCase(); if (x === 'good') return 'well'; if (/y$/.test(x)) return x.slice(0, -1) + 'ily'; if (/le$/.test(x)) return x.slice(0, -1) + 'y'; if (/ic$/.test(x)) return x + 'ally'; return x + 'ly'; }
+  function plur2(n) { var l = n.toLowerCase(); if (/s$/.test(l) || IRRPL[l] && IRRPL[l] === l) return n; return plural(l); }
+  var SUBJ1 = 'I|you|we|they|he|she|it|my \\w+|our \\w+|your \\w+|his \\w+|her \\w+|their \\w+|the \\w+';
+  var FAM = 'sister|brother|mother|father|mum|mom|dad|son|daughter|husband|wife|aunt|aunty|auntie|uncle|cousin|grandmother|grandfather|grandma|grandpa|nana|niece|nephew|partner|boss|teacher|friend|neighbour|neighbor|colleague|doctor|parents';
+  var UNIQUE = 'mum|mom|dad|mother|father|husband|wife|partner|grandmother|grandfather|boss';
+  var STATIVE = { knowing: 'know', liking: 'like', believing: 'believe', understanding: 'understand', owning: 'own', needing: 'need', wanting: 'want', preferring: 'prefer', belonging: 'belong', meaning: 'mean', hating: 'hate', seeming: 'seem', remembering: 'remember', recognising: 'recognise', recognizing: 'recognize', containing: 'contain', deserving: 'deserve', costing: 'cost' };
+  var AMBIG = 'work|help|play|love|walk|talk|call|answer|look|change|plan|book|order|text|email|rest|shop|drink|fix|park|cook|hope|care|kiss|hug|smile|laugh|dance|run|show|turn|pick|check|visit|use|need|want|like|share|stay|travel|wait|start|stop|return|reply|study|time|fun|cut|set|hit|put|cost|read|let|hurt|shut|come|become|be|lunch|dinner|breakfast|money|kids|children|friends|family|a|an|the|no|some|any|to|got|been|done|seen';
+  function third2(subj, b) { if (b === 'be') return /^i$/i.test(subj) ? 'am' : /^(you|we|they)$/i.test(subj) || /s$/.test(subj) && !/^(his|this|its)$/i.test(subj) ? 'are' : 'is'; if (/^(he|she|it)$/i.test(subj) || /^(my|our|your|his|her|their|the) \w+[^s]$/i.test(subj)) return VERB[b] ? VERB[b][0] : b + 's'; return b; }
+  var GRAM_ADV = [
+    // --- verb tenses ---
+    [/\b(already) (\w+)\b/gi, function (m, a, v, off, all) {
+      var sent = all.slice(0, off).split(/[.!?\n]/).pop() + m;
+      if (!/\b(when|by the time|before|after|as soon as)\b[^,]*\b(\w+ed|came|went|got|arrived|left|saw|woke|began|ran)\b/i.test(sent)) return m;
+      var low = v.toLowerCase(), b = FORM[low]; if (!b || low === b || VERB[b][1] !== low && VERB[b][3] !== low) return m; if (/\bhad\s+$/.test(all.slice(Math.max(0, off - 6), off))) return m;
+      return 'had ' + a + ' ' + VERB[b][3];
+    }, 'Earlier past action: use the past perfect (had already started)'],
+    [new RegExp('\\b(By (?:next \\w+|the end of (?:the )?\\w+|20\\d\\d|tomorrow|then|the time \\w+ \\w+|Friday|Monday|June|December)),? (' + SUBJ1 + ') will (?!have\\b)(' + RX_BASE + ')\\b', 'g'), function (m, by, s, v) { return by + ', ' + s + ' will have ' + VERB[v.toLowerCase()][3]; }, 'By + future time: use “will have + past participle”'],
+    [/\b(I|you|we|they|he|she|it|my \w+|the \w+|people|everyone|nobody) (am|is|are|was|were|’m|’re|’s) (knowing|liking|believing|understanding|owning|needing|wanting|preferring|belonging|meaning|hating|seeming|remembering|recognising|recognizing|containing|deserving|costing)\b/gi, function (m, s, be, v) {
+      var b = STATIVE[v.toLowerCase()], past = /^(was|were)$/i.test(be);
+      return s + ' ' + (past ? VERB[b] ? VERB[b][1] : b + 'ed' : third2(s, b));
+    }, 'This verb describes a state, not an action: use the simple form (I know)'],
+    [/\b(I|you|we|they|he|she|it|my \w+|the \w+) (am|is|are|’m|’re|’s) having (a|an|two|three|four|no|many|any|some|one|lots of) (car|cars|house|houses|dog|dogs|cat|cats|brother|brothers|sister|sisters|child|children|kids|son|sons|daughter|daughters|job|jobs|money|phone|computer|garden|bike|boat|degree|problem|problems|headache|cold|idea|ideas)\b/gi, function (m, s, be, d, n) { return s + ' ' + third2(s, 'have') + ' ' + d + ' ' + n; }, '“Have” for owning is not used in the -ing form'],
+    [new RegExp('^(While|As|When) (I|he|she|it|we|they|you|my \\w+) (cooked|walked|watched|slept|drove|studied|ate|played|worked|talked|waited|cleaned|ran|swam|danced|showered|travelled|traveled|shopped|read|wrote|sat|stood|waited|listened|cycled|jogged|swept|washed|ironed|gardened|painted),? (?=(the|a|my|I|we|he|she|they|someone|somebody|suddenly|it)\\b[^.!?]*\\b(rang|called|came|arrived|started|began|broke|fell|knocked|saw|heard|happened|appeared|stopped|went))', 'g'), function (m, w, s, v) {
+      var b = FORM[v.toLowerCase()] || v.toLowerCase(); var be = /^(I|he|she|it)$/i.test(s) || /^my /i.test(s) ? 'was' : 'were';
+      return w + ' ' + s + ' ' + be + ' ' + (VERB[b] ? VERB[b][2] : b + 'ing') + ', ';
+    }, 'Longer background action: use the past continuous (I was cooking)'],
+    [new RegExp('\\b(have|has|had|haven’t|hasn’t|hadn’t|I’ve|you’ve|we’ve|they’ve|’ve) (' + RX_BASE + ')\\b(?! (to|of|on|off|out|up|for|with|and)\\b)', 'gi'), function (m, h2, v) {
+      var b = v.toLowerCase(); if (new RegExp('^(' + AMBIG + ')$').test(b) || !VERB[b] || VERB[b][3] === b) return m; return h2 + ' ' + VERB[b][3];
+    }, 'After have/has/had use the past participle (have finished)'],
+    [/\b(I|you|we|they|he|she|my \w+) use to (\w+)\b/gi, function (m, s, v) { return s + ' used to ' + v; }, '“used to” for past habits'],
+    [/\b(didn’t|didn't|did not|never) used to\b/gi, function (m, a) { return a + ' use to'; }, 'After “didn’t”, write “use to”'],
+    [new RegExp('\\b(am|is|are|was|were|’m|’re|’s|get|gets|got|getting|become|became) used to (' + RX_BASE + ')\\b', 'gi'), function (m, a, v) { var b = v.toLowerCase(); return a + ' used to ' + (VERB[b] ? VERB[b][2] : b + 'ing'); }, '“be used to” + -ing (I am used to waking up early)'],
+    [new RegExp('\\b(It is|It’s|It has been|it is|it’s) (raining|snowing|pouring)\\b([^.!?]{0,20}?)\\b(since (?:morning|this morning|yesterday|last night|lunch|lunchtime|breakfast|\\d{1,2}(?: ?[ap]m)?|monday|tuesday|wednesday|thursday|friday|saturday|sunday)|for (?:' + NUMW + ') (?:hours?|days?|weeks?|minutes?))', 'gi'), function (m, s, v, mid, t) { return keepCase(s, 'it') + ' has been ' + v + mid + t; }, 'With “since/for”, use “has been + -ing”'],
+    // --- passive voice ---
+    [new RegExp('\\b(is|are|was|were|be|been|being|isn’t|aren’t|wasn’t|weren’t) (' + alt(BASES.filter(function (b) { return VERB[b][3] !== b && !new RegExp('^(open|close|clean|free|like|tidy|use|care|rest|hope|wait|love|work|play|plan|book|park|shop|check|order|text|email|fix|cook|answer|call|change|show|turn|pick|share|stay|travel|start|stop|return|reply|study|visit|need|want|look|talk|walk|help|kiss|hug|smile|laugh|dance|pray|bake|paint|push|pull|thank|agree|believe|pass|miss|join|follow|save|invite|attend|receive|explain|prepare|complete|relax|worry|drop|text|cross|fill|earn|rent|note|notice|collect|offer|manage|graduate|hate|prefer|promise|refuse|expect|intend|afford|continue|lie|light|set|dig|stick|lead|mean|stand|sit|feel|keep|find|hold|run|lose|win|fight|fall|hang|bring|become)$').test(b); }).concat(['wrote', 'took', 'gave', 'ate', 'broke', 'spoke', 'chose', 'drove', 'stole', 'began', 'sang', 'drank', 'swam', 'flew', 'knew', 'grew', 'threw', 'wore', 'rode', 'hid', 'bit', 'froze', 'forgot', 'forgave', 'shook', 'woke', 'blew', 'drew', 'saw', 'did'])) + ')\\b(?! (to|for|me|you|him|her|us|them|it)\\b)', 'gi'), function (m, be, v) {
+      var low = v.toLowerCase(), b = FORM[low] || low; if (!VERB[b]) return m; if (low === VERB[b][3]) return m; return be + ' ' + VERB[b][3];
+    }, 'Passive: be + past participle (was built, was written)'],
+    [/\b(was|were|is|are|has been|have been|had been|be|been) (happened|occurred|arrived|died|existed|disappeared|emerged|risen|appeared|seemed|belonged|consisted|happen|occur|exist|disappear|appear|belong|consist)\b/gi, function (m, be, v) {
+      var x = v.toLowerCase().replace(/ed$/, '').replace(/^(happen|occurr|occur|arriv|di|exist|disappear|emerg|appear|seem|belong|consist|ris)$/, function (y) { return { occurr: 'occur', arriv: 'arrive', di: 'die', emerg: 'emerge', ris: 'rise' }[y] || y; });
+      if (x === 'risen') x = 'rise'; var past = { occur: 'occurred', arrive: 'arrived', die: 'died', emerge: 'emerged', rise: 'rose' }[x] || x + 'ed';
+      var low = be.toLowerCase(); if (/^(was|were)$/.test(low)) return past; if (/^(is)$/.test(low)) return x + 's'; if (low === 'are') return x; if (/^(has been|have been)$/.test(low)) return low.split(' ')[0] + ' ' + (x === 'rise' ? 'risen' : past); if (low === 'had been') return 'had ' + (x === 'rise' ? 'risen' : past); return m;
+    }, 'This verb has no passive (it happened, not it was happened)'],
+    [/\b(the|a|my|our|your|his|her|their|this|that) (window|door|glass|cup|vase|car|house|letter|cake|book|phone|bridge|road|wall|plate|bike|computer|email|report|song|picture|painting|poem|meal|dinner|fence|roof|toy|chair|table|tree|bag|wallet|money|tyre|tire) (broke|wrote|built|made|painted|took|stole|ate|cleaned|fixed|repaired|designed|cooked|sent|opened|closed|damaged|destroyed|cut|sold|bought|found|lost|chose|drew|sang|planted|delivered) by\b/gi, function (m, d, n, v) { return d + ' ' + n + ' was ' + pp(v) + ' by'; }, 'Passive: “was broken by”'],
+    // --- adjective (relative) clauses ---
+    [new RegExp('\\b((?:my|our|your|his|her|their|the|a) (?:' + FAM + ')) which\\b', 'gi'), function (m, n) { return n + ' who'; }, 'Use “who” for people'],
+    [/\b(man|woman|person|boy|girl|friend|family|people|student|students|teacher|neighbour|neighbor|child|children|company|lady|guy|men|women|doctor|customer) (that|who) (his|her|their|its) (\w+)\b/gi, function (m, n, r, p2, o) { return n + ' whose ' + o; }, 'Use “whose” for belonging'],
+    [/\bwhere ((?:I|we|you|they|he|she|my \w+|our \w+) (?:grew up|live|lived|work|worked|stay|stayed|study|studied|was born|were born|met|go|went)) (in|at|to)\b(?=\s+(?:is|was|are|were|has|have|will|still|used)\b|\s*[,.!?])/gi, function (m, c) { return 'where ' + c; }, 'After “where”, no extra “in/at”'],
+    [/\b(which|that|where|who|whom) ((?:I|we|you|they|he|she) \w+(?: (?:in|at|on|to|with|for|about|from))?) (it|them|him|her)\b(?= (?:is|was|are|were|has|have|will|can|looks?|seems?)\b)/gi, function (m, r, c) { return r + ' ' + c; }, 'Don’t repeat the object after which/that'],
+    [/\b(people|students|children|men|women|friends|kids|workers|parents|teachers|man|woman|person|boy|girl|teacher|lady|student|child|friend|ones?) (who|that) (they|he|she) (?=\w)/gi, function (m, n, r) { return n + ' ' + r + ' '; }, 'Don’t repeat the subject after who/that'],
+    [/\b(a|an|some|any|another|one|two|three|several|many) (\w+), (who|that) (?=\w)/gi, function (m, d, n, r) { return d + ' ' + n + ' ' + r + ' '; }, 'No comma before a clause that identifies which one'],
+    [/\b(\w+), that (is|was|are|were|has|have|had|can|will|would|I|we|you|they|he|she|it)\b/g, function (m, n, x, off, all) { if (/\b(so|such|said|say|says|think|know|believe|hope|feel|mean|told|tell|sure|clear|true|fact)$/i.test(n)) return m; if (/^(I|we|you|they|he|she|it)$/.test(x)) return m; return n + ', which ' + x; }, 'After a comma, use “which” (not “that”)'],
+    // --- noun clauses and reported speech ---
+    [/\b(asked|wondered|wanted to know|didn’t know|did not know|couldn’t remember|forgot|had no idea|wasn’t sure) ((?:me|him|her|us|them) )?(where|what|when|why|how|who|what time|how much|how many|how long|how often|which \w+|if|whether) (do|does|did|is|are|was|were|can|will) (I|you|we|they|he|she|it|the \w+|my \w+|your \w+) (\w+)\b/gi, function (m, v, o, w, aux, s, verb) {
+      var a = aux.toLowerCase(), b = FORM[verb.toLowerCase()];
+      if (/^(do|does|did)$/.test(a)) { if (!b) return m; return v + ' ' + (o || '') + w + ' ' + s + ' ' + VERB[b][1]; }
+      var map = { is: 'was', are: 'were', was: 'was', were: 'were', can: 'could', will: 'would' };
+      return v + ' ' + (o || '') + w + ' ' + s + ' ' + map[a] + ' ' + verb;
+    }, 'Reported question: normal word order and a past tense (where I lived)'],
+    [/\b(tell me|know|wonder|understand|explain|sure|remember|idea|let me know|find out|check|show me|ask him|ask her|ask them) (what time|how much|how many|how long|how often|which \w+) (do|does|did) (you|he|she|they|we|I|it|the \w+|my \w+) (\w+)/gi, function (m, a, w, d, sb, v) { var b = FORM[v.toLowerCase()]; if (!b) return m; var out = d.toLowerCase() === 'did' ? VERB[b][1] : d.toLowerCase() === 'does' || /^(he|she|it)$/i.test(sb) || /^(the|my) \w+[^s]$/i.test(sb) ? VERB[b][0] : b; return a + ' ' + w + ' ' + sb + ' ' + out; }, 'Inside a sentence, keep normal word order (what time the shop opens)'],
+    [/\b(said|told (?:me|him|her|us|them|everyone)|explained|replied|mentioned|added|complained|admitted|claimed|announced) (that )?(he|she|they|I|we|it|you|the \w+|my \w+) (is|are|am|has|have|will|can|does|do|doesn’t|don’t|isn’t|aren’t|won’t|can’t)\b/gi, function (m, v, t, s, a) {
+      var map = { is: 'was', am: 'was', are: 'were', has: 'had', have: 'had', will: 'would', can: 'could', does: 'did', do: 'did', 'doesn’t': 'didn’t', 'don’t': 'didn’t', 'isn’t': 'wasn’t', 'aren’t': 'weren’t', 'won’t': 'wouldn’t', 'can’t': 'couldn’t' };
+      return v + ' ' + (t || '') + s + ' ' + map[a.toLowerCase()];
+    }, 'Reported speech: shift the tense back (is → was)'],
+    // --- conjunctions, connectives, adverb clauses ---
+    [new RegExp('\\b(Despite|despite|In spite of|in spite of) (it|I|we|he|she|they|you|there|the \\w+|my \\w+|our \\w+) (was|were|is|are|had|has|have|did|didn’t|wasn’t|weren’t|could|couldn’t|' + RX_PAST + ')\\b', 'g'), function (m, d, s, v) { return keepCase(d, 'although') + ' ' + s + ' ' + v; }, '“Despite” + noun; use “although” + clause'],
+    [/(^|[.!?]\s+|,\s+)(Even|even) (I|you|we|they|he|she|it|my \w+|the \w+|there) (was|were|is|are|had|have|did|didn’t|wasn’t|am|can|could|\w+ed)\b/g, function (m, pre, e, s, v) { return pre + keepCase(e, 'even') + ' though ' + s + ' ' + v; }, '“even though” + clause'],
+    [new RegExp('\\b(due to|because of|owing to) (I|we|you|they|he|she|it|there|the \\w+|my \\w+) (was|were|is|are|had|has|have|did|didn’t|wasn’t|couldn’t|could|' + RX_PAST + ')\\b', 'gi'), function (m, d, s, v) { return 'because ' + s + ' ' + v; }, '“due to” + noun; use “because” + clause'],
+    [/\b(Unless|unless) (I|you|we|they|he|she|it|the \w+|my \w+) (don’t|doesn’t|do not|does not) (\w+)/g, function (m, u, s, n, v) { var b = FORM[v.toLowerCase()]; if (!b) return m; return u + ' ' + s + ' ' + third2(s, b); }, '“unless” already means “if not”'],
+    [/(\w),\s+(however|therefore|moreover|furthermore|consequently|nevertheless|nonetheless|otherwise|thus|hence|meanwhile|instead|besides|in addition|as a result|for example|for instance|in fact|on the other hand),?\s+(I|we|he|she|they|it|you|my \w+|our \w+|the \w+|there|this|that|these|those|most|many|some)\b/g, function (m, a, t, s) { return a + '; ' + t + ', ' + s; }, 'Use a semicolon before however/therefore joining two sentences'],
+    [/(\w),\s+(let’s|let's|let us) /g, function (m, a, l) { return a + '; ' + l + ' '; }, 'Two sentences: use a semicolon or full stop'],
+    [/\b(Because|because|Since|As) ([^,.!?]{3,60}), so /g, function (m, c, mid) { return c + ' ' + mid + ', '; }, 'Don’t use “so” after “because”'],
+    [/\b(Although|Though|Even though) ([^,.!?]{3,60}), (but|yet|however) /g, function (m, c, mid) { return c + ' ' + mid + ', '; }, 'Don’t use “but” after “although”'],
+    // --- agreement and structure ---
+    [/\b(Each|each|Every one|every one|Neither|neither|Either|either) of (the|my|our|your|his|her|their|these|those|them|us|you)\b ?(\w+)? (have|are|were|do|don’t|aren’t|weren’t)\b/g, function (m, e, d, n, v) { var map = { have: 'has', are: 'is', were: 'was', do: 'does', 'don’t': 'doesn’t', 'aren’t': 'isn’t', 'weren’t': 'wasn’t' }; return e + ' of ' + d + (n ? ' ' + n : '') + ' ' + map[v]; }, '“Each/neither of …” takes a singular verb'],
+    [new RegExp('\\b(One|one) of (the|my|our|your|his|her|their|these|those) (\\w+) (' + RX_BASE + '|have|are|were|do)\\b', 'g'), function (m, o, d, n, v) {
+      if (/^(best|worst|most|few|main|biggest|greatest|top)$/i.test(n)) return m;
+      var map = { have: 'has', are: 'is', were: 'was', do: 'does' }, vv = map[v] || (VERB[v.toLowerCase()] ? VERB[v.toLowerCase()][0] : v); return o + ' of ' + d + ' ' + plur2(n) + ' ' + vv;
+    }, '“One of my friends lives …” (plural noun, singular verb)'],
+    [/\b(One|one) of (the|my|our|your|his|her|their|these|those) (best|worst|most \w+|biggest|greatest|top|few|main|nicest|oldest|largest|smallest|happiest|richest|fastest|tallest) ([a-z]{3,})\b/g, function (m, o, d, a, n) { if (/^(in|of|and|for|the|ever|that|who|which|i|we|you)$/.test(n) || /s$/.test(n) || IRRPL[n] === undefined && /(ing|ly|ed)$/.test(n)) return m; return o + ' of ' + d + ' ' + a + ' ' + plur2(n); }, '“one of the best players” (plural)'],
+    [/\b(The|the) number of (\w+) (are|were|have)\b/g, function (m, t, n, v) { return t + ' number of ' + n + ' ' + { are: 'is', were: 'was', have: 'has' }[v]; }, '“The number of …” is singular'],
+    [/\b(A|a) number of (\w+) (is|was|has)\b/g, function (m, t, n, v) { return t + ' number of ' + n + ' ' + { is: 'are', was: 'were', has: 'have' }[v]; }, '“A number of …” is plural'],
+    [new RegExp('\\b((?:the|this|that|some|my|your|our|more|all the|much|any|their|his|her) (?:' + UNCOUNT + '))(s)? (are|were|have)\\b', 'gi'), function (m, n, s2, v) { return n + ' ' + { are: 'is', were: 'was', have: 'has' }[v.toLowerCase()]; }, 'Uncountable noun: singular verb (the information is)'],
+    [/\b(feel|feels|felt|feeling|look|looks|looked|smell|smells|smelled|smelt|taste|tastes|tasted|sound|sounds|sounded|seem|seems|seemed) (badly)\b/gi, function (m, v) { return v + ' bad'; }, 'After feel/look/seem use an adjective (feel bad)'],
+    [/\b(drive|drives|drove|driving|speak|speaks|spoke|speaking|talk|talks|talked|work|works|worked|working|walk|walks|walked|run|runs|ran|write|writes|wrote|play|plays|played|sing|sings|sang|cook|cooks|cooked|answer|answered|listen|listens|listened|move|moves|moved|act|acted|behave|behaves|behaved|dress|dressed|eat|eats|ate|drive|think|thinks|thought|breathe|breathes|explain|explained|finish|finished|react|reacted|reply|replied|respond|responded) (careful|quick|slow|quiet|loud|bad|happy|easy|clear|proper|correct|beautiful|nice|honest|safe|calm|polite|serious|perfect|fluent|patient|gentle|sudden|careless|brave|kind|warm|soft|neat|regular|direct|angry|nervous|confident|smooth|rude|polite|quick)\b(?! (and|or)\b)/gi, function (m, v, a) { return v + ' ' + adverb(a); }, 'Use an adverb to describe how (drives carefully)'],
+    [/\b(suggest|suggests|suggested|suggesting|recommend|recommends|recommended) to (\w+)\b/gi, function (m, a, v) { var b = FORM[v.toLowerCase()]; if (!b || v.toLowerCase() !== b) return m; return a + ' ' + VERB[b][2]; }, '“suggest + -ing” (suggested going)'],
+    [/\b(I|we|you|they|he|she) (married|marry) (with|to) /g, function (m, s, v) { return s + ' ' + v + ' '; }, '“I married her” (no “with”)'],
+    [/\b(revert back|revert) (to (?:me|us|him|her|them)|on this|on (?:the|my) email)\b/gi, function (m, a, t) { return /^to/i.test(t) ? 'reply ' + t : 'reply'; }, 'Say “reply” (revert means go back to a previous state)'],
+    [/\brevert back\b/gi, function (m) { return keepCase(m, 'reply'); }, 'Say “reply”'],
+    [/\b(do|does|did|kindly do) the needful\b/gi, function (m) { return 'do what is needed'; }, 'Say “do what is needed”'],
+    [/\bprepone(d)?\b/gi, function (m, d) { return d ? 'brought forward' : 'bring forward'; }, 'Say “bring forward”'],
+    [/\bcope up with\b/gi, function (m) { return keepCase(m, 'cope with'); }, '“cope with” (no “up”)'],
+    [/\bbetween you and I\b/gi, function (m) { return keepCase(m, 'between you and me'); }, 'Say “between you and me”'],
+    // --- punctuation ---
+    [/\b((?:two|three|four|five|six|seven|several|the following|these|a few) (?:things|items|reasons|steps|tips|ingredients|places|countries|subjects|languages|people|options|ways|colours|colors|foods|questions|rules|tools|skills|cities))\s+(?!(?:to|for|in|on|at|of|that|which|are|is|were|was)\b)(\w+(?: \w+)?, \w+(?: \w+)?,? (?:and|or) \w+)/gi, function (m, a, list) { return a + ': ' + list; }, 'Use a colon before a list'],
+    [/\b(are|is|were|was|include|includes|including|such as|like)[;:]\s+/gi, function (m, a) { return a + ' '; }, 'No colon or semicolon straight after a verb'],
+    [/\b(\w+ed|wagged|lost|has|had|in|on|of|with|into|from|by|at|for|about|under|change|changed|lost|know|find|found|took|gave) (it’s|it's) (tail|own|name|colour|color|shape|size|way|purpose|leaves|paws|nest|head|eyes|legs|wings|value|price|best|place|food|toys?|owner|home|history|people|roots|surface|engine|doors?|windows?|roof|branches|fur|ears|mouth|nose|teeth|beauty|charm|job|work|role|power|meaning|course|end|side|top|bottom|centre|center|own way)\b/gi, function (m, a, i, n) { return a + ' its ' + n; }, '“its” (no apostrophe) shows belonging'],
+    [/\b(the|my|our|your|their|his|her) (kids|parents|students|girls|boys|teachers|friends|neighbours|neighbors|dogs|cats|players|workers|babies|sisters|brothers|grandparents|customers|guests) (toys?|room|rooms|house|names|bags|books|shoes|clothes|bikes|school|teacher|lunches|lunch|homework|rights|party|car|cars|team|ideas|future|safety|health|bedroom|bedrooms|beds|food|bowls|uniforms|birthday|birthdays|wedding|anniversary|questions|feedback|home|faces|work|marks|results)\b/gi, function (m, d, n, o) { return d + ' ' + n + '’ ' + o; }, 'Plural owner: add the apostrophe after s (the kids’ toys)'],
+    [/\b(said|asked|replied|shouted|whispered|says|asks|cried|answered|explained|added),?\s*["“]([a-z])([^"”\n]*?)["”]\s*([?!.])/gi, function (m, v, f, r, p2) { return v + ', “' + f.toUpperCase() + r + p2 + '”'; }, 'Quotation: comma before, capital letter, and the ? inside the quotation marks'],
+    [/\b(said|asked|replied|shouted|whispered|says|asks|answered),?\s*["“]([A-Z])([^"”\n]*?)["”]\s*([?!.])/g, function (m, v, f, r, p2) { return v + ', “' + f + r + p2 + '”'; }, 'Quotation: the ? goes inside the quotation marks'],
+    [/, (and|or), (?=\w)/g, function (m, c) { return ' ' + c + ' '; }, 'No comma after “and” in a list'],
+    [/\b(Thank you|Thanks|Sorry|Congratulations|Well done|Good luck|Happy birthday|Excuse me|See you) ([A-Z][a-z]+) (for|on|with|and|again|tomorrow|soon|later)\b/g, function (m, t, n, w) { return t + ', ' + n + ', ' + w; }, 'Put commas around the name of the person you are talking to'],
+    [/\b(Thank you|Thanks|Sorry|Congratulations|Well done|Good luck|Happy birthday|Bye|Goodbye|See you|Good night|Good morning) ([A-Z][a-z]+)(?=[.!?]|$)/gm, function (m, t, n) { return /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday|Everyone|All)$/.test(n) ? m : t + ', ' + n; }, 'Put a comma before the name of the person you are talking to'],
+    [/(^|[.!?]\s+|\n)(After|Before|During|Despite|Because of|Due to|Thanks to|According to|Unlike|Like|Besides|Apart from|Instead of|In spite of) ([a-z]+(?: [a-z]+){0,4}) (I|we|you|he|she|they|it|there|my \w+|our \w+|the \w+|people|everyone|most \w+) (?=\w)/g, function (m, pre, p2, phr, s) {
+      if (/\b(I|we|you|he|she|they|it)\b/.test(phr) || /(^| )(is|was|are|were|had|have|did)( |$)/.test(phr)) return m;
+      return pre + p2 + ' ' + phr + ', ' + s + ' ';
+    }, 'Add a comma after an opening phrase'],
+    [/(^|[.!?]\s+|\n)(When|If|Although|Though|Even though|Because|While|As soon as|Once|Unless|After|Before|Since|Until|Whenever|Wherever|As long as) ((?:I|we|you|he|she|they|it|there|my \w+|our \w+|the \w+|people|everyone|\w+) (?:[\w’']+ ){0,8}?[\w’']+) (I|we|you|he|she|they|there|my \w+|our \w+|the \w+|people|everyone) (will|would|can|could|should|must|might|may|am|is|are|was|were|have|has|had|went|go|goes|felt|feel|got|get|stayed|stay|called|call|cooked|cook|left|leave|came|come|ran|run|love|loved|helped|help|watched|watch|made|make|took|take|saw|see|did|do|didn’t|don’t|won’t|can’t|couldn’t|always|never|usually|often|still|also|just|then|need|needed|want|wanted|ate|eat|slept|sleep|started|start|stopped|stop|bought|buy|tried|try|decided|decide|knew|know|met|meet|found|find|said|say|told|tell|asked|ask)\b/g, function (m, pre, c, cl, s, v) {
+      var words = cl.split(/\s+/); if (words.length < 2) return m;
+      var hasVerb = words.some(function (t) { var l = t.toLowerCase(); return FORM[l] || /^(am|is|are|was|were|be|been|can|could|will|would|should|must|’s|’re|’m|didn’t|don’t|doesn’t|won’t|can’t|isn’t|wasn’t)$/.test(l) || /(ed|’s|’re|’m|n’t)$/.test(l); });
+      if (!hasVerb) return m;
+      return pre + c + ' ' + cl + ', ' + s + ' ' + v;
+    }, 'Put a comma after an opening clause (When I got home, I cooked)'],
+    [/(^|\n)(I wonder|I don’t know|I do not know|I’m not sure|I am not sure|I asked|She asked|He asked|They asked|We asked|I want to know|I’d like to know|I would like to know|I’m wondering|I am wondering|Please let me know|Let me know)\b([^?\n"“”]*)\?/g, function (m, pre, a, rest) { return pre + a + rest + '.'; }, 'An indirect question ends with a full stop'],
+    [/\b([Oo]n )?the (\d{1,2})(?:st|nd|rd|th)? of (January|February|March|April|May|June|July|August|September|October|November|December)\b/g, function (m, on, d, mo) { return (on ? on : '') + d + ' ' + mo; }, 'NZ date style: 5 May'],
+    [/\b(\d{1,2})(st|nd|rd|th) (January|February|March|April|May|June|July|August|September|October|November|December)\b/g, function (m, d, s2, mo) { return d + ' ' + mo; }, 'NZ date style: 5 May'],
+    [/([a-z]) (it is|it’s|they are|they’re|we are|we’re|I am|I’m|she is|she’s|he is|he’s|there is|there are) (?=(?:so|very|really|a|an|the|beautiful|amazing|lovely|great|good|nice|fun|delicious|expensive|cheap|cold|hot|big|small|busy|quiet|easy|hard|my|our|always|never|not|too)\b)/g, function (m, a, s2, off, all) {
+      var before = all.slice(0, off + 1).split(/[.!?\n;:,]/).pop(), words = before.trim().split(/\s+/), last = words[words.length - 1] || '';
+      if (words.length < 3) return m;
+      if (/^(and|but|or|so|because|that|if|when|while|although|though|since|after|before|until|unless|which|who|where|as|than|think|thought|know|knew|said|says|hope|believe|feel|felt|guess|mean|wish|say|tell|told|is|was|are|were|be|am|do|does|did|can|could|will|would|should|must|to|of|in|on|at|for|with|from|by|about|like|what|how|why|whether|even|also|then|sure|glad|happy|sorry|afraid|seems|seemed|realise|realize|realised|realized|show|shows|showed|means|meant|because)$/i.test(last)) return m;
+      var hasVerb = words.some(function (t) { var l = t.toLowerCase().replace(/[^a-z’']/g, ''); return FORM[l] || /^(am|is|are|was|were|can|could|will|would|let’s)$/.test(l); });
+      if (!hasVerb) return m;
+      return a + '. ' + s2.charAt(0).toUpperCase() + s2.slice(1) + ' ';
+    }, 'Two sentences run together: add a full stop'],
+  ];
+
+  GRAM_PRE.push.apply(GRAM_PRE, GRAM_ADV);
   var GRAM_POST = [
     [/\b(an|a) some\b/gi, 'some', 'Use “some”']
   ];
@@ -436,7 +566,7 @@
       var before = rest.slice(0, m.index);
       var lastBit = before.split(/[,;]/).pop();
       if (!new RegExp('\\b(am|is|are|was|were|be|been|' + RX_ANYV + ')\\b', 'i').test(lastBit) || /^\s*(I|we|you|they|he|she|it)\s*$/i.test(lastBit)) break;
-      if (/\b(if|when|because|although|though|while|after|before|since|as|unless|until|whether)\b/i.test(lastBit) || /^(However|Firstly|Secondly|Finally|Also|Then|Next|Yes|No|Well|So|Overall|In addition|For example)$/i.test(before.trim())) break;
+      if (/\b(if|when|because|although|though|while|after|before|since|as|unless|until|whether|even)\b/i.test(lastBit) || /^(However|Firstly|Secondly|Finally|Also|Then|Next|Yes|No|Well|So|Overall|In addition|For example)$/i.test(before.trim())) break;
       parts.push(before); rest = rest.slice(m.index + 1).replace(/^\s+/, ''); n++;
     }
     if (!parts.length) return s;
@@ -448,10 +578,31 @@
     var second = mid.length ? mid.join(', ') + ', and ' + last : last;
     return first + '. ' + second.charAt(0).toUpperCase() + second.slice(1);
   }
+
+  /* extra (non-identifying) information about a named person or place goes between commas */
+  function relCommas(s) {
+    var m = s.match(new RegExp('^(\\s*)((?:My|Our|my|our) (?:' + FAM + ')|[A-Z][a-zāēīōū]+(?: [A-Z][a-zāēīōū]+){0,3}) (who|which|whose) (.+)$'));
+    if (m && !/,/.test(m[4].split(/\b(is|are|was|were|has|have|had)\b/)[0])) {
+      var np = m[2], first = np.split(' ')[0].toLowerCase();
+      var proper = !/^(my|our)$/.test(first);
+      if (proper && (COMMON[first] || FORM[first] || /^(the|this|that|these|those|a|an|it|he|she|they|we|i|people|everyone|someone|anyone|nobody|children|students|men|women|kids|friends|parents|most|many|some|all|each|every|one|there|here)$/.test(first))) return s;
+      var words = m[4].split(' '), seenVerb = false, cut = -1;
+      for (var i = 0; i < words.length; i++) {
+        var w = words[i].toLowerCase().replace(/[^a-z’']/g, ''), isV = FORM[w] || /^(am|is|are|was|were|can|could|will|would|should|must|has|have|had)$/.test(w);
+        if (!seenVerb) { if (isV) seenVerb = true; continue; }
+        if (isV && i > 0 && (/^(is|are|was|were|has|have|had|will|can|could|would|should|must)$/.test(w) || FORM[w] && FORM[w] !== w) && !/^(to|and|or|who|which|that|i|we|you|they|he|she)$/i.test(words[i - 1].toLowerCase())) { cut = i; break; }
+      }
+      if (cut > 1 && /^(still|also|always|never|often|usually|really|just|now|then|sometimes|already|only|even|rarely|seldom)$/i.test(words[cut - 1])) cut--;
+      if (cut > 0) return m[1] + np + ', ' + m[3] + ' ' + words.slice(0, cut).join(' ') + ', ' + words.slice(cut).join(' ');
+      return s;
+    }
+    return s.replace(/\b([a-z]+ )([A-Z][a-zāēīōū]+(?: [A-Z][a-zāēīōū]+){0,3}) (which|who) (?=\w)/g, function (x, pre, np, r) { if (/^(and|or|of|the|a|an|to|for|in|on|at|with)\s$/.test(pre) && !/^(in|to|at|visited|from)\s$/.test(pre)) return x; return pre + np + ', ' + r + ' '; });
+  }
   function sentenceFix(s, changes) {
     var o = s, n;
     n = fixQuestion(o); if (n !== o) { changes.push({ from: o, to: n, why: 'Question word order: “Where are you going?”' }); o = n; }
     n = embedded(o); if (n !== o) { changes.push({ from: o, to: n, why: 'Inside a sentence, keep normal order: “tell me where the station is”' }); o = n; }
+    n = relCommas(o); if (n !== o) { changes.push({ from: o, to: n, why: 'Extra information about a named person or place goes between commas' }); o = n; }
     n = splice(o); if (n !== o) { changes.push({ from: o, to: n, why: 'Run-on sentence: join ideas with “and” or a full stop' }); o = n; }
     return o;
   }
@@ -461,6 +612,7 @@
     sents.forEach(function (s) {
       var w = s.split(/\s+/).length;
       if (/^(Because|Although|Though|Even though|While|Which|If|When|Since|Unless)\b[^,]*[.!]$/i.test(s.trim()) && w < 14) tips.push('“' + s.trim().slice(0, 50) + '” is only half a sentence. Add the main idea (e.g. “Because I was tired, I went to bed.”).');
+      if (/^[A-Z][a-z]+ing\b[^,]{0,45},\s+(the|a|an|it|there|this|my|our|his|her|their)\b/.test(s.trim()) && !/^(During|According|Including|Regarding|Considering|Following|Excluding|Concerning|Morning|Evening|Spring|Nothing|Something|Everything|Anything|Wedding|Building|Ceiling|Thing|King|Ring|Sing|Bring|Swing)\b/.test(s.trim())) tips.push('“' + s.trim().slice(0, 45) + '…” — check who is doing the -ing action. Put that person straight after the comma (e.g. “Walking to school, I got caught in the rain.”).');
       if (/^(And|But|So|Or)\b/.test(s.trim()) && w < 5) tips.push('“' + s.trim() + '” is very short — join it to the sentence before.');
       if (w > 40) tips.push('One sentence has ' + w + ' words. Try splitting it into two for clarity.');
       if (!s.split(/[^A-Za-z’']+/).some(function (t) { var l = t.toLowerCase(); return FORM[l] || /^(am|is|are|was|were|be|been|can|could|will|would|should|must|may|might|shall)$/.test(l) || /(ed|es)$/.test(l) && l.length > 4 || WORDS && /s$/.test(l) && FORM[l.slice(0, -1)]; }) && w > 3 && w < 20 && !/[?]$/.test(s)) tips.push('“' + s.trim().slice(0, 50) + '” may be missing a verb.');
@@ -486,7 +638,7 @@
     [/\b(there|There) was (many|several|two|three|four|five|lots of|a lot of)\b/g, function (m, t, n) { return t + ' were ' + n; }, 'Use “there were” with plurals'],
     // have / do agreement
     [new RegExp('\\b(' + SING + ') (have|do|don’t|don\'t)\\b', 'gi'), function (m, s, v) { var x = v.toLowerCase(); return s + ' ' + (x === 'have' ? 'has' : x === 'do' ? 'does' : 'doesn’t'); }, 'Singular subject: “has/does/doesn’t”'],
-    [new RegExp('\\b(I|' + PLUR + ') (has|does|doesn’t|doesn\'t)\\b', 'g'), function (m, s, v) { var x = v.toLowerCase(); return s + ' ' + (x === 'has' ? 'have' : x === 'does' ? 'do' : 'don’t'); }, 'Use “have/do/don’t” here'],
+    [new RegExp('\\b(I|' + PLUR + ') (has|does|doesn’t|doesn\'t)\\b', 'g'), function (m, s, v, off, all) { if (/\b(each|one|neither|either|every one|none|any|which) of\s+$/i.test(all.slice(Math.max(0, off - 20), off))) return m; var x = v.toLowerCase(); return s + ' ' + (x === 'has' ? 'have' : x === 'does' ? 'do' : 'don’t'); }, 'Use “have/do/don’t” here'],
     [/\b(everyone|everybody|nobody|someone|somebody) (have|do)\b/gi, function (m, s, v) { return s + ' ' + (v.toLowerCase() === 'have' ? 'has' : 'does'); }, 'Use “has/does” with everyone'],
     // modal / do-support / to + base verb
     [new RegExp('\\b(can|could|will|would|shall|should|may|might|must|can’t|cannot|won’t|wouldn’t|shouldn’t|couldn’t|don’t|doesn’t|didn’t|do|does|did|to) (' + RX_THIRD + '|' + RX_PAST + ')\\b', 'gi'),
@@ -502,7 +654,7 @@
     [/\b(have|has|had|haven’t|hasn’t|hadn’t|I’ve|you’ve|we’ve|they’ve|he’s|she’s) (went|did|saw|ate|wrote|took|gave|came|ran|began|drank|spoke|broke|chose|drove|flew|forgot|knew|rode|sang|swam|threw|wore|woke|grew|fell|stole|hid|bit|blew|froze|shook|forgave)\b/gi, function (m, a, v) { return a + ' ' + VERB[FORM[v.toLowerCase()]][3]; }, 'Use the past participle (have gone, has eaten)'],
     [/\b(I|we|they|you|he|she) (seen|done)\b(?! by)/g, function (m, s, v) { return s + ' ' + (v === 'seen' ? 'saw' : 'did'); }, 'Use “saw/did” (or “have seen/done”)'],
     [/\b(peoples|childrens|womens|mens|sheeps|fishes)\b/gi, function (m) { return keepCase(m, { peoples: 'people', childrens: 'children', womens: 'women', mens: 'men', sheeps: 'sheep', fishes: 'fish' }[m.toLowerCase()]); }, 'Already plural'],
-    [/\b(plays?|played|sings?|sang|speaks?|spoke|writes?|wrote|cooks?|cooked|works?|worked|runs?|ran|swims?|swam|dances?|danced|draws?|drew|did|does|do|drives?|drove|reads?) (\w+ )?(very |really |so )?good\b/gi, function (m, v, o, adv) { return v + ' ' + (o || '') + (adv || '') + 'well'; }, 'Use “well” to describe how you do something'],
+    [/\b(plays?|played|sings?|sang|speaks?|spoke|writes?|wrote|cooks?|cooked|works?|worked|runs?|ran|swims?|swam|dances?|danced|draws?|drew|did|does|do|drives?|drove|reads?) (\w+ )?(very |really |so )?good\b/gi, function (m, v, o, adv) { if (o && /^(is|was|are|were|be|been|am|it|that|this|seems?|looks?|feels?|tastes?|smells?|sounds?|books?|stories|story|articles?|a|the) $/i.test(o)) return m; if (/^(read|reads)$/i.test(v)) return m; return v + ' ' + (o || '') + (adv || '') + 'well'; }, 'Use “well” to describe how you do something'],
     // double negatives
     [/\b(don’t|doesn’t|didn’t|can’t|won’t|isn’t|aren’t|wasn’t|never|not) (\w+ )?(no|nothing|nobody|nowhere|none)\b/gi, function (m, a, mid, n) { var r = { no: 'any', nothing: 'anything', nobody: 'anybody', nowhere: 'anywhere', none: 'any' }[n.toLowerCase()]; return a + ' ' + (mid || '') + r; }, 'Double negative'],
     // comparatives and quantities
@@ -528,13 +680,12 @@
     [/\b(return|returned) back\b/gi, function (m, a) { return a; }, '“return” already means go back'],
     [/\b(repeat|repeated) again\b/gi, function (m, a) { return a; }, '“repeat” already means again'],
     [/\b(Me|me) and (my \w+|him|her|them|\w+) (\w+)\b/g, function (m, me, o, v) { var low = v.toLowerCase(); if (!FORM[low] && !/^(are|were|will|can|could|would|should)$/.test(low)) return m; var vv = low === 'is' ? 'are' : low === 'was' ? 'were' : FORM[low] && FORM[low] !== 'be' && VERB[FORM[low]][0] === low ? FORM[low] : v; var who = { him: 'he', her: 'she', them: 'they' }[o.toLowerCase()] || o; return keepCase(me, who) + ' and I ' + vv; }, 'Say “… and I”'],
-    [/\bbetween you and I\b/gi, 'between you and me', 'Say “between you and me”'],
     [/\b(\w+) \1\b/gi, function (m, a) { return /^(that|had)$/i.test(a) ? m : a; }, 'Repeated word'],
     // more word choice
     [/\b(its|it’s|it's) (to|too) (\w+)/gi, function (m, a, t, w) { return keepCase(a, 'it’s') + ' too ' + w; }, 'Say “it’s too …”'],
     [/\bto (much|many|late|early|big|small|hot|cold|expensive|cheap|hard|easy|far|long|fast|slow|soon|bad|good|busy|tired|young|old|loud|quiet|heavy|sweet|spicy)\b(?! (to|for) \w+ing)/gi, function (m, w) { return keepCase(m, 'too') + ' ' + w; }, 'Use “too” (meaning “very/also”)'],
     [/\b(me|you|us|him|her|them|it) to([.!?,]|$)/gi, function (m, a, p) { return a + ' too' + p; }, 'Use “too” (meaning “also”)'],
-    [/\b(can|could|will|would|should|do|does|did|shall|may|must) (you|I|we|they|he|she|it|someone|anyone) (\w+)\b/gi, function (m, mod, s, v) { var b = FORM[v.toLowerCase()]; if (!b || b === 'be' || b === v.toLowerCase()) return m; if (VERB[b][2] === v.toLowerCase()) return m; return mod + ' ' + s + ' ' + b; }, 'Use the base verb in questions'],
+    [/\b(can|could|will|would|should|do|does|did|shall|may|must) (you|I|we|they|he|she|it|someone|anyone) (\w+)\b/gi, function (m, mod, s, v, off, all) { var b = FORM[v.toLowerCase()]; if (!b || b === 'be' || b === v.toLowerCase()) return m; if (VERB[b][2] === v.toLowerCase()) return m; if (mod === 'May' && off > 0 && !/[.!?\n]\s*$/.test(all.slice(0, off))) return m; if (/^(did|do|does)$/i.test(mod) && !/\?/.test(all.slice(off, off + 200).split(/[.!\n]/)[0])) return m; return mod + ' ' + s + ' ' + b; }, 'Use the base verb in questions'],
     [new RegExp('\\b(a lot of|lots of|plenty of|some of the|all the|all of the|many of the) (' + alt(NOUNS) + ')\\b', 'gi'), function (m, q, w) { return q + ' ' + plural(w.toLowerCase()); }, 'Use the plural'],
     [/\beveryday(?=\s*([.!?,;]|$|and\b|at\b|in\b|for\b|after\b|before\b|with\b|to\b|until\b))/gi, function (m) { return keepCase(m, 'every day'); }, '“every day” (two words) means each day'],
     [/\b(who’s|who's) (car|house|book|bag|phone|turn|idea|dog|kids|children|job)\b/gi, function (m, a, n) { return keepCase(a, 'whose') + ' ' + n; }, 'Use “whose” for belonging'],
@@ -554,7 +705,7 @@
   var PAST_MARK = /\b(yesterday|last (night|week|month|year|weekend|monday|tuesday|wednesday|thursday|friday|saturday|sunday|time|summer|winter|christmas|easter)|ago|this morning|in 20[01]\d|in 19\d\d|when I was (young|little|a child|a kid))\b/i;
   var PSUBJ = /\b((?:my \w+|\w+) and I|I|we|they|you|he|she|it|my \w+|the \w+|(?!(?:Yesterday|Last|This|When|In|On|At|The|And|But|So|Then|After|Before)\b)[A-Z][a-z]+)\s+(?:also |really |just |then |all |both )?(\w+)\b/g;
   function pastTense(sentence) {
-    if (!PAST_MARK.test(sentence) || /\b(will|going to|tomorrow|next)\b/i.test(sentence)) return sentence;
+    if (!PAST_MARK.test(sentence) || /\b(will|going to|tomorrow|next|since)\b/i.test(sentence)) return sentence;
     return sentence.replace(PSUBJ, function (m, s, v) {
       var low = v.toLowerCase(), b = FORM[low];
       if (/^(am|is|are)$/.test(low)) return m.slice(0, m.length - v.length) + keepCase(v, (/^(I|he|she|it)$/i.test(s) || /^(my|the) /i.test(s) && !/s$/.test(s) ? 'was' : 'were'));
@@ -564,7 +715,7 @@
     });
   }
   function pastAnd(sentence) {
-    if (!PAST_MARK.test(sentence) || /\b(will|going to|tomorrow|next)\b/i.test(sentence)) return sentence;
+    if (!PAST_MARK.test(sentence) || /\b(will|going to|tomorrow|next|since)\b/i.test(sentence)) return sentence;
     return sentence.replace(/\b(and|then|but|so) (also |then )?(\w+)\b/gi, function (m, c, adv, v) {
       var low = v.toLowerCase(), b = FORM[low]; if (!b || b === 'be') return m;
       if (low !== b && low !== VERB[b][0]) return m;
@@ -706,7 +857,20 @@
     }).join('\n');
     return t;
   }
-  function fixText(text, mode) {
+
+  /* polish: stronger, precise words for flat "very + adjective" phrases */
+  var POLISH = { 'very good': 'excellent', 'very bad': 'terrible', 'very big': 'huge', 'very large': 'enormous', 'very small': 'tiny', 'very happy': 'delighted', 'very tired': 'exhausted', 'very important': 'essential', 'very hungry': 'starving', 'very cold': 'freezing', 'very beautiful': 'stunning', 'very interesting': 'fascinating', 'very difficult': 'challenging', 'very easy': 'simple', 'very scared': 'terrified', 'very angry': 'furious', 'very surprised': 'astonished', 'very busy': 'swamped', 'very clean': 'spotless', 'very dirty': 'filthy', 'very funny': 'hilarious', 'very nice': 'lovely', 'very pretty': 'gorgeous', 'very smart': 'brilliant', 'very quiet': 'silent', 'very old': 'ancient', 'very rich': 'wealthy', 'very poor': 'impoverished', 'very sure': 'certain', 'very worried': 'anxious', 'very excited': 'thrilled', 'very boring': 'tedious', 'very expensive': 'costly', 'very cheap': 'inexpensive', 'very fast': 'rapid', 'very slow': 'sluggish', 'very sad': 'heartbroken', 'very wet': 'soaked', 'very hot': 'scorching', 'very strong': 'powerful', 'very weak': 'feeble', 'really good': 'excellent', 'really bad': 'terrible', 'really big': 'huge', 'really happy': 'delighted', 'really tired': 'exhausted', 'really important': 'essential', 'really interesting': 'fascinating', 'really funny': 'hilarious', 'a lot of time': 'plenty of time', 'kind of': 'rather', 'sort of': 'somewhat', 'got better': 'improved', 'get better': 'improve', 'gets better': 'improves', 'got worse': 'worsened', 'find out': 'discover', 'found out': 'discovered', 'look into': 'investigate', 'looked into': 'investigated', 'think about': 'consider', 'thought about': 'considered', 'talk about': 'discuss', 'talked about': 'discussed', 'a little bit': 'slightly', 'lots of': 'many', 'nowadays': 'today', 'big problem': 'major problem', 'good chance': 'strong chance' };
+  var POLISH_CASUAL = { 'kind of': 1, 'sort of': 1, 'find out': 1, 'found out': 1, 'look into': 1, 'looked into': 1, 'think about': 1, 'thought about': 1, 'talk about': 1, 'talked about': 1, 'lots of': 1, 'nowadays': 1, 'got better': 1, 'get better': 1, 'gets better': 1, 'got worse': 1, 'a little bit': 1 };
+  function polishText(text, mode) {
+    var changes = [], formal = /^(academic|business|email)$/.test(mode);
+    var keys = Object.keys(POLISH).filter(function (k) { return formal || !POLISH_CASUAL[k]; }).sort(function (a, b) { return b.length - a.length; });
+    var rx = new RegExp('\\b(' + keys.map(function (k) { return k.replace(/ /g, '\\s+'); }).join('|') + ')\\b', 'gi');
+    var out = text.replace(rx, function (m) { var k = m.toLowerCase().replace(/\s+/g, ' '); var v = POLISH[k]; if (!v) return m; if (/^lots of$/.test(k) && /^\s*(time|money|water|work|fun|food|love|help|information|advice)\b/i.test(text.slice(text.indexOf(m) + m.length))) return m; var r = /^[A-Z]/.test(m) ? v.charAt(0).toUpperCase() + v.slice(1) : v; changes.push({ from: m, to: r, why: 'Polish: a stronger, more precise word' }); return r; });
+    out = out.replace(/\b(a|A|an|An) (excellent|enormous|essential|astonished|ancient|impoverished|anxious|inexpensive|huge|terrible|tiny|delighted|stunning|fascinating|challenging|simple|hilarious|lovely|gorgeous|brilliant|silent|wealthy|certain|thrilled|tedious|costly|rapid|sluggish|heartbroken|soaked|scorching|powerful|feeble|major|strong)\b/g, function (m, art, w) { var an = /^[aeiou]/i.test(w); var A = /^A/.test(art) ? (an ? 'An' : 'A') : (an ? 'an' : 'a'); return A + ' ' + w; });
+    return { text: out, changes: changes };
+  }
+
+  function fixText(text, mode, opts) {
     var sp = spellCheck(text);
     var g = grammarFix(sp.text);
     var cur = g.text, changes = sp.changes.concat(g.changes), tips = sp.tips.slice(0, 4), seenTip = {};
@@ -726,6 +890,7 @@
       });
       cur = next;
     }
+    if (!(opts && opts.noPolish) && mode !== 'creative') { var pl = polishText(cur, mode); if (pl.changes.length) { cur = pl.text; changes = changes.concat(pl.changes); } }
     var tidied = tidy(cur);
     if (tidied !== cur.trim()) changes.push({ from: '', to: '', why: 'Capital letters and full stops tidied.' });
     return { text: tidied, changes: changes.reverse(), tips: tips.slice(0, 8) };
@@ -921,6 +1086,16 @@
     [/comma|run-on|full stop|punctuation|sentence structure|long sentence/, 'Commas and full stops', 'Don’t join two complete sentences with only a comma (“The food was cold, the staff were rude”). Use a full stop, or a joining word: “The food was cold, and the staff were rude.” Put a comma after an opening phrase: “In the morning, we left.”'],
     [/capital|capitalis/, 'Capital letters', 'Capitalise the first word of a sentence, “I”, names, places, days, months, languages and nationalities: “On Monday I flew to Wellington with Aroha. We speak English and Māori.”'],
     [/linking|connector|cohesive|transition/, 'Linking words', 'Adding: also, in addition, furthermore. Contrast: however, although, whereas. Cause/result: because, so, therefore, as a result. Example: for example, such as. Ending: in conclusion, overall, on balance. Use a range — not the same one every time.'],
+    [/semicolon|semi-colon/, 'Semicolons', 'Use a semicolon to join two complete sentences that are closely linked: “I like tea; my husband prefers coffee.” Use one before however/therefore when they join two sentences: “It rained; however, we went out.”'],
+    [/\bcolons?\b/, 'Colons', 'Use a colon after a complete sentence to introduce a list, an example or an explanation: “I need three things: milk, bread and eggs.” Don’t put a colon straight after a verb (“My favourites are pizza and pasta”).'],
+    [/relative|which or that|who or which|whose|adjective clause/, 'Who, which, that and whose', 'Who for people, which for things, that for both, whose for belonging (“the man whose car was stolen”). If the information is extra (the person or place is already clear), put it between commas: “My mother, who is 70, still works.” If it tells you which one, no commas: “The students who passed were happy.”'],
+    [/noun clause|reported|indirect/, 'Reported speech and indirect questions', 'Reported speech usually moves the tense back: “I am tired” → She said she was tired. Indirect questions use normal word order and no question mark: “Where do you live?” → He asked where I lived.'],
+    [/fragment|half a sentence|incomplete sentence/, 'Sentence fragments', 'A sentence needs a subject and a verb and must make sense alone. “Because it rained.” is only half — add the main idea: “Because it rained, we stayed inside.”'],
+    [/dangling|modifier/, 'Dangling modifiers', 'An opening -ing phrase must describe the subject that comes straight after the comma. Wrong: “Walking to school, the rain started.” Right: “Walking to school, I got caught in the rain.”'],
+    [/adverb clause|subordinat|although|because|unless/, 'Adverb clauses', 'Clauses with although, because, when, if, unless and while need a main clause. Put a comma after the opening clause: “When I got home, I cooked dinner.” Don’t add “but” after although or “so” after because.'],
+    [/stative|state verb|knowing|liking/, 'State verbs', 'Verbs for states — know, like, love, want, need, believe, understand, own, belong — are not usually used in the -ing form: “I know the answer” (not “I am knowing”).'],
+    [/past perfect|had \+|had already/, 'Past perfect', 'Use had + past participle for the earlier of two past actions: “When I arrived, the film had already started.”'],
+    [/apostrophe|possessive/, 'Apostrophes', 'Use ’s for one owner (my mum’s car) and s’ for plural owners (the kids’ toys). Its = belonging to it; it’s = it is. Use apostrophes for short forms: don’t, can’t, I’m, let’s.'],
     [/ielts/, 'IELTS tips', 'Writing Task 1 (20 min, 150+ words): give an overview and key figures, no opinion. Task 2 (40 min, 250+ words): answer every part of the question, give a clear position, 4–5 paragraphs. Try the 🎓 Exam practice tab — I’ll time you, count your words and give a practice band.'],
     [/cambridge|b2 first|\bfce\b|c1 advanced|\bcae\b|c2 proficiency|\bcpe\b/, 'Cambridge tips', 'B2 First writing: 140–190 words each. C1 Advanced: 220–260. C2 Proficiency: 240–280 (summary essay) and 280–320. Plan for 5 minutes, use the right style for the reader, show a range of linking words and structures, and leave time to check. Practise in 🎓 Exam practice.'],
     [/nzcel|new zealand certificate in english/, 'NZCEL tips', 'NZCEL runs from Foundation to Level 6, with General, Employment and Academic strands at Levels 3–5. Focus on purpose and audience, clear paragraphs, accurate grammar and (for Academic) formal language with sources. Practise in 🎓 Exam practice.']

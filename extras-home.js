@@ -272,7 +272,7 @@
       var text = (d.title || 'Grocery list') + '\n' + CATS.map(function (cc) { var its = d.items.filter(function (it) { return it.cat === cc[0]; }); return its.length ? cc[1] + ' ' + cc[0] + '\n' + its.map(function (it) { return (it.done ? '☑ ' : '☐ ') + it.name + (it.qty ? ' · ' + it.qty : ''); }).join('\n') : ''; }).filter(Boolean).join('\n\n');
       function copyText() { try { navigator.clipboard.writeText(text); } catch (e) {} }
       return h('div', { className: 'jx-page' },
-        JNZX.Header('FAMILY TOGETHER · SHOPPING MADE SIMPLE', 'Grocery list.', 'Plan your shop by aisle, set a budget, tick things off as you go, and share a colourful printable list. Everything saves on this device.'),
+        JNZX.Header('MODERN & LIFESTYLE · SHOPPING MADE SIMPLE', 'Grocery list.', 'Plan your shop by aisle, set a budget, tick things off as you go, and share a colourful printable list. Everything saves on this device.'),
         h('div', { className: 'jx-row jx-form' },
           h('label', null, 'List name', h('input', { value: d.title, maxLength: 60, style: { minWidth: '16em' }, onChange: function (e) { var v = e.target.value; set(function (x) { return Object.assign({}, x, { title: v }); }); } })),
           h('label', null, 'Budget (NZD)', h('input', { type: 'number', min: 0, step: 1, value: d.budget, style: { width: '9em' }, onChange: function (e) { var v = e.target.value; set(function (x) { return Object.assign({}, x, { budget: v }); }); } })),
@@ -405,7 +405,7 @@
       var cv = useState({ amt: '', from: 'week' }), conv = cv[0], setConv = cv[1];
       var perMonth = num(conv.amt) * ({ week: 52, fortnight: 26, month: 12, year: 1 }[conv.from]) / 12;
       return h('div', { className: 'jx-page jx-money', style: { '--mp': t.accent } },
-        JNZX.Header('FAMILY TOGETHER · MY MONEY PLAN', 'My Money Plan.', 'A monthly household budget in New Zealand dollars: plan your income, bills, everyday spending, savings and debts, then track what really happened. Saved on this device.'),
+        JNZX.Header('MODERN & LIFESTYLE · MY MONEY PLAN', 'My Money Plan.', 'A monthly household budget in New Zealand dollars: plan your income, bills, everyday spending, savings and debts, then track what really happened. Saved on this device.'),
         h('div', { className: 'jx-row jx-form' },
           h('label', null, 'Month', h('input', { type: 'month', value: month, onChange: function (e) { if (e.target.value) setMonth(e.target.value); } })),
           data.months[prevKey] && h('button', { type: 'button', className: 'secondary', onClick: copyPrev }, 'Copy plan from last month')),
