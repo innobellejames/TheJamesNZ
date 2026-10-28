@@ -13,11 +13,8 @@
     ['For adult CPR, how many chest compressions do you give before 2 rescue breaths?', ['5', '10', '15', '30'], 3, 'Give 30 compressions, then 2 breaths. If you can’t give breaths, keep doing compressions.', 'First aid'],
     ['Where do you place your hands for adult CPR?', ['On the stomach', 'Heel of one hand in the centre of the chest, other hand on top', 'On the left shoulder', 'Under the neck'], 1, 'Heel of the hand in the centre of the chest, with the other hand on top. Push hard and fast.', 'First aid'],
     ['For CPR on a baby under one year, you compress the chest using…', ['Two fingers in the centre of the chest, just below the nipple line', 'Both fists', 'The heel of both hands', 'Your elbow'], 0, 'Use two fingers, about one third of the chest depth.', 'First aid'],
-    ['Who can use an AED (defibrillator)?', ['Only doctors', 'Only paramedics', 'Anyone — it gives spoken instructions', 'Only people with a licence'], 2, 'AEDs talk you through each step. Anyone can use one.', 'First aid'],
-    ['While an AED is analysing or giving a shock, you should…', ['Keep doing compressions', 'Make sure nobody touches the person', 'Give the person water', 'Remove the pads'], 1, 'Nobody should touch the person during analysis or a shock. Resume CPR when told.', 'First aid'],
     ['An adult is choking but coughing strongly. What should you do?', ['Give back blows straight away', 'Encourage them to keep coughing', 'Give them a drink', 'Lie them down'], 1, 'While the cough is effective, encourage coughing — don’t give back blows yet.', 'First aid'],
     ['A choking adult cannot breathe, cough or speak. After calling 111, you give…', ['Up to 5 back blows, then up to 5 chest thrusts, and repeat', 'A glass of water', 'Mouth-to-mouth only', 'Nothing until help arrives'], 0, 'Lean them forward: up to 5 back blows, check, then up to 5 chest thrusts. Repeat as needed.', 'First aid'],
-    ['Why should you never blindly sweep a choking person’s mouth with your finger?', ['It is rude', 'It can push the object further down', 'It takes too long', 'It is only for babies'], 1, 'Only remove an object you can clearly see. A blind sweep can make the blockage worse.', 'First aid'],
     ['Someone is bleeding heavily. What is the best first action after keeping yourself safe?', ['Wash the wound with soap', 'Apply firm, continuous direct pressure with a clean cloth', 'Lift the person to stand up', 'Wait to see if it stops'], 1, 'Firm, continuous pressure controls bleeding. Call 111 for heavy or uncontrolled bleeding.', 'First aid'],
     ['There is an object stuck in a wound. You should…', ['Pull it out quickly', 'Leave it in and press around it', 'Push it in further', 'Pour water on it'], 1, 'Don’t remove an embedded object — apply pressure around it.', 'First aid'],
     ['How long should you cool a burn under cool running water?', ['30 seconds', '5 minutes', 'At least 20 minutes', 'Until it stops hurting, however short'], 2, 'Cool the burn for at least 20 minutes while keeping the rest of the person warm.', 'First aid'],
@@ -38,6 +35,9 @@
     ['At a patrolled beach, where should you swim?', ['Anywhere you like', 'Between the red and yellow flags', 'Near the rocks', 'Behind the surf break'], 1, 'Lifeguards watch the area between the red and yellow flags.', 'Sun & outdoors'],
     ['Someone is in trouble in the water and there is no lifeguard. Who do you call?', ['111 and ask for Police', '105', 'The Poisons Centre', 'A friend'], 0, 'Call 111 and ask for Police for a water rescue.', 'Sun & outdoors'],
     ['Before a walk or tramp, you should…', ['Leave without telling anyone', 'Tell a trusted person your route and when to raise the alarm', 'Rely on mobile coverage', 'Pack only enough food for lunch'], 1, 'Mobile coverage isn’t assured. Check the forecast, pack extra food and layers, and leave your plan with someone.', 'Sun & outdoors'],
+    ['In New Zealand, which side of the road do you drive on?', ['The right', 'The left', 'Either side on country roads', 'The middle on narrow roads'], 1, 'Keep left — and take extra care when turning and at roundabouts.', 'Road safety'],
+    ['Children under what age must use an approved child restraint in a car?', ['3', '5', '7', '12'], 2, 'Children under 7 must use an approved child restraint. Check the official rules for older children too.', 'Road safety'],
+    ['You need to use your phone while driving. What is the safest choice?', ['Text quickly at a red light', 'Hold it on your lap', 'Stop somewhere safe first', 'Use it only on straight roads'], 2, 'Plan your route before you leave, and stop somewhere safe to rest or use your phone.', 'Road safety'],
     ['Which number do you call for an urgent road incident that is NOT life-threatening?', ['111', '*555', '0800 764 766', '0800 933 922'], 1, 'Use *555 for urgent road incidents with no immediate danger to life, 111 for danger to life and 105 for non-emergency Police matters.', 'Road safety']
   ];
   var TOTAL = QUIZ.length;
@@ -81,42 +81,107 @@
         h('button', { type: 'button', className: 'secondary', disabled: !ready, onClick: share }, 'Share certificate')),
       msg && h('p', { className: 'small-note', role: 'status' }, msg));
   }
+  var SECT = { 'First aid': ['🩹', '#c0392b', '#fdecea'], 'Natural hazards': ['🌋', '#9a5b00', '#fff3dc'], 'Sun & outdoors': ['☀️', '#1b6b63', '#e3f4ef'], 'Road safety': ['🚗', '#2c5aa0', '#e7effb'] };
+  var LETTERS = ['A', 'B', 'C', 'D', 'E'];
+  function Ring(props) {
+    var pct = props.pct, r = 52, c = 2 * Math.PI * r;
+    return h('svg', { className: 'jx-sq-ring', viewBox: '0 0 120 120', role: 'img', 'aria-label': props.label },
+      h('circle', { cx: 60, cy: 60, r: r, fill: 'none', stroke: 'currentColor', strokeOpacity: 0.12, strokeWidth: 12 }),
+      h('circle', { cx: 60, cy: 60, r: r, fill: 'none', stroke: props.pass ? '#1f8a5a' : '#d9822b', strokeWidth: 12, strokeLinecap: 'round', strokeDasharray: c, strokeDashoffset: c * (1 - pct), transform: 'rotate(-90 60 60)' }),
+      h('text', { x: 60, y: 58, textAnchor: 'middle', fontSize: 26, fontWeight: 800, fill: 'currentColor' }, Math.round(pct * 100) + '%'),
+      h('text', { x: 60, y: 80, textAnchor: 'middle', fontSize: 12, fill: 'currentColor', opacity: 0.7 }, props.sub));
+  }
   function SafetyQuiz() {
     var st = JNZX.useStored('jnzx-safety-quiz', { order: null, answers: {}, done: null }), s = st[0], set = st[1];
-    var p = useState(0), page = p[0], setPage = p[1];
     var top = useRef(null);
-    function go(n) { setPage(n); try { top.current && top.current.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }
-    function start() { var perm = {}; QUIZ.forEach(function (q, i) { perm[i] = shuffle(q[1].length); }); set({ order: shuffle(TOTAL), perm: perm, answers: {}, done: null }); go(0); }
+    function scrollTop() { try { top.current && top.current.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {} }
+    function start() { var perm = {}; QUIZ.forEach(function (q, i) { perm[i] = shuffle(q[1].length); }); set({ order: shuffle(TOTAL), perm: perm, answers: {}, pos: 0, done: null }); scrollTop(); }
     var order = s.order;
-    var head = h('div', { className: 'jx-sq-head' }, h('p', { className: 'eyebrow' }, 'TEST YOURSELF'), h('h2', null, '🛟 Safety & Know-how quiz'), h('p', null, TOTAL + ' questions on first aid, earthquakes and tsunami, fire and floods, sun and water safety, and the road. Score ' + PASS + ' or more (80%) to earn a certificate of completion.'));
-    if (!order) return h('section', { className: 'jx-card jx-sq', ref: top }, head, h('button', { type: 'button', className: 'primary', onClick: start }, '▶ Start the quiz'), h('p', { className: 'small-note' }, 'Your answers are saved on this device as you go, so you can take a break.'));
+    if (!order) {
+      var counts = {}; QUIZ.forEach(function (q) { counts[q[4]] = (counts[q[4]] || 0) + 1; });
+      return h('section', { className: 'jx-sq jx-sq-intro jx-keep-colour', ref: top },
+        h('div', { className: 'jx-sq-hero' },
+          h('div', { className: 'jx-sq-badge', 'aria-hidden': true }, '🛟'),
+          h('div', null, h('p', { className: 'eyebrow' }, 'TEST YOURSELF · ' + TOTAL + ' QUESTIONS'), h('h2', null, 'Safety & Know-how quiz'), h('p', null, 'How ready are you for an emergency in Aotearoa? Answer one question at a time — you’ll see the right answer and a short tip after each one.'))),
+        h('div', { className: 'jx-sq-sections' }, Object.keys(SECT).map(function (k) { return h('div', { key: k, className: 'jx-sq-sec', style: { background: SECT[k][2], color: SECT[k][1] } }, h('span', { className: 'jx-sq-sec-ico' }, SECT[k][0]), h('strong', null, k), h('small', null, (counts[k] || 0) + ((counts[k] || 0) === 1 ? ' question' : ' questions'))); })),
+        h('ul', { className: 'jx-sq-facts' }, h('li', null, '⏱️ About 10 minutes'), h('li', null, '🎯 Pass mark: ' + PASS + ' of ' + TOTAL + ' (80%)'), h('li', null, '🏅 Certificate of completion when you pass'), h('li', null, '💾 Progress saved on this device')),
+        h('button', { type: 'button', className: 'primary jx-sq-go', onClick: start }, '▶ Start the quiz'));
+    }
     var answered = Object.keys(s.answers).length;
     if (s.done) {
-      var score = s.done.score, passed = score >= PASS;
-      return h('section', { className: 'jx-card jx-sq', ref: top }, head,
-        h('div', { className: 'jx-sq-result' + (passed ? ' is-pass' : '') }, h('h3', null, 'Your result: ' + score + ' / ' + TOTAL + ' (' + Math.round(score / TOTAL * 100) + '%)'), h('p', null, passed ? 'Ka pai! You know your safety basics.' : 'You need ' + PASS + ' to pass. Read the explanations and the guides above, then try again — the questions will be shuffled.'), h('button', { type: 'button', className: 'secondary', onClick: start }, '↺ Start again')),
+      var score = s.done.score, passed = score >= PASS, bySec = {};
+      order.forEach(function (qi) { var q = QUIZ[qi], k = q[4]; bySec[k] = bySec[k] || [0, 0]; bySec[k][1]++; if (s.answers[qi] === q[2]) bySec[k][0]++; });
+      return h('section', { className: 'jx-sq jx-keep-colour', ref: top },
+        h('div', { className: 'jx-sq-res' + (passed ? ' is-pass' : '') },
+          h(Ring, { pct: score / TOTAL, pass: passed, sub: score + ' / ' + TOTAL, label: 'Score ' + score + ' out of ' + TOTAL }),
+          h('div', null, h('p', { className: 'eyebrow' }, passed ? 'PASSED' : 'NOT QUITE YET'), h('h2', null, passed ? 'Ka pai! You know your safety basics.' : score >= PASS - 4 ? 'So close — have another go.' : 'Not quite yet — have another go.'), h('p', null, passed ? 'Create your certificate below.' : 'You need ' + PASS + ' to pass. Read the guides above and the tips in your review, then try again — questions and answers are shuffled.'),
+            h('button', { type: 'button', className: 'secondary', onClick: start }, '↺ Take the quiz again'))),
+        h('div', { className: 'jx-sq-sections' }, Object.keys(SECT).map(function (k) { var v = bySec[k] || [0, 0]; return h('div', { key: k, className: 'jx-sq-sec', style: { background: SECT[k][2], color: SECT[k][1] } }, h('span', { className: 'jx-sq-sec-ico' }, SECT[k][0]), h('strong', null, k), h('small', null, v[0] + ' / ' + v[1] + ' correct'), h('span', { className: 'jx-sq-bar' }, h('span', { style: { width: (v[1] ? v[0] / v[1] * 100 : 0) + '%', background: SECT[k][1] } }))); })),
         passed && h(Certificate, { attempt: s.done }),
-        h('details', { className: 'jx-sq-review', open: !passed }, h('summary', null, 'Review your answers'),
-          h('ol', { className: 'jx-review' }, order.map(function (qi) { var q = QUIZ[qi], a = s.answers[qi], ok = a === q[2]; return h('li', { key: qi, className: ok ? 'is-ok' : 'is-no' }, h('strong', null, q[0]), h('p', null, (ok ? '✓ ' : '✗ Your answer: ' + (a === undefined ? '—' : q[1][a]) + ' · Correct: ') + q[1][q[2]]), h('p', { className: 'jx-muted' }, q[3])); }))));
+        h('details', { className: 'jx-sq-review', open: !passed }, h('summary', null, '📝 Review all answers'),
+          h('ol', { className: 'jx-sq-rlist' }, order.map(function (qi) { var q = QUIZ[qi], a = s.answers[qi], ok = a === q[2]; return h('li', { key: qi, className: ok ? 'is-ok' : 'is-no' }, h('p', { className: 'jx-sq-rq' }, (ok ? '✅ ' : '❌ ') + q[0]), !ok && h('p', null, h('span', { className: 'jx-muted' }, 'Your answer: '), a === undefined ? '—' : q[1][a]), h('p', null, h('span', { className: 'jx-muted' }, 'Correct: '), h('strong', null, q[1][q[2]])), h('p', { className: 'jx-muted' }, '💡 ' + q[3])); }))));
     }
-    var per = 5, pages = Math.ceil(TOTAL / per), slice = order.slice(page * per, page * per + per);
-    function choose(qi, oi) { var a = Object.assign({}, s.answers); a[qi] = oi; set(Object.assign({}, s, { answers: a })); }
-    function submit() { var score = order.reduce(function (n, qi) { return n + (s.answers[qi] === QUIZ[qi][2] ? 1 : 0); }, 0); set(Object.assign({}, s, { done: { score: score, at: Date.now(), ref: JNZX.certKit ? JNZX.certKit.uuid() : String(Date.now()) } })); go(0); }
-    return h('section', { className: 'jx-card jx-sq', ref: top }, head,
-      h('div', { className: 'jx-progress', 'aria-label': answered + ' of ' + TOTAL + ' answered' }, h('span', { style: { width: answered / TOTAL * 100 + '%' } })),
-      h('p', { className: 'jx-muted' }, answered + ' of ' + TOTAL + ' answered · Page ' + (page + 1) + ' of ' + pages),
-      slice.map(function (qi, k) { var q = QUIZ[qi]; return h('fieldset', { key: qi, className: 'jx-q' }, h('legend', null, (page * per + k + 1) + '. ' + q[0]), h('small', { className: 'jx-sq-tag' }, q[4]), ((s.perm && s.perm[qi]) || q[1].map(function (_, i) { return i; })).map(function (oi) { var o = q[1][oi]; return h('label', { key: oi, className: 'jx-opt' + (s.answers[qi] === oi ? ' is-on' : '') }, h('input', { type: 'radio', name: 'sq' + qi, checked: s.answers[qi] === oi, onChange: function () { choose(qi, oi); } }), h('span', null, o)); })); }),
-      h('div', { className: 'jx-row' },
-        h('button', { type: 'button', className: 'secondary', disabled: page === 0, onClick: function () { go(page - 1); } }, '← Previous'),
-        page < pages - 1 ? h('button', { type: 'button', className: 'primary', onClick: function () { go(page + 1); } }, 'Next →')
-          : h('button', { type: 'button', className: 'primary', disabled: answered < TOTAL, onClick: submit }, answered < TOTAL ? 'Answer all ' + TOTAL + ' to submit' : 'Submit answers')));
+    var pos = Math.min(s.pos || 0, TOTAL - 1), qi = order[pos], q = QUIZ[qi], sec = SECT[q[4]] || ['❓', '#333', '#eee'];
+    var chosen = s.answers[qi], locked = chosen !== undefined, right = chosen === q[2];
+    var perm = (s.perm && s.perm[qi]) || q[1].map(function (_, i) { return i; });
+    var soFar = order.slice(0, pos + (locked ? 1 : 0)).reduce(function (n, x) { return n + (s.answers[x] === QUIZ[x][2] ? 1 : 0); }, 0);
+    function choose(oi) { if (locked) return; var a = Object.assign({}, s.answers); a[qi] = oi; set(Object.assign({}, s, { answers: a })); }
+    function goTo(n) { set(Object.assign({}, s, { pos: Math.max(0, Math.min(TOTAL - 1, n)) })); }
+    function submit() { var score = order.reduce(function (n, x) { return n + (s.answers[x] === QUIZ[x][2] ? 1 : 0); }, 0); set(Object.assign({}, s, { done: { score: score, at: Date.now(), ref: JNZX.certKit ? JNZX.certKit.uuid() : String(Date.now()) } })); scrollTop(); }
+    var allDone = answered >= TOTAL;
+    return h('section', { className: 'jx-sq jx-keep-colour', ref: top },
+      h('div', { className: 'jx-sq-top' },
+        h('span', { className: 'jx-sq-count' }, 'Question ' + (pos + 1) + ' of ' + TOTAL),
+        h('span', { className: 'jx-sq-score' }, '✅ ' + soFar + ' correct')),
+      h('div', { className: 'jx-sq-prog', role: 'progressbar', 'aria-valuemin': 0, 'aria-valuemax': TOTAL, 'aria-valuenow': answered }, h('span', { style: { width: answered / TOTAL * 100 + '%' } })),
+      h('article', { className: 'jx-sq-card', key: qi },
+        h('span', { className: 'jx-sq-chip', style: { background: sec[2], color: sec[1] } }, sec[0] + ' ' + q[4]),
+        h('h3', { className: 'jx-sq-q' }, q[0]),
+        h('div', { className: 'jx-sq-opts', role: 'radiogroup', 'aria-label': 'Answers' }, perm.map(function (oi, k) {
+          var cls = 'jx-sq-opt' + (locked && oi === q[2] ? ' is-right' : '') + (locked && oi === chosen && !right ? ' is-wrong' : '') + (chosen === oi ? ' is-chosen' : '');
+          return h('button', { key: oi, type: 'button', role: 'radio', 'aria-checked': chosen === oi, className: cls, disabled: locked && oi !== chosen && oi !== q[2], onClick: function () { choose(oi); } },
+            h('span', { className: 'jx-sq-letter' }, locked && oi === q[2] ? '✓' : locked && oi === chosen ? '✗' : LETTERS[k]), h('span', null, q[1][oi]));
+        })),
+        locked && h('div', { className: 'jx-sq-fb' + (right ? ' is-right' : ' is-wrong'), 'aria-live': 'polite' }, h('strong', null, right ? '✅ Correct!' : '❌ Not quite.'), ' ', q[3])),
+      h('div', { className: 'jx-sq-nav' },
+        h('button', { type: 'button', className: 'secondary', disabled: pos === 0, onClick: function () { goTo(pos - 1); } }, '← Back'),
+        pos < TOTAL - 1 ? h('button', { type: 'button', className: 'primary', disabled: !locked, onClick: function () { goTo(pos + 1); } }, locked ? 'Next question →' : 'Choose an answer')
+          : h('button', { type: 'button', className: 'primary', disabled: !allDone, onClick: submit }, allDone ? '🏁 See my result' : 'Answer all ' + TOTAL + ' first')),
+      h('div', { className: 'jx-sq-dots', 'aria-label': 'Jump to a question' }, order.map(function (x, k) { var st2 = s.answers[x] === undefined ? '' : s.answers[x] === QUIZ[x][2] ? ' ok' : ' no'; return h('button', { key: x, type: 'button', className: 'jx-sq-dot' + st2 + (k === pos ? ' on' : ''), 'aria-label': 'Question ' + (k + 1), onClick: function () { goTo(k); } }, k + 1); })),
+      allDone && pos < TOTAL - 1 && h('button', { type: 'button', className: 'primary jx-sq-finish', onClick: submit }, '🏁 All answered — see my result'));
   }
   JNZX.SafetyQuiz = SafetyQuiz;
   try {
     var baseSafety = NZSafety;
     NZSafety = function NZSafetyWithQuiz(props) { return h(R.Fragment, null, h(baseSafety, props), h(SafetyQuiz)); };
   } catch (e) { console.warn('[JNZX] safety quiz', e); }
-  var css = '.jx-sq{margin-top:22px;display:grid;gap:10px}.jx-sq-head h2{margin:2px 0 4px}.jx-sq-head p{margin:0}.jx-sq-tag{display:inline-block;margin:0 0 6px;font-size:.78rem;font-weight:700;color:#1b6b63}.jx-sq-result{padding:14px 16px;border-radius:14px;background:#fff4e5}.jx-sq-result.is-pass{background:#e6f5ec}.jx-sq-result h3{margin:0 0 4px}.jx-sq-review summary{cursor:pointer;font-weight:700}' +
-    'html[data-reading-theme="dark"] .jx-sq-result{background:#3a2a14;color:#ffe9c8}html[data-reading-theme="dark"] .jx-sq-result.is-pass{background:#163326;color:#d4f0dc}html[data-reading-theme="dark"] .jx-sq-tag{color:#8fd8c0}';
+  var css = '.jx-sq{margin-top:26px;display:grid;gap:14px;max-width:760px;margin-left:auto;margin-right:auto;padding:18px;border-radius:22px;background:#fff;border:1px solid #e1e8e4;box-shadow:0 6px 24px rgba(20,40,35,.06)}' +
+    '.jx-sq-hero{display:flex;gap:16px;align-items:flex-start}.jx-sq-badge{flex:0 0 64px;height:64px;border-radius:18px;display:grid;place-items:center;font-size:34px;background:#e3f4ef}.jx-sq-hero h2{margin:2px 0 6px}.jx-sq-hero p{margin:0}.jx-sq-hero .eyebrow{margin:0}' +
+    '.jx-sq-sections{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px}.jx-sq-sec{border-radius:16px;padding:12px 14px;display:grid;gap:2px}.jx-sq-sec-ico{font-size:22px}.jx-sq-sec strong{font-size:.98rem}.jx-sq-sec small{font-weight:600;opacity:.85}' +
+    '.jx-sq-bar{display:block;height:6px;border-radius:6px;background:rgba(0,0,0,.08);overflow:hidden;margin-top:6px}.jx-sq-bar span{display:block;height:100%;border-radius:6px}' +
+    '.jx-sq-facts{list-style:none;padding:0;margin:0;display:flex;flex-wrap:wrap;gap:8px 16px;font-weight:600;color:#3b4a46}.jx-sq-go{justify-self:start;font-size:1.05rem;padding:12px 22px!important}' +
+    '.jx-sq-top{display:flex;justify-content:space-between;align-items:center;font-weight:700}.jx-sq-count{color:#3b4a46}.jx-sq-score{color:#1f8a5a}' +
+    '.jx-sq-prog{height:10px;border-radius:10px;background:#e8eeeb;overflow:hidden}.jx-sq-prog span{display:block;height:100%;background:linear-gradient(90deg,#1b6b63,#2fa37a);border-radius:10px;transition:width .3s}' +
+    '.jx-sq-card{display:grid;gap:12px;animation:jxSqIn .25s ease}@keyframes jxSqIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}' +
+    '.jx-sq-chip{justify-self:start;border-radius:999px;padding:5px 12px;font-weight:700;font-size:.85rem}.jx-sq-q{margin:0;font-size:clamp(1.15rem,3.6vw,1.4rem);line-height:1.4}' +
+    '.jx-sq-opts{display:grid;gap:10px}.jx-sq-opt{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px;border-radius:14px;border:2px solid #dbe4df;background:#fff;color:#1f2a2a;font:inherit;font-size:1rem;line-height:1.4;cursor:pointer;touch-action:manipulation;min-height:56px}' +
+    '.jx-sq-opt:hover:not(:disabled){border-color:#1b6b63}.jx-sq-opt:disabled{opacity:.55;cursor:default}.jx-sq-letter{flex:0 0 34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:800;background:#eef3f0;color:#1b6b63}' +
+    '.jx-sq-opt.is-right{border-color:#1f8a5a;background:#e9f7ef;opacity:1}.jx-sq-opt.is-right .jx-sq-letter{background:#1f8a5a;color:#fff}.jx-sq-opt.is-wrong{border-color:#c0392b;background:#fdecea;opacity:1}.jx-sq-opt.is-wrong .jx-sq-letter{background:#c0392b;color:#fff}' +
+    '.jx-sq-fb{border-radius:14px;padding:12px 14px;line-height:1.5}.jx-sq-fb.is-right{background:#e9f7ef;color:#174d33}.jx-sq-fb.is-wrong{background:#fff4e5;color:#6b3d00}' +
+    '.jx-sq-nav{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.jx-sq-nav .primary{flex:1 1 200px;max-width:320px;margin-left:auto}' +
+    '.jx-sq-dots{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;padding-top:4px}.jx-sq-dot{width:32px;height:32px;border-radius:50%;border:1px solid #cfdad3;background:#fff;color:#3b4a46;font:inherit;font-size:.78rem;font-weight:700;cursor:pointer;padding:0}.jx-sq-dot.ok{background:#1f8a5a;color:#fff;border-color:#1f8a5a}.jx-sq-dot.no{background:#e9a23b;color:#fff;border-color:#e9a23b}.jx-sq-dot.on{outline:3px solid #1b6b63;outline-offset:2px}' +
+    '.jx-sq-finish{justify-self:center}' +
+    '.jx-sq-res{display:flex;gap:20px;align-items:center;flex-wrap:wrap;padding:16px;border-radius:18px;background:#fff6eb}.jx-sq-res.is-pass{background:#e9f7ef}.jx-sq-res>div{flex:1 1 260px}.jx-sq-res h2{margin:2px 0 6px}.jx-sq-res p{margin:0 0 10px}.jx-sq-ring{width:130px;height:130px;flex:0 0 130px;color:#1f2a2a}' +
+    '.jx-sq-review summary{cursor:pointer;font-weight:700;min-height:40px;display:flex;align-items:center}.jx-sq-rlist{padding-left:20px;display:grid;gap:12px}.jx-sq-rlist li{padding:10px 12px;border-radius:12px;background:#f6f8f7}.jx-sq-rlist li p{margin:2px 0}.jx-sq-rq{font-weight:700}' +
+    '@media (max-width:520px){.jx-sq{padding:14px;border-radius:18px}.jx-sq-hero{flex-direction:column}.jx-sq-res{flex-direction:column;align-items:flex-start}.jx-sq-dot{width:30px;height:30px}}' +
+    'html[data-reading-theme="dark"] .jx-sq{background:#141c1b;border-color:#2c3a37}html[data-reading-theme="dark"] .jx-sq-opt,html[data-reading-theme="dark"] .jx-sq-dot{background:#1b2524;color:#eef3f1;border-color:#3a4a46}html[data-reading-theme="dark"] .jx-sq-letter{background:#22302d;color:#9fe0c8}' +
+    'html[data-reading-theme="dark"] .jx-sq-opt.is-right{background:#163326}html[data-reading-theme="dark"] .jx-sq-opt.is-wrong{background:#3a1d1a}html[data-reading-theme="dark"] .jx-sq-fb.is-right{background:#163326;color:#d4f0dc}html[data-reading-theme="dark"] .jx-sq-fb.is-wrong{background:#3a2a14;color:#ffe2bd}' +
+    'html[data-reading-theme="dark"] .jx-sq .jx-sq-sec{background:#1d2927!important;border:1px solid #33433f}html[data-reading-theme="dark"] .jx-sq .jx-sq-sec,html[data-reading-theme="dark"] .jx-sq .jx-sq-sec *{color:#eef3f1!important}html[data-reading-theme="dark"] .jx-sq .jx-sq-chip{background:#22302d!important;color:#eef3f1!important}html[data-reading-theme="dark"] .jx-sq-res{background:#2a2416;color:#fbecd0}html[data-reading-theme="dark"] .jx-sq-res.is-pass{background:#163326;color:#d4f0dc}html[data-reading-theme="dark"] .jx-sq-ring{color:#eef3f1}' +
+    'html[data-reading-theme="dark"] .jx-sq .jx-sq-opt.is-right{background:#163326!important;border-color:#2fa37a!important;color:#eafff3!important}html[data-reading-theme="dark"] .jx-sq .jx-sq-opt.is-right .jx-sq-letter{background:#2fa37a!important;color:#fff!important}' +
+    'html[data-reading-theme="dark"] .jx-sq .jx-sq-opt.is-wrong{background:#3a1d1a!important;border-color:#e0675a!important;color:#ffe9e6!important}html[data-reading-theme="dark"] .jx-sq .jx-sq-opt.is-wrong .jx-sq-letter{background:#e0675a!important;color:#fff!important}' +
+    'html[data-reading-theme="dark"] .jx-sq .jx-sq-opt{background:#1b2524!important;color:#eef3f1!important;border-color:#3a4a46!important}html[data-reading-theme="dark"] .jx-sq .jx-sq-letter{background:#22302d!important;color:#9fe0c8!important}' +
+    'html[data-reading-theme="dark"] .jx-sq .jx-sq-dot{background:#1b2524!important;color:#eef3f1!important;border-color:#3a4a46!important}html[data-reading-theme="dark"] .jx-sq .jx-sq-dot.ok{background:#2fa37a!important;color:#fff!important}html[data-reading-theme="dark"] .jx-sq .jx-sq-dot.no{background:#d98b2b!important;color:#fff!important}' +
+    '.jx-sq .jx-sq-opt.is-right{background:#e9f7ef!important;border-color:#1f8a5a!important}.jx-sq .jx-sq-opt.is-wrong{background:#fdecea!important;border-color:#c0392b!important}.jx-sq .jx-sq-dot.ok{background:#1f8a5a!important;color:#fff!important}.jx-sq .jx-sq-dot.no{background:#e9a23b!important;color:#fff!important}' +
+    'html[data-reading-theme="dark"] .jx-sq-rlist li{background:#1b2524}html[data-reading-theme="dark"] .jx-sq-count,html[data-reading-theme="dark"] .jx-sq-facts{color:#d7e2de}html[data-reading-theme="dark"] .jx-sq-prog{background:#22302d}html[data-reading-theme="dark"] .jx-sq-badge{background:#22302d}';
   var stl = document.createElement('style'); stl.textContent = css; document.head.appendChild(stl);
 })();
