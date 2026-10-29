@@ -271,6 +271,7 @@
       h(JNZX.ShareBar, { tab: props.tab, printable: true }));
   }
   JNZX.register('x:holidays', HolidaysPage);
+  JNZX.holidayData = { ACT: ACT, ACT_FULL: ACT_FULL };
 
   /* ================= CELEBRATIONS ================= */
   function easter(y) { // Anonymous Gregorian algorithm

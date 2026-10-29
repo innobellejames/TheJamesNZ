@@ -1037,3 +1037,14 @@ html[data-reading-theme="dark"] .hymn-verse{background:#1c201f!important;color:#
 html[data-reading-theme="dark"] .hymn-verse *{color:#eef2f1!important}
 html[data-reading-theme="dark"] main .jx-ptable .jx-el :is(strong,small,span,p,em,b){color:#13202b!important}
 html[data-reading-theme="dark"] .mk-label,html[data-reading-theme="dark"] .jx-wc2-diff span{background:#123a37!important;color:#9fe7dc!important}
+/* keep heads in view on photo cards */
+main .mk-card-media img{object-position:50% 18%!important}
+.mk-card-media{height:200px}
+@media (max-width:600px){.mk-card-media{height:190px}}
+main .jx-shop-img img,main .jx-hub img{object-position:50% 18%}
+.jx-bub-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;width:100%}
+.jx-bub-chips button{border:1px solid #cfdcd6!important;background:#fff!important;color:#1f2a2a!important;border-radius:999px!important;padding:6px 12px!important;font-size:.85rem;font-weight:600;cursor:pointer;min-height:34px}
+.jx-bub-chips button:hover{border-color:#168c89!important;color:#168c89!important}
+html[data-reading-theme="dark"] .jx-bub-chips button{background:#18211f!important;color:#eef3f1!important;border-color:#3a4a46!important}
+.jx-hol-card .jx-catchy,.jx-make .jx-catchy{margin:0!important;padding:0 18px 16px!important;font-size:.85rem}
+html body main .mk-card .mk-card-media>img{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;aspect-ratio:auto!important}

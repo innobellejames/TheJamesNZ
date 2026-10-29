@@ -29390,6 +29390,12 @@ function WeatherOutfits() {
 					/* @__PURE__ */ (0, import_jsx_runtime.jsx)("li", { children: "Labrador: a comfortable harness, lead and fresh water. Check pavement temperature before a walk." })
 				] }),
 				(weather?.daily.uv ?? 0) >= 3 && /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "UV reaches 3 or higher: bring a sunhat and use sun protection." }),
+				window.JNZX && window.JNZX.ShareMini && (0, import_jsx_runtime.jsx)("div", { className: "jx-row jx-outfit-share", children: (0, import_jsx_runtime.jsx)(window.JNZX.ShareMini, {
+					label: "Share today’s outfit",
+					title: "What to wear in " + location + " · " + style,
+					text: "👕 What to wear in " + location + " today (" + style.toLowerCase() + ")" + (weather ? "\n🌡️ High " + Math.round(weather.daily.high) + "° · Low " + Math.round(weather.daily.low) + "°" : "") + "\n" + suggestions.concat([rain ? "Everyone: waterproof jacket and grippy shoes." : cold ? "Everyone: a warm knit and jacket." : "Everyone: light layers, sunhat and water."]).map((x) => "• " + x).join("\n"),
+					picture: () => window.JNZX.outfitPicture({ place: location, style, look: rain ? "RAIN-READY" : cold ? "COSY LAYERS" : "LIGHT, FLEXIBLE LAYERS", weather: weather ? "High " + Math.round(weather.daily.high) + "° · Low " + Math.round(weather.daily.low) + "° · Wind " + Math.round(weather.current.wind_speed_10m) + " km/h" : "", tips: suggestions.concat([rain ? "Everyone: waterproof jacket and grippy shoes." : cold ? "Everyone: a warm knit and jacket." : "Everyone: light layers, sunhat and water."]) })
+				}) }),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", {
 					className: "small-note",
 					children: "The animation changes with your clothing style and weather selection. Home clothes are for indoors; add suitable shoes and outer layers before going out. Adjust layers to your comfort; check severe weather alerts before outdoor plans."
