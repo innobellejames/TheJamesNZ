@@ -403,8 +403,37 @@
     return jAsset('./photo-share/inspiration.webp');
   };
   /* Weather › share today's outfit: the family's current outfit frame on a card */
+  JNZX.outfitCard = function (o, src) {
+    return new Promise(function (ok, bad) {
+      var img = new Image(); img.onerror = function () { bad(Error('image')); };
+      img.onload = function () {
+        var W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H; var g = c.getContext('2d');
+        var k = Math.max(W / img.naturalWidth, H / img.naturalHeight), dw = img.naturalWidth * k, dh = img.naturalHeight * k;
+        g.drawImage(img, (W - dw) / 2, (H - dh) * 0.3, dw, dh);
+        var gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(0,0,0,.45)'); gr.addColorStop(.25, 'rgba(0,0,0,0)'); gr.addColorStop(.45, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.65)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+        function pill(x, y, t, bg, fg) { g.font = '700 40px Arial, sans-serif'; var w = g.measureText(t).width + 56; g.fillStyle = bg; g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, 70, 35); else g.rect(x, y, w, 70); g.fill(); g.fillStyle = fg; g.fillText(t, x + 28, y + 48); return w; }
+        g.textAlign = 'left'; var x = 50; x += pill(x, 60, o.look || '', 'rgba(255,255,255,.93)', '#14243a') + 14; pill(x, 60, o.style || '', '#d5b16d', '#14243a');
+        g.fillStyle = '#fff'; g.font = '700 76px "Playfair Display", Georgia, serif'; g.shadowColor = 'rgba(0,0,0,.6)'; g.shadowBlur = 18; g.fillText('Outfit check ✨', 50, 220);
+        g.font = '600 40px Arial, sans-serif'; g.fillText((o.place || 'New Zealand') + (o.weather ? ' · ' + o.weather : ''), 50, 285); g.shadowBlur = 0;
+        var set = JNZX.outfitSet ? JNZX.outfitSet(o.style, o.kind) : [], y = H - 140 - set.length * 150;
+        set.forEach(function (it) {
+          g.font = '34px Arial, sans-serif'; var words = (it[1] + ': ' + it[2]).split(' '), lines = [], cur = '';
+          words.forEach(function (w2) { var t2 = cur ? cur + ' ' + w2 : w2; if (g.measureText(t2).width > W - 230 && cur) { lines.push(cur); cur = w2; } else cur = t2; }); if (cur) lines.push(cur);
+          var hh = 40 + lines.length * 44; g.fillStyle = 'rgba(255,255,255,.95)'; g.beginPath(); if (g.roundRect) g.roundRect(40, y, W - 80, hh, 28); else g.rect(40, y, W - 80, hh); g.fill();
+          g.font = '52px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.fillText(it[0], 66, y + 66);
+          g.fillStyle = '#1f2a2a'; g.font = '34px Arial, sans-serif'; lines.forEach(function (l, i) { g.fillText(l, 150, y + 58 + i * 44); });
+          y += hh + 14;
+        });
+        g.textAlign = 'center'; g.fillStyle = '#fff'; g.font = '700 34px Georgia, serif'; g.fillText('T H E   J A M E S   N Z  ·  www.thejamesnz.com', W / 2, H - 50);
+        c.toBlob(function (b) { b ? ok(new File([b], 'TheJamesNZ-outfit-check.png', { type: 'image/png' })) : bad(Error('blob')); }, 'image/png');
+      };
+      img.src = src;
+    });
+  };
   JNZX.outfitPicture = function (o) {
     return new Promise(function (ok, bad) {
+      var oc = document.querySelector('.jx-oc-img');
+      if (oc) return JNZX.outfitCard(o, oc.src).then(ok, bad);
       var el = document.querySelector('.family-outfit-animation');
       if (!el) return bad(Error('no outfit'));
       var cs = getComputedStyle(el), m = /url\("?([^")]+)"?\)/.exec(cs.backgroundImage);
