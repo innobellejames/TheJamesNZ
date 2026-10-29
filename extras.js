@@ -609,9 +609,9 @@
   var TOPIC = {
     'Inspiration': ['./photo-share/inspiration.webp', 'Quotes for leadership, faith, parenting, kindness and more.'],
     'Coffee corner': ['./coffee-posts/coffee-02.webp', 'Coffee facts, quotes, brew guides and a few jokes.'],
-    'x:personal-improvement': ['./workout-photos/easy-outdoor.webp', 'Focus, movement and water — small daily habits.'],
+    'x:personal-improvement': ['./story-pages/story-22-end.webp', 'Focus, movement and water — small daily habits.'],
     'Focus time': ['./mindfulness-scenes/stream.webp', 'Calm focus timers with gentle moving scenes.'],
-    'Workouts': ['./workout-photos/med-home.webp', 'Easy to intense workouts at home or outdoors.'],
+    'Workouts': ['./story-pages/story-12-begin.webp', 'Easy to intense workouts at home or outdoors.'],
     'Water tracker': ['./mindfulness-scenes/sky.webp', 'Fill a drop for each glass and keep a water journal.'],
     'Weather & OOTD': ['./story-pages/story-08-end.webp', 'Today’s weather and what to wear.'],
     'Today’s fruit & vege picks': ['./recipe-photos/vegetables.webp', 'What’s in season and good value this week.'],
