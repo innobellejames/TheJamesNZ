@@ -453,9 +453,96 @@
 
   /* ======================= MY KIWI ADVENTURES ======================= */
   var IDEAS = [['🏖️', 'Swim at a surf beach between the flags'], ['🥾', 'Walk a Great Walk (or part of one)'], ['🌋', 'Climb a volcano or maunga'], ['🐧', 'Spot a little blue penguin'], ['🐋', 'See whales or dolphins'], ['🥝', 'Pick your own berries or apples'], ['🍦', 'Eat hokey pokey ice cream'], ['🐟', 'Have fish and chips on the beach'], ['⛺', 'Camp at a DOC campsite'], ['✨', 'See glowworms'], ['🌌', 'Stargaze in a Dark Sky Reserve'], ['🌟', 'Find Matariki in the winter sky'], ['🚲', 'Ride a cycle trail'], ['🛶', 'Paddle a kayak or waka'], ['🎣', 'Catch (and release) a fish'], ['🌊', 'Visit a waterfall'], ['♨️', 'Soak in a hot pool'], ['🏔️', 'Play in the snow'], ['🗺️', 'Visit Cape Reinga / Te Rerenga Wairua'], ['🪨', 'Find the Moeraki Boulders'], ['🦭', 'See fur seals at a colony'], ['🐦', 'Hear a tūī or bellbird in the bush'], ['🌳', 'See a giant kauri tree'], ['🏛️', 'Explore Te Papa'], ['🚂', 'Ride a heritage train'], ['🎡', 'Go to an A&P show'], ['🥧', 'Taste a classic mince and cheese pie'], ['🍓', 'Try a pavlova with fresh fruit'], ['🧺', 'Have a picnic at a regional park'], ['🏉', 'Watch a rugby or netball game live'], ['🎆', 'Watch Guy Fawkes or Matariki fireworks'], ['🌅', 'Watch the first sunrise of the year'], ['🏝️', 'Take a ferry to an island'], ['🦕', 'Fossick for fossils or pretty stones'], ['🐑', 'Visit a farm and feed the animals'], ['🌿', 'Plant a native tree'], ['🧹', 'Join a beach clean-up'], ['📚', 'Borrow a library book about Aotearoa'], ['🗣️', 'Learn a mihi in te reo Māori'], ['🎶', 'Learn a waiata as a family'], ['🍞', 'Try rēwena bread or a hāngī'], ['🏊', 'Jump off a jetty (where it’s safe)'], ['🚶', 'Walk a coastal track at low tide'], ['🔭', 'Visit a planetarium or observatory'], ['🎨', 'Paint a Kiwi landscape'], ['🏕️', 'Toast marshmallows on a campfire'], ['🐚', 'Collect shells (and leave living ones)'], ['🛝', 'Find the best playground in your town'], ['⛪', 'Visit a historic church'], ['📸', 'Make a family photo book']];
-  var DESIGNS = [['summer', 'Summer pop'], ['bush', 'Bush & beach'], ['night', 'Matariki night sky'], ['clean', 'Clean & simple']];
+  var DESIGNS = [['printable', 'Printable — gingham frame'], ['printable-zigzag', 'Printable — zigzag frame'], ['printable-dots', 'Printable — dotty frame'], ['summer', 'Summer pop'], ['bush', 'Bush & beach'], ['night', 'Matariki night sky'], ['clean', 'Clean & simple']];
+  var SCRIPT = '"Great Vibes", "Allura", "Brush Script MT", "Segoe Script", cursive';
+  function fontsReady() { try { return document.fonts && document.fonts.load ? Promise.all([document.fonts.load('120px "Great Vibes"'), document.fonts.load('600 24px "Playfair Display"')]).catch(function () {}) : Promise.resolve(); } catch (e) { return Promise.resolve(); } }
+  function framePattern(g, kind, acc, x, y, w, hh) {
+    g.save(); g.beginPath(); g.rect(x, y, w, hh); g.clip();
+    g.fillStyle = hexA(acc, 0.28); g.fillRect(x, y, w, hh);
+    if (kind === 'zigzag') {
+      g.strokeStyle = hexA(acc, 0.85); g.lineWidth = 9; g.lineJoin = 'miter';
+      for (var yy = y - 20; yy < y + hh + 40; yy += 34) { g.beginPath(); for (var xx = x - 20, up = 0; xx < x + w + 40; xx += 22, up = 1 - up) g.lineTo(xx, yy + (up ? -11 : 11)); g.stroke(); }
+    } else if (kind === 'dots') {
+      g.fillStyle = hexA(acc, 0.8);
+      for (var r2 = 0, yy2 = y + 12; yy2 < y + hh + 20; yy2 += 26, r2++) for (var xx2 = x + 12 + (r2 % 2 ? 13 : 0); xx2 < x + w + 20; xx2 += 26) { g.beginPath(); g.arc(xx2, yy2, 6, 0, 7); g.fill(); }
+    } else {
+      g.fillStyle = hexA(acc, 0.42);
+      for (var a1 = x; a1 < x + w; a1 += 44) g.fillRect(a1, y, 22, hh);
+      for (var b1 = y; b1 < y + hh; b1 += 44) g.fillRect(x, b1, w, 22);
+    }
+    g.restore();
+  }
+  function fitLines(g, text, maxW, maxLines) {
+    var words = text.split(/\s+/), lines = [], cur = '';
+    words.forEach(function (w) { var t = cur ? cur + ' ' + w : w; if (g.measureText(t).width <= maxW || !cur) cur = t; else { lines.push(cur); cur = w; } });
+    if (cur) lines.push(cur);
+    if (lines.length > maxLines) { lines = lines.slice(0, maxLines); var l = lines[maxLines - 1]; while (g.measureText(l + '…').width > maxW && l.length > 3) l = l.slice(0, -1); lines[maxLines - 1] = l.replace(/\s+\S*$/, '') + '…'; }
+    return lines;
+  }
+  /* A printable bucket list: script title, patterned frame, tick boxes in two columns. */
+  function drawPrintable(c, d, t, kind) {
+    var W = 1240, H = 1754, g = c.getContext('2d'), acc = t.accent, ink = isDarkHex(t.bg) ? '#2a2a2a' : t.ink, paper = isDarkHex(t.bg) ? '#f6f2ea' : t.bg;
+    c.width = W; c.height = H;
+    g.fillStyle = paper; g.fillRect(0, 0, W, H);
+    g.textAlign = 'center'; g.fillStyle = hexA(ink, 0.75); g.font = '600 24px ' + SERIF;
+    var kick = (d.kicker || 'MY KIWI ADVENTURES').toUpperCase().split('').join(' ');
+    g.fillText(kick, W / 2, 92);
+    var title = d.title || 'Our Kiwi bucket list', tsz = 150;
+    do { g.font = tsz + 'px ' + SCRIPT; tsz -= 4; } while (g.measureText(title).width > W - 160 && tsz > 60);
+    g.fillStyle = ink; g.fillText(title, W / 2, 240);
+    g.font = '600 30px ' + SERIF; g.fillStyle = hexA(ink, 0.85);
+    var sub = (d.subtitle || 'Bucket list').toUpperCase().split('').join(' ');
+    g.fillText(sub, W / 2, 300);
+    var fx = 70, fy = 340, fw = W - 140, fh = H - fy - 170;
+    framePattern(g, kind, acc, fx, fy, fw, fh);
+    var ix = fx + 44, iy = fy + 44, iw = fw - 88, ih = fh - 88;
+    g.fillStyle = '#ffffff'; g.fillRect(ix, iy, iw, ih); g.strokeStyle = hexA(acc, 0.5); g.lineWidth = 2; g.strokeRect(ix + 10, iy + 10, iw - 20, ih - 20);
+    var items = d.items || [], n = items.length, cols = n > 16 ? 2 : 1, perCol = Math.ceil(n / cols) || 1;
+    var colW = (iw - 80 - (cols - 1) * 40) / cols, avail = ih - 110;
+    try { g.letterSpacing = '1px'; } catch (e) {}
+    var fs = cols === 1 ? 30 : 24, lay;
+    for (; fs >= 16; fs -= 1) {
+      g.font = fs + 'px ' + SERIF;
+      var box0 = Math.round(fs * 1.05), lh = fs * 1.3, ok = true;
+      lay = [];
+      for (var cI = 0; cI < cols; cI++) {
+        var chunk = items.slice(cI * perCol, (cI + 1) * perCol), lines = chunk.map(function (it) { return fitLines(g, String(it.t || '').toUpperCase(), colW - box0 - 18, 3); });
+        var textH = lines.reduce(function (sum, L) { return sum + L.length * lh; }, 0), gap = chunk.length ? (avail - textH) / chunk.length : 0;
+        if (gap < fs * 0.55) { ok = false; break; }
+        lay.push({ chunk: chunk, lines: lines, gap: Math.min(gap, fs * 1.6), lh: lh });
+      }
+      if (ok) break;
+    }
+    var box = Math.round(fs * 1.05);
+    lay.forEach(function (L, cI) {
+      var used = L.lines.reduce(function (sum, ls) { return sum + ls.length * L.lh; }, 0) + L.gap * L.chunk.length;
+      var y = iy + 55 + Math.max(0, (avail - used) / 2) + fs, x = ix + 40 + cI * (colW + 40);
+      L.chunk.forEach(function (it, k) {
+        g.strokeStyle = hexA(ink, 0.8); g.lineWidth = 2.5; g.strokeRect(x, y - box + 4, box, box);
+        if (it.done) { g.strokeStyle = acc; g.lineWidth = 5; g.beginPath(); g.moveTo(x + 4, y - box / 2 + 2); g.lineTo(x + box / 2.4, y); g.lineTo(x + box + 6, y - box - 4); g.stroke(); }
+        g.textAlign = 'left'; g.font = fs + 'px ' + SERIF; g.fillStyle = it.done ? hexA(ink, 0.55) : ink;
+        L.lines[k].forEach(function (ln, j) { g.fillText(ln, x + box + 16, y + j * L.lh); });
+        y += L.lines[k].length * L.lh + L.gap;
+      });
+    });
+    try { g.letterSpacing = '0px'; } catch (e) {}
+    var done = items.filter(function (i) { return i.done; }).length;
+    g.textAlign = 'center'; g.fillStyle = ink; g.font = 'italic 30px ' + SERIF;
+    g.fillText(done + ' of ' + n + ' done', W / 2, fy + fh + 62);
+    g.font = '600 34px ' + SERIF; g.fillText('THE JAMES NZ'.split('').join(' '), W / 2, H - 58);
+    g.font = '20px ' + SANS; g.fillStyle = hexA(ink, 0.6); g.fillText('www.thejamesnz.com', W / 2, H - 26);
+    g.textAlign = 'left';
+  }
+  JNZX.bucketPicture = function (d, theme) {
+    var c = document.createElement('canvas'), t = themeOf(theme || { id: 'ocean' }), design = (theme && theme.design) || 'printable';
+    return fontsReady().then(function () {
+      if (/^printable/.test(design)) drawPrintable(c, d, t, design.split('-')[1] || 'gingham'); else drawBucket(c, Object.assign({}, d, { theme: theme }), t);
+      return new Promise(function (ok) { c.toBlob(function (b) { ok(new File([b], 'TheJamesNZ-' + String(d.title || 'bucket-list').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) + '.png', { type: 'image/png' })); }, 'image/png'); });
+    });
+  };
   function drawBucket(c, d, t) {
     var W = 1240, H = 1754, g = c.getContext('2d'), design = (d.theme && d.theme.design) || 'summer';
+    if (/^printable/.test(design)) return drawPrintable(c, d, t, design.split('-')[1] || 'gingham');
     var ink = t.ink, bg = t.bg, acc = t.accent;
     if (design === 'night' && !(d.theme && d.theme.bg)) { bg = '#0f1a33'; ink = '#f4f1e8'; }
     c.width = W; c.height = H;
@@ -561,20 +648,21 @@
         h('label', null, 'Your idea', h('input', { value: text, maxLength: 140, placeholder: 'e.g. Picnic at the botanic gardens', onChange: function (e) { setText(e.target.value); } })),
         h('button', { type: 'submit', className: 'primary' }, 'Add idea')),
       h('div', { className: 'jx-row' },
-        JNZX.ShareMini ? h(JNZX.ShareMini, { label: 'Share this list', title: city + ' · our bucket list', text: city + ' · our bucket list\n' + post, bg: bg }) : null),
+        JNZX.ShareMini ? h(JNZX.ShareMini, { label: 'Share this list', title: city + ' · our bucket list', text: city + ' · our bucket list\n' + post, bg: bg, picture: function () { return JNZX.bucketPicture({ kicker: 'MY KIWI ADVENTURES · ' + (region === 'All regions' ? 'AOTEAROA' : region), title: city, subtitle: 'Bucket list', items: items.map(function (r) { return { t: r.text, done: r.done }; }) }, { id: 'ocean', design: 'printable' }); } }) : null),
       h('p', { className: 'small-note' }, 'Ideas are suggestions, not bookings. Check opening hours, access, weather and costs before you go.'));
   }
   try {
     var BaseBucket = NZBucket;
     NZBucket = function KiwiAdventures() {
       var st = JNZX.useStored('jnzx-kiwi-bucket', null), raw = st[0], setRaw = st[1];
-      var d = raw || { title: 'Our Kiwi bucket list', subtitle: '50 adventures in Aotearoa', items: IDEAS.map(function (x) { return { id: uid(), e: x[0], t: x[1], done: false }; }), theme: { id: 'ocean', design: 'summer' } };
+      useEffect(function () { try { if (!localStorage.getItem('jnzx-kiwi-bucket-v14')) { localStorage.setItem('jnzx-kiwi-bucket-v14', '1'); if (raw && raw.theme && (!raw.theme.design || raw.theme.design === 'summer')) setRaw(Object.assign({}, raw, { theme: Object.assign({}, raw.theme, { design: 'printable' }) })); } } catch (e) {} }, []);
+      var d = raw || { title: 'Our Kiwi bucket list', subtitle: '50 adventures in Aotearoa', items: IDEAS.map(function (x) { return { id: uid(), e: x[0], t: x[1], done: false }; }), theme: { id: 'ocean', design: 'printable' } };
       function set(fn) { setRaw(function (p) { return fn(p || d); }); }
       var tb = useState('poster'), tab = tb[0], setTab = tb[1];
       var nw = useState(''), newIdea = nw[0], setNewIdea = nw[1], em = useState('⭐'), emoji = em[0], setEmoji = em[1];
       var pk = useState(null), pick = pk[0], setPick = pk[1];
       var t = themeOf(d.theme);
-      var ref = usePoster(function (c) { if (c) drawBucket(c, d, t); }, [JSON.stringify(d), tab]);
+      var ref = usePoster(function (c, alive) { if (c) { drawBucket(c, d, t); return fontsReady().then(function () { if (alive()) drawBucket(c, d, t); }); } }, [JSON.stringify(d), tab]);
       var done = d.items.filter(function (i) { return i.done; }).length;
       function upd(id, o) { set(function (x) { return Object.assign({}, x, { items: x.items.map(function (i) { return i.id === id ? Object.assign({}, i, o) : i; }) }); }); }
       return h('div', { className: 'jx-page' },

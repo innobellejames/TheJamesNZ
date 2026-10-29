@@ -411,14 +411,24 @@
     var shareText = P[1] + ' ' + P[0] + ' (' + P[2] + '; capital ' + P[6] + '): ' + there + '\n🇳🇿 ' + nzLabel(date) + ': ' + nz + '\nMoney: ' + P[8] + ' (' + P[7] + ')';
     var T1 = tparts(date, P[5]), T0 = tparts(date, 'Pacific/Auckland');
     var placeName = /\(/.test(P[0]) ? placeLabel(P).split(' · ')[0] : P[2];
-    return h('section', { className: 'jx-globe jx-wc' + (props.compact ? ' is-compact' : '') },
-      h('div', { className: 'jx-wc-times', 'aria-live': 'polite' },
-        h('div', { className: 'jx-wc-t is-there' }, h('p', { className: 'jx-wc-where' }, P[1] + ' ' + placeName + (placeName !== countryOf(P) ? ', ' + countryOf(P) : '')), h('p', { className: 'jx-wc-clock' }, T1.time), h('p', { className: 'jx-wc-day' }, T1.day)),
-        h('div', { className: 'jx-wc-diff' }, h('span', null, sel === 0 ? 'Home' : diffText(date, P[5]).replace(' New Zealand', ' NZ'))),
-        h('div', { className: 'jx-wc-t is-nz' }, h('p', { className: 'jx-wc-where' }, '🇳🇿 New Zealand · ' + nzLabel(date)), h('p', { className: 'jx-wc-clock' }, T0.time), h('p', { className: 'jx-wc-day' }, T0.day))),
-      h('p', { className: 'jx-wc-facts' }, '🏛️ Capital: ' + P[6] + '  ·  💵 ' + P[8] + ' (' + P[7] + ')' + (P[9] ? '  ·  ✨ ' + P[9] : '')),
-      h(Picker, { sel: sel, choose: choose }),
-      h('div', { className: 'jx-row jx-wc-actions' }, h(JNZX.ShareMini, { title: 'Time in ' + placeName, text: shareText, label: 'Share these times' })),
+    var hr = +new Intl.DateTimeFormat('en-GB', { timeZone: P[5], hour: 'numeric', hourCycle: 'h23' }).format(date);
+    var call = sel === 0 ? null : hr >= 8 && hr < 21 ? ['ok', '👍 A good time to call'] : hr >= 21 || hr < 7 ? ['no', '😴 Probably asleep — send a message instead'] : ['maybe', '🌅 Early morning — maybe wait a little'];
+    return h('section', { className: 'jx-globe jx-wc jx-wc2' + (props.compact ? ' is-compact' : '') },
+      h('div', { className: 'jx-wc2-grid' },
+        h('div', { className: 'jx-wc2-times', 'aria-live': 'polite' },
+          h('div', { className: 'jx-wc2-card is-there' },
+            h('p', { className: 'jx-wc2-where' }, h('span', { className: 'jx-wc2-flag', 'aria-hidden': true }, P[1]), placeName + (placeName !== countryOf(P) ? ', ' + countryOf(P) : '')),
+            h('p', { className: 'jx-wc2-clock' }, T1.time), h('p', { className: 'jx-wc2-day' }, T1.day),
+            call && h('p', { className: 'jx-wc2-call is-' + call[0] }, call[1])),
+          h('div', { className: 'jx-wc2-diff' }, h('span', null, sel === 0 ? '🏠 You’re looking at home' : '⏱ ' + diffText(date, P[5]).replace(' New Zealand', ' NZ'))),
+          h('div', { className: 'jx-wc2-card is-nz' },
+            h('p', { className: 'jx-wc2-where' }, h('span', { className: 'jx-wc2-flag', 'aria-hidden': true }, '🇳🇿'), 'New Zealand · ' + nzLabel(date)),
+            h('p', { className: 'jx-wc2-clock' }, T0.time), h('p', { className: 'jx-wc2-day' }, T0.day))),
+        h('div', { className: 'jx-wc2-side' },
+          h('span', { className: 'mk-label' }, 'CHOOSE A PLACE'),
+          h(Picker, { sel: sel, choose: choose }),
+          h('ul', { className: 'jx-wc2-facts' }, h('li', null, '🏛️ ', h('strong', null, 'Capital: '), P[6]), h('li', null, '💵 ', h('strong', null, 'Money: '), P[8] + ' (' + P[7] + ')'), P[9] ? h('li', null, '✨ ' + P[9]) : null),
+          h('div', { className: 'jx-row jx-wc-actions' }, h(JNZX.ShareMini, { title: 'Time in ' + placeName, text: shareText, label: 'Share these times' })))),
       h('details', { className: 'jx-wc-more' }, h('summary', null, '💱 Money converter'), h(CurrencyBox, { key: 'cur-' + sel, place: P })),
       h('details', { className: 'jx-wc-more', open: globeOpen, onToggle: function (e) { setGlobeOpen(e.currentTarget.open); } }, h('summary', null, '🌏 Spin the globe (optional)'),
         h('div', { className: 'jx-globe-stage' },
@@ -486,6 +496,18 @@
       '.jx-wc-diff span{padding:4px 10px;font-size:.78rem}.jx-wc-facts{font-size:.9rem}.jx-wc .jx-gp{padding:10px 12px;gap:8px}' +
       '.jx-wc-more .jx-globe-canvas{max-width:240px!important;height:auto}.jx-wc-more{padding:8px 12px}' +
       '@media (max-width:600px){.jx-wc-times{grid-template-columns:1fr 1fr}.jx-wc-diff{grid-column:1/-1;order:3}}';
+    css += '.jx-wc2{max-width:1100px;gap:18px}.jx-wc2-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:start}' +
+      '.jx-wc2-times{display:grid;gap:10px}.jx-wc2-card{border-radius:18px;padding:20px 22px;text-align:left;box-shadow:0 4px 12px rgba(20,36,58,.08),0 2px 6px rgba(20,36,58,.05)}' +
+      '.jx-wc2-card.is-there{background:#fff;border-top:5px solid #d5b16d}.jx-wc2-card.is-nz{background:linear-gradient(135deg,#0c1828,#14243a 55%,#1e3355);color:#fff}' +
+      '.jx-wc2-where{margin:0;display:flex;align-items:center;gap:8px;font-weight:700;font-size:.95rem;color:#2c3e50}.is-nz .jx-wc2-where{color:rgba(255,255,255,.85)}.jx-wc2-flag{font-size:1.4rem}' +
+      '.jx-wc2-clock{margin:6px 0 0;font-family:\"Playfair Display\",Georgia,serif;font-weight:700;font-size:clamp(2.2rem,6vw,3.2rem);line-height:1.05;color:#14243a;font-variant-numeric:tabular-nums}.is-nz .jx-wc2-clock{color:#fff}' +
+      '.jx-wc2-day{margin:4px 0 0;color:#657184;font-size:.92rem}.is-nz .jx-wc2-day{color:rgba(255,255,255,.7)}' +
+      '.jx-wc2-call{display:inline-block;margin:12px 0 0;padding:5px 12px;border-radius:999px;font-size:.85rem;font-weight:600}.jx-wc2-call.is-ok{background:#e3f4ef;color:#106b55}.jx-wc2-call.is-maybe{background:#fff3d6;color:#7a5a00}.jx-wc2-call.is-no{background:#ece9f7;color:#4a3d86}' +
+      '.jx-wc2-diff{text-align:center}.jx-wc2-diff span{display:inline-block;background:rgba(22,140,137,.1);color:#127572;border-radius:999px;padding:6px 14px;font-weight:700;font-size:.85rem}' +
+      '.jx-wc2-side{display:grid;gap:10px;background:#fff;border-radius:18px;padding:18px;box-shadow:0 4px 12px rgba(20,36,58,.08)}.jx-wc2-side .mk-label{justify-self:start;margin:0}.jx-wc2-side .jx-gp{margin:0;background:transparent;border:0;padding:0}' +
+      '.jx-wc2-facts{list-style:none;margin:0;padding:12px 0 0;border-top:1px solid #e6ecef;display:grid;gap:6px;font-size:.93rem;color:#2c3e50}.jx-wc2 .jx-wc-actions{justify-content:flex-start}' +
+      '.jx-wc2 .jx-wc-more{max-width:none}@media (max-width:800px){.jx-wc2-grid{grid-template-columns:1fr}}' +
+      'html[data-reading-theme=\"dark\"] .jx-wc2-card.is-there,html[data-reading-theme=\"dark\"] .jx-wc2-side{background:#18211f}html[data-reading-theme=\"dark\"] .jx-wc2-clock{color:#fff}html[data-reading-theme=\"dark\"] .jx-wc2-where,html[data-reading-theme=\"dark\"] .jx-wc2-facts{color:#e3ebe8}html[data-reading-theme=\"dark\"] .jx-wc2-day{color:#b8c4c1}html[data-reading-theme=\"dark\"] .jx-wc2-facts{border-color:#33433f}html[data-reading-theme=\"dark\"] .jx-wc2-diff span{background:rgba(111,211,198,.14);color:#8fe0d4}';
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   })();
 })();

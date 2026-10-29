@@ -54,6 +54,34 @@
     ['💜', 'Passionfruit', range(2, 6), 'Northland, Auckland and Bay of Plenty gardens', 'Wrinkly skin means sweet and ripe!'],
     ['🌽', 'Sweetcorn', range(1, 3), 'Roadside stalls in Waikato, Gisborne and Canterbury', 'Cook it the same day for the sweetest corn.']
   ];
+  // Regions and their main towns; each place in a guide is matched to its region by name.
+  var REGIONS = [
+    ['Northland', ['Whangārei', 'Kerikeri', 'Kaitaia', 'Paihia', 'Dargaville'], /northland|kerikeri|whang[aā]rei|upper north island/i],
+    ['Auckland', ['Auckland', 'North Shore', 'Manukau', 'Pukekohe', 'Waiheke Island'], /auckland|parnell|cornwall park|upper north island/i],
+    ['Waikato', ['Hamilton', 'Cambridge', 'Taupō', 'Thames', 'Coromandel', 'Tokoroa'], /waikato|hamilton|coromandel|upper north island/i],
+    ['Bay of Plenty', ['Tauranga', 'Rotorua', 'Whakatāne', 'Te Puke', 'Katikati'], /bay of plenty|tauranga|te puke|upper north island/i],
+    ['Gisborne', ['Gisborne'], /gisborne/i],
+    ["Hawke's Bay", ['Napier', 'Hastings', 'Havelock North', 'Waipukurau'], /hawke/i],
+    ['Taranaki', ['New Plymouth', 'Stratford', 'Hāwera'], /taranaki|pukeiti|pukekura/i],
+    ['Manawatū-Whanganui', ['Palmerston North', 'Whanganui', 'Feilding', 'Levin'], /manawat|whanganui|palmerston/i],
+    ['Wellington', ['Wellington', 'Lower Hutt', 'Upper Hutt', 'Porirua', 'Masterton'], /wellington|lady norwood|wairarapa/i],
+    ['Tasman & Nelson', ['Nelson', 'Richmond', 'Motueka', 'Tākaka'], /nelson|tasman|motueka/i],
+    ['Marlborough', ['Blenheim', 'Picton', 'Kaikōura'], /marlborough|blenheim/i],
+    ['West Coast', ['Greymouth', 'Hokitika', 'Westport'], /west coast/i],
+    ['Canterbury', ['Christchurch', 'Timaru', 'Ashburton', 'Rangiora', 'Tekapo'], /canterbury|christchurch|hagley|mona vale|tekapo|mackenzie/i],
+    ['Otago', ['Dunedin', 'Queenstown', 'Wānaka', 'Cromwell', 'Alexandra', 'Oamaru'], /otago|dunedin|queenstown|w[aā]naka|cromwell|clyde|alexandra/i],
+    ['Southland', ['Invercargill', 'Gore', 'Te Anau'], /southland|invercargill/i]
+  ];
+  var EVERYWHERE = /all over|across nz|across the country|nationwide|everywhere|near most cities|many town parks|home gardens|country gardens|botanic gardens|older parks|old villas|woodland gardens|native forest|native bush|scrubland|parks and home|dahlia society|bulb farms|roadside|backyards/i;
+  var NORTH = /north island/i;
+  function inRegion(x, ri) {
+    if (ri < 0) return 'yes';
+    var where = x[3], R = REGIONS[ri];
+    if (R[2].test(where)) return 'yes';
+    if (NORTH.test(where) && !/upper north island/i.test(where) && ri <= 8) return 'yes';
+    if (EVERYWHERE.test(where)) return 'wide';
+    return '';
+  }
   function Months(props) {
     return h('div', { className: 'jx-mon', 'aria-label': 'Months: ' + props.m.map(function (x) { return MON[x - 1]; }).join(', ') },
       MON.map(function (n, i) { return h('span', { key: n, className: props.m.indexOf(i + 1) >= 0 ? 'on' : '' }, n.charAt(0)); }));
@@ -62,21 +90,32 @@
     var now = new Date().getMonth() + 1;
     var t = JNZX.useStored('jnzx-seasons-type', 'flowers'), type = t[0], setType = t[1];
     var mm = useState(now), month = mm[0], setMonth = mm[1];
-    var list = (type === 'flowers' ? FLOWERS : FRUIT).filter(function (x) { return !month || x[2].indexOf(month) >= 0; });
+    var rg = JNZX.useStored('jnzx-seasons-region', -1), ri = +rg[0], setRi = rg[1];
+    var tw = JNZX.useStored('jnzx-seasons-town', ''), town = tw[0], setTown = tw[1];
+    var list = (type === 'flowers' ? FLOWERS : FRUIT).filter(function (x) { return (!month || x[2].indexOf(month) >= 0) && inRegion(x, ri); });
+    list.sort(function (a, b) { return (inRegion(a, ri) === 'yes' ? 0 : 1) - (inRegion(b, ri) === 'yes' ? 0 : 1); });
+    var placeName = ri < 0 ? 'New Zealand' : (town || REGIONS[ri][0]);
     return h('div', null,
       JNZX.Header('KIWI ADVENTURES · SEASONS', 'Flowers to see and fruit to pick.', 'What’s blooming and what’s ripe across Aotearoa, month by month.'),
       h('div', { className: 'jx-cs-tabs', role: 'tablist', 'aria-label': 'Flowers or fruit' },
         [['flowers', '🌸 Flowers (' + FLOWERS.length + ')'], ['fruit', '🍓 Fruit picking (' + FRUIT.length + ')']].map(function (x) { return h('button', { key: x[0], type: 'button', role: 'tab', 'aria-selected': type === x[0], className: type === x[0] ? 'is-on' : '', onClick: function () { setType(x[0]); } }, x[1]); })),
+      h('div', { className: 'jx-row jx-form jx-season-where' },
+        h('label', null, '📍 Region', h('select', { value: ri, onChange: function (e) { setRi(+e.target.value); setTown(''); } },
+          h('option', { value: -1 }, 'All of New Zealand'), REGIONS.map(function (r, i) { return h('option', { key: r[0], value: i }, r[0]); }))),
+        h('label', null, '🏘️ City or town', h('select', { value: town, disabled: ri < 0, onChange: function (e) { setTown(e.target.value); } },
+          h('option', { value: '' }, ri < 0 ? 'Choose a region first' : 'Anywhere in ' + REGIONS[ri][0]), ri < 0 ? null : REGIONS[ri][1].map(function (t) { return h('option', { key: t, value: t }, t); })))),
       h(JNZX.Chips, { label: 'Month', options: [{ value: 0, label: 'All year' }].concat(MON.map(function (n, i) { return { value: i + 1, label: n + (i + 1 === now ? ' • now' : '') }; })), value: month, onChange: setMonth }),
-      h('p', { className: 'small-note' }, list.length + (type === 'flowers' ? ' flowers ' : ' fruits ') + (month ? 'in ' + MON[month - 1] : 'through the year') + '. Months are typical and shift with weather and region — check opening times before you go.'),
+      h('p', { className: 'small-note' }, list.length + (type === 'flowers' ? ' flowers ' : ' fruits ') + (ri >= 0 ? 'near ' + placeName + ' ' : '') + (month ? 'in ' + MON[month - 1] : 'through the year') + (ri >= 0 && town ? ' (we list places for the whole ' + REGIONS[ri][0] + ' region)' : '') + '. Months are typical and shift with weather and region — check opening times before you go.'),
+      list.length ? null : h('p', { className: 'jx-note' }, 'Nothing listed for ' + placeName + (month ? ' in ' + MON[month - 1] : '') + ' yet — try “All year” or a nearby region.'),
       h('div', { className: 'jx-season-grid' }, list.map(function (x) {
         var when = x[2].length === 12 ? 'All year' : MON[x[2][0] - 1] + '–' + MON[x[2][x[2].length - 1] - 1];
         return h('article', { key: x[1], className: 'jx-card jx-season' },
           h('div', { className: 'jx-season-top' }, h('span', { className: 'jx-season-emo', 'aria-hidden': true }, x[0]), h('div', null, h('h3', null, x[1]), h('small', null, '📅 ' + when))),
           h(Months, { m: x[2] }),
           h('p', null, h('strong', null, '📍 '), x[3]),
+          ri >= 0 && inRegion(x, ri) === 'wide' ? h('p', { className: 'jx-season-wide' }, '🇳🇿 Found in many places across NZ — look in your local parks, gardens and markets.') : null,
           h('p', { className: 'jx-muted' }, '💡 ' + x[4]),
-          h(JNZX.ShareMini, { title: x[1] + ' in NZ', text: x[0] + ' ' + x[1] + ' — ' + when + '. ' + x[3] + '.', label: 'Share' }));
+          h(JNZX.ShareMini, { title: x[1] + (ri >= 0 ? ' near ' + placeName : ' in NZ'), text: x[0] + ' ' + x[1] + ' — ' + when + '. ' + x[3] + '.\n💡 ' + x[4], label: 'Share' }));
       })),
       h('div', { className: 'jx-note' }, h('strong', null, 'Picking tips: '), 'Bring containers, water, hats and sunscreen. Some farms take cards only, some cash only. Pay for what you eat on the farm! Only pick where it’s allowed — never native plants or public gardens.'),
       h(JNZX.ShareBar, { tab: props.tab }));

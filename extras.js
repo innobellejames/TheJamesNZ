@@ -234,7 +234,7 @@
       JNZX.Header(hb.kicker, hb.title, hb.blurb),
       h('span', { className: 'mk-label' }, 'WHAT’S INSIDE'),
       h('div', { className: 'mk-grid' }, hb.kids.map(function (k) {
-        var drawn = JNZX.cover && JNZX.cover(k), info = TOPIC[k] || [null, ''], src = drawn || (info[0] ? jAsset(info[0]) : null), emo = (JNZX.coverEmoji && JNZX.coverEmoji(k)) || '✨';
+        var drawn = JNZX.cover && JNZX.cover(k), info = TOPIC[k] || [null, ''], src = (info[0] ? jAsset(info[0]) : null) || drawn, emo = (JNZX.coverEmoji && JNZX.coverEmoji(k)) || '✨';
         return h('button', { key: k, type: 'button', className: 'mk-card', onClick: function () { props.navigate(k); } },
           h('span', { className: 'mk-card-media' }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : null, h('span', { className: 'mk-card-shade' }), h('span', { className: 'mk-card-badge', 'aria-hidden': true }, emo)),
           h('span', { className: 'mk-card-body' }, h('strong', { className: 'mk-card-title' }, JNZX.label(k)), info[1] && h('span', { className: 'mk-card-desc' }, info[1]), h('span', { className: 'mk-card-go' }, 'Explore ', h('span', { 'aria-hidden': true }, '→'))));
@@ -426,7 +426,7 @@
     var pe = useState(false), picFail = pe[0], setPicFail = pe[1];
     useEffect(function () {
       var live = true;
-      Promise.resolve().then(function () { return JNZX.makePicture(o); }).then(function (f) { if (live) setPic({ file: f, url: URL.createObjectURL(f) }); }, function () {
+      Promise.resolve().then(function () { return o.picture ? o.picture() : JNZX.makePicture(o); }).then(function (f) { if (live) setPic({ file: f, url: URL.createObjectURL(f) }); }, function () {
         // background could not load: try the plain default picture
         return JNZX.makePicture(Object.assign({}, o, { bg: jAsset('./photo-share/inspiration.webp') })).then(function (f) { if (live) setPic({ file: f, url: URL.createObjectURL(f) }); }, function () { if (live) setPicFail(true); });
       });
@@ -460,7 +460,7 @@
       var body = props.text || props.title;
       var line = JNZX.catchyFor ? JNZX.catchyFor(ev && ev.currentTarget, props.title, body) : '';
       if (line && body.indexOf(line) < 0) body += '\n\n' + line;
-      return { title: props.title, text: body, url: props.url || JNZX.postLink(props.title, body), bg: props.bg };
+      return { title: props.title, text: body, url: props.url || JNZX.postLink(props.title, body), bg: props.bg, picture: props.picture };
     }
     function go(ev) { setSheet(build(ev)); }
     return h('span', { className: 'jx-sharemini' },
@@ -568,52 +568,52 @@
     'Focus time': ['./mindfulness-scenes/stream.webp', 'Calm focus timers with gentle moving scenes.'],
     'Workouts': ['./workout-photos/med-home.webp', 'Easy to intense workouts at home or outdoors.'],
     'Water tracker': ['./mindfulness-scenes/sky.webp', 'Fill a drop for each glass and keep a water journal.'],
-    'Weather & OOTD': ['./family-walk-consistent.webp', 'Today’s weather and what to wear.'],
-    'Today’s fruit & vege picks': ['./oct13/produce-sheet.png', 'What’s in season and good value this week.'],
+    'Weather & OOTD': ['./story-pages/story-08-end.webp', 'Today’s weather and what to wear.'],
+    'Today’s fruit & vege picks': ['./recipe-photos/vegetables.webp', 'What’s in season and good value this week.'],
     'NZ bucket lists': ['./family-seaside-consistent.webp', 'A family bucket list and poster for Aotearoa.'],
-    'NZ quiz': ['./family-play-consistent.webp', 'Test your Kiwi knowledge with a fun quiz.'],
-    'x:seasons': [null, 'When to see the flowers and pick your own fruit, month by month.'],
-    'x:citizenship': [null, 'A 20-question practice test: 45 minutes, pass with 15.'],
-    'x:hometips': [null, 'Family Life, Made Easier and Family Checklists.'],
-    'x:baby': [null, 'Milestones, pregnancy, feeding, potty training and parenting.'],
-    'x:potty': [null, 'Readiness check, a calm 3-day plan, tips and a sticker chart.'],
-    'x:love': [null, 'Together Time, Love Notes and Our Memory Jar.'],
-    'x:world-clock': [null, 'Spin the globe: the time anywhere, next to NZ time.'],
+    'NZ quiz': ['./story-pages/story-09-end.webp', 'Test your Kiwi knowledge with a fun quiz.'],
+    'x:seasons': ['./story-pages/story-16-begin.webp', 'When to see the flowers and pick your own fruit, month by month.'],
+    'x:citizenship': ['./story-pages/story-22-end.webp', 'A 20-question practice test: 45 minutes, pass with 15.'],
+    'x:hometips': ['./story-pages/story-32-end.webp', 'Family Life, Made Easier and Family Checklists.'],
+    'x:baby': ['./expansion/care-photos-1.webp', 'Milestones, pregnancy, feeding, potty training and parenting.'],
+    'x:potty': ['./story-pages/story-26-middle.webp', 'Readiness check, a calm 3-day plan, tips and a sticker chart.'],
+    'x:love': ['./story-pages/story-30-end.webp', 'Together Time, Love Notes and Our Memory Jar.'],
+    'x:world-clock': ['./expansion/culture-a-0.webp', 'Spin the globe: the time anywhere, next to NZ time.'],
     'NZ safety & know-how': ['./oct15/preparedness.png', 'Be prepared: first aid, sun, road and emergencies.'],
     'Reading nook': ['./story-pages/story-02-middle.webp', 'Original family stories as page-turning flip-books.'],
-    'Family tips': ['./family-home-clothes.png', 'Practical tips that make home life easier.'],
+    'Family tips': ['./story-pages/story-26-end.webp', 'Practical tips that make home life easier.'],
     'Homemade recipes': ['./recipe-photos/soup.webp', '325 easy recipes for every meal, diet and cuisine, with nutrition.'],
     'Grocery list': ['./photo-share/savings-groceries.webp', 'A colourful grocery list with a budget.'],
     'Budget tracker': ['./photo-share/savings-money.webp', 'Plan income, bills, spending and savings.'],
-    'x:diy': [null, '18 simple home projects with NZ safety notes.'],
+    'x:diy': ['./story-pages/story-10-middle.webp', '18 simple home projects with NZ safety notes.'],
     'x:holidays': ['./story-cartoons/story-05.webp', '36 indoor activities for rainy school holidays.'],
     'x:celebrations': ['./october/loaves-0.webp', 'Christmas, Easter, Matariki and important NZ days.'],
     'Languages': ['./oct7-country/about-humans.webp', 'Greetings and phrases from around the world.'],
     'Kids’ learning & activities': ['./story-cartoons/story-03.webp', 'Age-based activities and 53 focus games.'],
-    'x:science': [null, 'An interactive periodic table and science basics.'],
-    'x:math': [null, 'Scientific and graphing calculators, simulations and trigonometry.'],
-    'x:english': [null, 'A 128,000-word dictionary and Kiwi expressions.'],
-    'x:exam': [null, 'Writing and speaking practice for IELTS, Cambridge B2 First, C1 Advanced, C2 Proficiency and NZCEL, with instant feedback.'],
-    'x:leadership': [null, 'A free course with a 30-question assessment and certificate.'],
-    'Speaking practice': ['./mateo-smile-clean.webp', 'Tips, practice tools and quizzes for speaking with confidence.'],
-    'x:speaking-time': [null, 'How long will your speech take? Find out and practise.'],
-    'x:nzsl': [null, 'Start learning New Zealand Sign Language.'],
+    'x:science': ['./story-pages/story-19-middle.webp', 'An interactive periodic table and science basics.'],
+    'x:math': ['./story-pages/story-28-begin.webp', 'Scientific and graphing calculators, simulations and trigonometry.'],
+    'x:english': ['./story-pages/story-05-middle.webp', 'A 128,000-word dictionary and Kiwi expressions.'],
+    'x:exam': ['./expansion/life-photos-2.webp', 'Writing and speaking practice for IELTS, Cambridge B2 First, C1 Advanced, C2 Proficiency and NZCEL, with instant feedback.'],
+    'x:leadership': ['./story-pages/story-29-middle.webp', 'A free course with a 30-question assessment and certificate.'],
+    'Speaking practice': ['./story-pages/story-14-end.webp', 'Tips, practice tools and quizzes for speaking with confidence.'],
+    'x:speaking-time': ['./story-pages/story-17-middle.webp', 'How long will your speech take? Find out and practise.'],
+    'x:nzsl': ['./story-pages/story-24-begin.webp', 'Start learning New Zealand Sign Language.'],
     'Today’s prayer': ['./photo-share/prayer.webp', 'Prayers for daily life, worries and the people you love.'],
     'Communal prayers': ['./faith/guardian-angels.webp', 'Everyday prayers to pray together.'],
     'How to pray the rosary': ['./rosary-natural.webp', 'Pray the rosary at your own pace.'],
     'Bible & Gospel': ['./october/creation-0.webp', 'Read Scripture and today’s Gospel.'],
     'Saints day': ['./faith/therese.webp', 'A saint for every day of the year.'],
-    'Catholic songs & guitar': [null, 'Original devotional songs with guitar chords.'],
+    'Catholic songs & guitar': ['./expansion/church-book-2.webp', 'Original devotional songs with guitar chords.'],
     'Lives that inspire': ['./faith/francis.webp', 'True stories of faith and courage.'],
     'Catholic churches': ['./faith/auckland.webp', 'Find a Catholic church near you in New Zealand.'],
     'Bible stories for kids': ['./october/noah-1.webp', '50 Bible story flip-books for little hearts.'],
     'x:saints': ['./faith/saint-denis.webp', '117 saints and martyrs with their stories.'],
     'x:faith-formation': ['./october/children-0.webp', 'Faith formation topics, worksheets and lessons.'],
     'x:bible-dictionary': ['./october/samaritan-0.webp', '4,860 people, places and words of the Bible.'],
-    'x:design': [null, 'Design invitations and posters, then share them.'],
-    'x:shortcuts': [null, '184 Office and Windows keyboard shortcuts.'],
+    'x:design': ['./story-pages/story-28-middle.webp', 'Design invitations and posters, then share them.'],
+    'x:shortcuts': ['./story-pages/story-35-begin.webp', '184 Office and Windows keyboard shortcuts.'],
     'Saving tips': ['./photo-share/savings-home.webp', 'Small ways to save money at home.'],
-    'Family checklists': ['./family-smart-casual.png', 'Ready-made checklists for family life.'],
+    'Family checklists': ['./story-pages/story-18-middle.webp', 'Ready-made checklists for family life.'],
     'Pregnancy & baby age': ['./expansion/care-photos-0.webp', 'Track pregnancy weeks and baby’s age.'],
     'Pregnancy quotes & tips': ['./expansion/care-photos-1.webp', 'Gentle words and tips for pregnancy.'],
     'Parenting quotes & tips': ['./expansion/care-photos-2.webp', 'Encouragement and tips for parents.'],
@@ -623,12 +623,12 @@
     'Parent–child & child–parent': ['./expansion/life-photos-2.webp', 'Memories and words between parents and children.'],
     'About us': ['./oct13/about-storybook-texture.png', 'Meet the family behind The James NZ.'],
     'Small business': ['./oct9/about-family-cover.png', 'Discover local makers and small businesses.'],
-    'How to use this website': ['./mateo-poses.webp', 'A quick guide to finding your way around.'],
-    'FAQ': [null, 'Answers to common questions.'],
+    'How to use this website': ['./story-pages/story-05-begin.webp', 'A quick guide to finding your way around.'],
+    'FAQ': ['./story-pages/story-25-begin.webp', 'Answers to common questions.'],
     'Home & garden': ['./mindfulness-scenes/garden.webp', 'Seasonal tips for home and garden.'],
-    'x:sustainable': [null, 'Recycling rules, eco tips and a family challenge.'],
-    'x:public-holidays': [null, 'NZ public holidays for any year.'],
-    'x:jobs': [null, 'Trusted NZ job sites and career help.']
+    'x:sustainable': ['./story-pages/story-13-middle.webp', 'Recycling rules, eco tips and a family challenge.'],
+    'x:public-holidays': ['./story-pages/story-12-middle.webp', 'NZ public holidays for any year.'],
+    'x:jobs': ['./story-pages/story-29-begin.webp', 'Trusted NZ job sites and career help.']
   };
   var TILE = ['#e8f3ee', '#fdeee4', '#e8f0fb', '#f3ecfb', '#fff6d9', '#fde9ee', '#e6f6f6'];
   function GroupLanding(props) {
@@ -647,7 +647,7 @@
     function card(it, k) {
       var info = TOPIC[it.name] || [null, ''], Ico = it.icon || Icons.grid, img = info[0];
       var drawn = JNZX.cover && JNZX.cover(it.name), witty = JNZX.coverLine ? JNZX.coverLine(it.name) : '';
-      var src = drawn || (img ? jAsset(img) : null);
+      var src = (img ? jAsset(img) : null) || drawn;
       return h('button', { key: it.name, type: 'button', className: 'jx-shop-card', onClick: function () { props.navigate(it.name); } },
         h('span', { className: 'jx-shop-img' + (drawn ? ' is-drawn' : ''), style: src ? null : { background: TILE[k % TILE.length] } }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : h(Ico, { size: 44 })),
         h('span', { className: 'jx-shop-body' }, h('strong', null, it.displayName || it.name), info[1] && h('span', { className: 'jx-shop-desc' }, info[1]), witty && h('em', { className: 'jx-shop-witty' }, '“' + witty + '”'), h('span', { className: 'jx-shop-go' }, 'Open →')));
@@ -659,7 +659,7 @@
     function mcard(it, kk) {
       var info = TOPIC[it.name] || [null, ''], Ico = it.icon || Icons.grid, img = info[0];
       var drawn = JNZX.cover && JNZX.cover(it.name), emo = (JNZX.coverEmoji && JNZX.coverEmoji(it.name)) || GEMO[title] || '✨';
-      var src = drawn || (img ? jAsset(img) : null);
+      var src = (img ? jAsset(img) : null) || drawn;
       return h('button', { key: it.name, type: 'button', className: 'mk-card', onClick: function () { props.navigate(it.name); } },
         h('span', { className: 'mk-card-media', style: src ? null : { background: TILE[kk % TILE.length] } }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : h(Ico, { size: 44 }), h('span', { className: 'mk-card-shade' }), h('span', { className: 'mk-card-badge', 'aria-hidden': true }, emo)),
         h('span', { className: 'mk-card-body' }, h('strong', { className: 'mk-card-title' }, it.displayName || it.name), info[1] && h('span', { className: 'mk-card-desc' }, info[1]), h('span', { className: 'mk-card-go' }, 'Explore ', h('span', { 'aria-hidden': true }, '→'))));
@@ -735,7 +735,7 @@
   }
   function scan() {
     timer = null;
-    if (!isDark()) { document.querySelectorAll('[data-jx-dk]').forEach(function (el) { el.style.removeProperty('background-color'); el.style.removeProperty('background-image'); el.removeAttribute('data-jx-dk'); }); return; }
+    if (!isDark()) { document.querySelectorAll('[data-jx-dk]').forEach(function (el) { el.style.removeProperty('background-color'); el.style.removeProperty('background-image'); el.style.removeProperty('color'); el.removeAttribute('data-jx-dk'); }); return; }
     var els = document.querySelectorAll('#root *:not(svg *):not(canvas):not(img):not(.jx-keep-colour):not(.jx-keep-colour *)');
     for (var i = 0; i < els.length; i++) {
       var el = els[i]; if (el.hasAttribute('data-jx-dk')) continue;
@@ -743,13 +743,22 @@
       var gi = bi && bi !== 'none' && bi.indexOf('url(') < 0 ? conv(bi) : null;
       if (bg) el.style.setProperty('background-color', bg, 'important');
       if (gi) el.style.setProperty('background-image', gi, 'important');
-      if (bg || gi) el.setAttribute('data-jx-dk', '');
+      if (bg || gi) { el.setAttribute('data-jx-dk', ''); continue; }
+      // light boxes with light text (e.g. song verses): make the box dark
+      var B = rgb(cs.backgroundColor), C = rgb(cs.color);
+      if (B && B[3] >= 0.5 && C && lum(B) > 0.72 && lum(C) > 0.55 && (!bi || bi === 'none')) { var mx = Math.max(B[0], B[1], B[2]), mn = Math.min(B[0], B[1], B[2]); if (mx - mn > 30) { el.style.setProperty('color', '#17201d', 'important'); el.querySelectorAll('*').forEach(function (k) { if (!k.hasAttribute('data-jx-dk')) { k.style.setProperty('color', '#17201d', 'important'); k.setAttribute('data-jx-dk', ''); } }); } else el.style.setProperty('background-color', '#1c201f', 'important'); el.setAttribute('data-jx-dk', ''); continue; }
+      // dark text left on a dark page: make the text light
+      if (C && lum(C) < 0.18 && hasText(el)) { var E = effBg(el); if (E !== null && E < 0.2) { el.style.setProperty('color', '#eef2f1', 'important'); el.setAttribute('data-jx-dk', ''); } }
     }
   }
+  function rgb(str) { var m = /rgba?\(([^)]+)\)/.exec(str || ''); if (!m) return null; var p = m[1].split(',').map(parseFloat); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; }
+  function lum(c) { var f = function (v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }; return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]); }
+  function hasText(el) { for (var n = el.firstChild; n; n = n.nextSibling) if (n.nodeType === 3 && n.nodeValue.trim()) return true; return false; }
+  function effBg(el) { for (var a = el; a && a !== document.documentElement; a = a.parentElement) { var st = getComputedStyle(a); if (st.backgroundImage && st.backgroundImage !== 'none') return null; var c = rgb(st.backgroundColor); if (c && c[3] > 0.5) return lum(c); } return 0; }
   function soon() { if (!timer) timer = setTimeout(scan, 250); }
   function start() {
     new MutationObserver(soon).observe(document.getElementById('root') || document.body, { childList: true, subtree: true });
-    new MutationObserver(function () { document.querySelectorAll('[data-jx-dk]').forEach(function (el) { el.style.removeProperty('background-color'); el.style.removeProperty('background-image'); el.removeAttribute('data-jx-dk'); }); soon(); }).observe(root, { attributes: true, attributeFilter: ['data-reading-theme'] });
+    new MutationObserver(function () { document.querySelectorAll('[data-jx-dk]').forEach(function (el) { el.style.removeProperty('background-color'); el.style.removeProperty('background-image'); el.style.removeProperty('color'); el.removeAttribute('data-jx-dk'); }); soon(); }).observe(root, { attributes: true, attributeFilter: ['data-reading-theme'] });
     soon();
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();

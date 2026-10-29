@@ -1018,3 +1018,22 @@ html[data-reading-theme="dark"] .mk-hero,html[data-reading-theme="dark"] main .j
 .jx-ssheet-tip{margin:10px 0 0;font-size:.8rem;line-height:1.45;color:#657184}
 html[data-reading-theme="dark"] .jx-ssheet-wait{background:#1b2524}
 html[data-reading-theme="dark"] .jx-ssheet-tip{color:#b8c4c1}
+/* From Our Kitchen: dropdown filters */
+.recipe-filters{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px;margin:18px 0 12px}
+.recipe-filters label,.recipe-pick label{display:grid;gap:6px;font-weight:700;font-size:.9rem;min-width:0}
+.recipe-filters select,.recipe-filters input,.recipe-pick select{width:100%;box-sizing:border-box;font:inherit;font-size:16px;font-weight:500;padding:10px 12px;border-radius:12px;min-height:46px}
+.recipe-pick{margin:0 0 16px;max-width:640px}
+.recipe-more{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:18px 0}
+.jx-season-where{display:flex;flex-wrap:wrap;gap:12px;margin:10px 0}
+.jx-season-where label{flex:1 1 220px;display:grid;gap:6px;font-weight:700;min-width:0}
+.jx-season-where select{width:100%;box-sizing:border-box}
+.jx-season-wide{font-size:.85rem;color:#4f6b62;margin:0}
+html[data-reading-theme="dark"] .jx-season-wide{color:#b8d3ca}
+section.jx-globe.jx-wc2{background:none!important;border:0!important;padding:0!important;box-shadow:none!important}
+/* dark reading theme: keep text readable on coloured tiles and tabs */
+html[data-reading-theme="dark"] .jx-el,html[data-reading-theme="dark"] .jx-el *{color:#13202b!important}
+html[data-reading-theme="dark"] .jx-lib-nav button.is-on{background:#2f5d8a!important;color:#fff!important;border-color:#2f5d8a!important}
+html[data-reading-theme="dark"] .hymn-verse{background:#1c201f!important;color:#eef2f1!important}
+html[data-reading-theme="dark"] .hymn-verse *{color:#eef2f1!important}
+html[data-reading-theme="dark"] main .jx-ptable .jx-el :is(strong,small,span,p,em,b){color:#13202b!important}
+html[data-reading-theme="dark"] .mk-label,html[data-reading-theme="dark"] .jx-wc2-diff span{background:#123a37!important;color:#9fe7dc!important}

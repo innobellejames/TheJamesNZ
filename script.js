@@ -33734,7 +33734,7 @@ var expandedSavingTips = [
 //#endregion
 //#region app/home-life.tsx
 function Recipes() {
-	const [filter, setFilter] = (0, import_react.useState)("All recipes"), [diet, setDiet] = (0, import_react.useState)("All dietary needs"), [cuisine, setCuisine] = (0, import_react.useState)("All cuisines"), [search, setSearch] = (0, import_react.useState)(""), [selected, setSelected] = (0, import_react.useState)(null);
+	const [filter, setFilter] = (0, import_react.useState)("All recipes"), [diet, setDiet] = (0, import_react.useState)("All dietary needs"), [cuisine, setCuisine] = (0, import_react.useState)("All cuisines"), [search, setSearch] = (0, import_react.useState)(""), [selected, setSelected] = (0, import_react.useState)(null), [shown, setShown] = (0, import_react.useState)(12);
 	const r = recipes.find((r) => r.id === selected);
 	if (r) return /* @__PURE__ */ (0, import_jsx_runtime.jsxs)(import_jsx_runtime.Fragment, { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
 		className: "secondary",
@@ -33816,60 +33816,13 @@ function Recipes() {
 				alt: "Paper-cut illustration of lentil soup, bread, and vegetables on a kitchen table"
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", { children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)("h2", { children: "A little homemade comfort." }), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Start with what is in your kitchen. Choose a simple recipe and make it your own." })] })]
 		}),
-		/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "filters",
-			children: [
-				"All recipes",
-				"Breakfast",
-				"Lunch",
-				"Dinner",
-				"Snack",
-				"Dessert",
-				"Side"
-			].map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-				className: filter === c ? "selected" : "",
-				"aria-pressed": filter === c,
-				onClick: () => setFilter(c),
-				children: c
-			}, c))
-		}),
-		/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "filters",
-			children: [
-				"All dietary needs",
-				"Kids-friendly",
-				"Diabetes-conscious",
-				"Gluten-free ingredients",
-				"Dairy-free ingredients", "High-protein", "Vegetarian", "Low carbs", "No added carbs", "Pregnancy meals", "Breastfeeding meals", "First baby foods", "Creative food"
-			].map((t) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-				className: diet === t ? "selected" : "",
-				"aria-pressed": diet === t,
-				onClick: () => setDiet(t),
-				children: t
-			}, t))
-		}),
-		/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
-			className: "filters",
-			"aria-label": "Recipe cuisine",
-			children: [
-				"All cuisines",
-				"Filipino",
-				"Indian",
-				"Kiwi / New Zealand",
-				"Everyday"
-			].map((c) => /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
-				className: cuisine === c ? "selected" : "",
-				"aria-pressed": cuisine === c,
-				onClick: () => setCuisine(c),
-				children: c
-			}, c))
-		}),
-		/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("label", { children: ["Search recipes", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("input", {
-			type: "search",
-			value: search,
-			onChange: (e) => setSearch(e.target.value),
-			placeholder: "Recipe or ingredient…"
-		})] }),
+		jH('div', { className: 'recipe-filters' },
+			jH('label', null, 'Meal', jH('select', { value: filter, onChange: (e) => { setFilter(e.target.value); setShown(12); } }, ["All recipes", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Side"].map((c) => jH('option', { key: c, value: c }, c)))),
+			jH('label', null, 'Dietary need', jH('select', { value: diet, onChange: (e) => { setDiet(e.target.value); setShown(12); } }, ["All dietary needs", "Kids-friendly", "Diabetes-conscious", "Gluten-free ingredients", "Dairy-free ingredients", "High-protein", "Vegetarian", "Low carbs", "No added carbs", "Pregnancy meals", "Breastfeeding meals", "First baby foods", "Creative food"].map((c) => jH('option', { key: c, value: c }, c)))),
+			jH('label', null, 'Cuisine', jH('select', { value: cuisine, onChange: (e) => { setCuisine(e.target.value); setShown(12); } }, ["All cuisines", "Filipino", "Indian", "Kiwi / New Zealand", "Everyday"].map((c) => jH('option', { key: c, value: c }, c)))),
+			jH('label', null, 'Search', jH('input', { type: 'search', value: search, onChange: (e) => { setSearch(e.target.value); setShown(12); }, placeholder: 'Recipe or ingredient…' }))),
+		(() => { const list = recipes.filter((r) => (filter === "All recipes" || r.category === filter) && (diet === "All dietary needs" || r.tags.includes(diet)) && (cuisine === "All cuisines" || recipeCuisine(r) === cuisine) && (r.name + " " + r.ingredients.join(" ")).toLowerCase().includes(search.toLowerCase()));
+			return jH('div', { className: 'recipe-pick' }, jH('label', null, 'Choose a recipe (' + list.length + ')', jH('select', { value: '', onChange: (e) => { if (e.target.value) { setSelected(e.target.value); try { window.scrollTo({ top: 0 }); } catch (x) {} } } }, jH('option', { value: '' }, list.length ? '— ' + list.length + ' matching recipes —' : 'No recipes match — try another choice'), list.map((r) => jH('option', { key: r.id, value: r.id }, r.name + ' · ' + r.minutes + ' min'))))); })(),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("p", {
 			className: "small-note",
 			children: ["No added carbs means no added starchy ingredients, not a guarantee of zero carbohydrate. These are meal ideas, not prescribed restrictive diets for pregnancy, breastfeeding or babies. Dietary tags describe ingredients, not a guarantee of suitability. Check every packaged ingredient for allergens and cross-contact. Diabetes-conscious options use vegetables and protein with no added sugar; match carbohydrate portions to your own diabetes plan. ", /* @__PURE__ */ (0, import_jsx_runtime.jsx)("a", {
@@ -33881,7 +33834,7 @@ function Recipes() {
 		}),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)("div", {
 			className: "recipe-grid",
-			children: recipes.filter((r) => (filter === "All recipes" || r.category === filter) && (diet === "All dietary needs" || r.tags.includes(diet)) && (cuisine === "All cuisines" || recipeCuisine(r) === cuisine) && (r.name + " " + r.ingredients.join(" ")).toLowerCase().includes(search.toLowerCase())).map((r) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("article", { children: [
+			children: recipes.filter((r) => (filter === "All recipes" || r.category === filter) && (diet === "All dietary needs" || r.tags.includes(diet)) && (cuisine === "All cuisines" || recipeCuisine(r) === cuisine) && (r.name + " " + r.ingredients.join(" ")).toLowerCase().includes(search.toLowerCase())).slice(0, shown).map((r) => /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("article", { children: [
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
 					className: "recipe-photo-heading",
 					style: { backgroundImage: `linear-gradient(#08131877,#081318d1),url("${recipePhoto(r)}")` },
@@ -33918,6 +33871,8 @@ function Recipes() {
 				})
 			] }, r.id))
 		}),
+		(() => { const n = recipes.filter((r) => (filter === "All recipes" || r.category === filter) && (diet === "All dietary needs" || r.tags.includes(diet)) && (cuisine === "All cuisines" || recipeCuisine(r) === cuisine) && (r.name + " " + r.ingredients.join(" ")).toLowerCase().includes(search.toLowerCase())).length;
+			return n > shown ? jH('div', { className: 'recipe-more' }, jH('button', { type: 'button', className: 'secondary', onClick: () => setShown(shown + 12) }, 'Show 12 more recipes'), jH('span', { className: 'small-note' }, 'Showing ' + shown + ' of ' + n)) : n ? jH('p', { className: 'small-note recipe-more' }, 'Showing all ' + n + ' recipes') : null; })(),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsx)(FoodSafety, {})
 	] });
 }
