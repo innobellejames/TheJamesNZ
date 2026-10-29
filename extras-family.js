@@ -342,11 +342,13 @@
     var items = dates(year).concat(dates(year + 1)).filter(function (x) { return x[1] >= new Date(now.getFullYear(), now.getMonth(), now.getDate()); }).slice(0, 8);
     function feast(id) {
       var f = FEASTS[id];
+      var art = JNZX.art && JNZX.art(id);
       return h('div', { className: 'jx-feast' },
+        art && h('img', { className: 'jx-feast-cover', src: art, alt: '' }),
         h('p', { className: 'eyebrow' }, f.kicker), h('h2', null, f.title), h('p', null, f.intro),
         h('h3', null, 'What it means'), list(f.meaning),
         h('h3', null, 'Family activities'),
-        h('div', { className: 'jx-cards3' }, f.acts.map(function (a) { return h('article', { key: a[0], className: 'jx-card' }, h('h4', null, a[0]), h('p', { className: 'jx-muted' }, 'Ages: ' + a[1]), h('p', null, a[2]), h(JNZX.ShareMini, { title: a[0] + ' · ' + f.title, text: f.title + ' family activity — ' + a[0] + ' (ages ' + a[1] + '): ' + a[2], label: 'Share' })); })));
+        h('div', { className: 'jx-cards3' }, f.acts.map(function (a) { return h('article', { key: a[0], className: 'jx-card' }, h('h4', null, a[0]), h('p', { className: 'jx-muted' }, 'Ages: ' + a[1]), h('p', null, a[2]), h(JNZX.ShareMini, { bg: art, title: a[0] + ' · ' + f.title, text: f.title + ' family activity — ' + a[0] + ' (ages ' + a[1] + '): ' + a[2], label: 'Share' })); })));
     }
     return h('div', null,
       JNZX.Header('FAMILY TOGETHER · CELEBRATE TOGETHER', 'Christmas, Easter, Matariki & NZ days.', 'The meaning behind each season, important New Zealand days, the dates for the year ahead and simple activities to share at home.'),
@@ -360,9 +362,10 @@
         { id: 'easter', label: '🥚 Easter', render: function () { return feast('easter'); } },
         { id: 'matariki', label: '✨ Matariki', render: function () { return feast('matariki'); } },
         { id: 'nzdays', label: '🇳🇿 NZ days', render: function () { return h('div', { className: 'jx-feast' },
+          JNZX.art && h('img', { className: 'jx-feast-cover', src: JNZX.art('nzdays'), alt: '' }),
           h('p', { className: 'eyebrow' }, 'IMPORTANT DAYS IN AOTEAROA'), h('h2', null, 'New Zealand days to mark together'),
           h('p', null, 'National days, remembrance and the cultures that make up Aotearoa — with a simple family idea for each.'),
-          h('div', { className: 'jx-cards3' }, NZEVENTS.map(function (ev) { var d = ev[1] && ev[1](year); return h('article', { key: ev[0], className: 'jx-card' }, h('h4', null, ev[0]), h('p', { className: 'jx-muted' }, d ? fmt(d) : ev[2]), h('p', null, ev[3]), h('p', null, h('strong', null, 'Family idea: '), ev[4]), h(JNZX.ShareMini, { title: ev[0], text: ev[0] + ' — ' + ev[4] })); })),
+          h('div', { className: 'jx-cards3' }, NZEVENTS.map(function (ev) { var d = ev[1] && ev[1](year); return h('article', { key: ev[0], className: 'jx-card' }, h('h4', null, ev[0]), h('p', { className: 'jx-muted' }, d ? fmt(d) : ev[2]), h('p', null, ev[3]), h('p', null, h('strong', null, 'Family idea: '), ev[4]), h(JNZX.ShareMini, { bg: JNZX.art && JNZX.art(/Matariki/.test(ev[0]) ? 'matariki' : /Christmas/.test(ev[0]) ? 'christmas' : /Easter|Good Friday/.test(ev[0]) ? 'easter' : 'nzdays'), title: ev[0], text: ev[0] + ' — ' + ev[4] })); })),
           h('p', { className: 'small-note' }, 'Events shown by month vary each year — check the organisers’ websites for exact dates. Lunar New Year dates are listed for 2026–2030.')); } }
       ] }),
       h(JNZX.ShareBar, { tab: props.tab, printable: true }));

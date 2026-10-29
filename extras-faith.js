@@ -457,6 +457,7 @@
       h('table', { className: 'jx-ws-grid' }, h('tbody', null, ws.grid.map(function (row, i) { return h('tr', { key: i }, row.map(function (ch, j) { return h('td', { key: j }, ch); })); }))),
       h('p', { className: 'jx-ws-words' }, ws.words.join(' · ')));
   }
+  function libCover(id) { return JNZX.art ? JNZX.art(id) : null; }
   function LibraryPage(props) {
     var o = useState(LIB[0].id), cur = o[0], setCur = o[1];
     var item = LIB.find(function (x) { return x.id === cur; }) || LIB[0];
@@ -467,8 +468,8 @@
         { id: 'topics', label: '📚 Topics', render: function () {
           return h('div', { className: 'jx-lib' },
             h('nav', { className: 'jx-lib-nav jx-noprint', 'aria-label': 'Topics' }, LIB.map(function (x) { return h('button', { key: x.id, type: 'button', className: x.id === cur ? 'is-on' : '', onClick: function () { setCur(x.id); setWs(false); } }, x.title); })),
-            h('article', { className: 'jx-lib-main' }, h('h2', null, item.title), item.body(),
-              h('div', { className: 'jx-row jx-noprint' }, h('button', { type: 'button', className: 'secondary', onClick: function () { setWs(!ws); } }, ws ? 'Hide worksheet' : '🧩 Make a word-search worksheet'), h('button', { type: 'button', className: 'secondary', onClick: function () { window.print(); } }, 'Print this topic')),
+            h('article', { className: 'jx-lib-main' }, libCover(item.id) && h('img', { className: 'jx-lib-cover', src: libCover(item.id), alt: '' }), h('h2', null, item.title), item.body(),
+              h('div', { className: 'jx-row jx-noprint' }, h('button', { type: 'button', className: 'secondary', onClick: function () { setWs(!ws); } }, ws ? 'Hide worksheet' : '🧩 Make a word-search worksheet'), h('button', { type: 'button', className: 'secondary', onClick: function () { window.print(); } }, 'Print this topic'), h(JNZX.ShareMini, { label: 'Share this topic', title: item.title, text: item.title + ' — a family faith guide from The James NZ', bg: libCover(item.id) })),
               ws && h(WordSearch, { title: item.title, words: item.words })));
         } },
         { id: 'lessons', label: '🧑‍🏫 Family lesson plans', render: function () {
