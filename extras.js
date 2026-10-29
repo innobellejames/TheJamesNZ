@@ -236,7 +236,7 @@
       h('div', { className: 'mk-grid' }, hb.kids.map(function (k) {
         var drawn = JNZX.cover && JNZX.cover(k), info = TOPIC[k] || [null, ''], src = (info[0] ? jAsset(info[0]) : null) || drawn, emo = (JNZX.coverEmoji && JNZX.coverEmoji(k)) || '✨';
         return h('button', { key: k, type: 'button', className: 'mk-card', onClick: function () { props.navigate(k); } },
-          h('span', { className: 'mk-card-media' }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : null, h('span', { className: 'mk-card-shade' }), h('span', { className: 'mk-card-badge', 'aria-hidden': true }, emo)),
+          h('span', { className: 'mk-card-media' }, src ? h('img', { src: src, alt: '', loading: 'lazy', onLoad: JNZX.focusImg }) : null, h('span', { className: 'mk-card-shade' }), h('span', { className: 'mk-card-badge', 'aria-hidden': true }, emo)),
           h('span', { className: 'mk-card-body' }, h('strong', { className: 'mk-card-title' }, JNZX.label(k)), info[1] && h('span', { className: 'mk-card-desc' }, info[1]), h('span', { className: 'mk-card-go' }, 'Explore ', h('span', { 'aria-hidden': true }, '→'))));
       })),
       h(ShareBar, { tab: props.tab }));
@@ -391,6 +391,7 @@
     }
     return 'menu';
   };
+  JNZX.focusImg = function (e) { var i = e.currentTarget || e.target; if (i && i.naturalHeight > i.naturalWidth * 0.95) i.style.setProperty('object-position', '50% 6%', 'important'); };
   JNZX.bgFor = function (tab) {
     tab = tab || JNZX._tab || '';
     try {
@@ -400,6 +401,50 @@
       if (g && g.image) return jAsset(g.image);
     } catch (e) {}
     return jAsset('./photo-share/inspiration.webp');
+  };
+  /* Weather › share today's outfit: the family's current outfit frame on a card */
+  JNZX.outfitPicture = function (o) {
+    return new Promise(function (ok, bad) {
+      var el = document.querySelector('.family-outfit-animation');
+      if (!el) return bad(Error('no outfit'));
+      var cs = getComputedStyle(el), m = /url\("?([^")]+)"?\)/.exec(cs.backgroundImage);
+      if (!m) return bad(Error('no image'));
+      var img = new Image(); img.onerror = function () { bad(Error('image')); };
+      img.onload = function () {
+        var r = el.getBoundingClientRect(), ew = r.width || 300, eh = r.height || 300;
+        var sz = cs.backgroundSize.split(' '), bw, bh;
+        function len(v, box, nat) { return /%$/.test(v) ? parseFloat(v) / 100 * box : /px$/.test(v) ? parseFloat(v) : nat; }
+        if (sz[0] === 'cover' || sz[0] === 'contain') { var k = (sz[0] === 'cover' ? Math.max : Math.min)(ew / img.naturalWidth, eh / img.naturalHeight); bw = img.naturalWidth * k; bh = img.naturalHeight * k; }
+        else { bw = len(sz[0], ew, img.naturalWidth); bh = sz[1] && sz[1] !== 'auto' ? len(sz[1], eh, img.naturalHeight) : bw * img.naturalHeight / img.naturalWidth; }
+        var ps = cs.backgroundPosition.split(' ');
+        function pos(v, box, b) { return /%$/.test(v) ? (box - b) * parseFloat(v) / 100 : parseFloat(v) || 0; }
+        var px = pos(ps[0], ew, bw), py = pos(ps[1] || '50%', eh, bh), kx = img.naturalWidth / bw, ky = img.naturalHeight / bh;
+        var sx = -px * kx, sy = -py * ky, sw = ew * kx, sh = eh * ky;
+        var W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; var g = c.getContext('2d');
+        g.fillStyle = '#fbf6ec'; g.fillRect(0, 0, W, H);
+        g.fillStyle = '#14243a'; g.fillRect(0, 0, W, 150);
+        g.fillStyle = '#d5b16d'; g.font = '600 26px Georgia, serif'; g.textAlign = 'center'; g.fillText('W H A T   T O   W E A R   T O D A Y', W / 2, 62);
+        g.fillStyle = '#fff'; g.font = '700 46px "Playfair Display", Georgia, serif'; g.fillText((o.place || 'New Zealand') + ' · ' + (o.style || ''), W / 2, 122);
+        var fw = 860, fh = Math.min(620, fw * sh / sw), fx = (W - fw) / 2, fy = 180;
+        g.save(); g.beginPath(); if (g.roundRect) g.roundRect(fx, fy, fw, fh, 28); else g.rect(fx, fy, fw, fh); g.clip();
+        g.fillStyle = '#ffffff'; g.fillRect(fx, fy, fw, fh);
+        var k2 = Math.min(fw / sw, fh / sh), dw = sw * k2, dh = sh * k2; g.drawImage(img, sx, sy, sw, sh, fx + (fw - dw) / 2, fy + (fh - dh) / 2, dw, dh); g.restore();
+        var y = fy + fh + 60; g.textAlign = 'center';
+        g.fillStyle = '#168c89'; g.font = '700 30px Arial, sans-serif'; g.fillText(o.look || '', W / 2, y);
+        if (o.weather) { y += 46; g.fillStyle = '#2c3e50'; g.font = '28px Arial, sans-serif'; g.fillText(o.weather, W / 2, y); }
+        y += 40; g.textAlign = 'left'; g.font = '27px Arial, sans-serif'; g.fillStyle = '#2c3e50';
+        (o.tips || []).slice(0, 5).forEach(function (t) {
+          var words = ('• ' + t).split(' '), line = '';
+          words.forEach(function (w) { var tt = line ? line + ' ' + w : w; if (g.measureText(tt).width > W - 200 && line) { if (y < H - 150) { y += 38; g.fillText(line, 100, y); } line = '   ' + w; } else line = tt; });
+          if (line && y < H - 150) { y += 38; g.fillText(line, 100, y); }
+          y += 6;
+        });
+        g.textAlign = 'center'; g.fillStyle = '#14243a'; g.font = '700 30px Georgia, serif'; g.fillText('T H E   J A M E S   N Z', W / 2, H - 70);
+        g.fillStyle = '#657184'; g.font = '24px Arial, sans-serif'; g.fillText('www.thejamesnz.com', W / 2, H - 32);
+        c.toBlob(function (b) { b ? ok(new File([b], 'TheJamesNZ-what-to-wear.png', { type: 'image/png' })) : bad(Error('blob')); }, 'image/png');
+      };
+      img.src = m[1];
+    });
   };
   JNZX.makePicture = function (o) {
     return createPhotoPost({ title: o.title, text: o.text, credit: o.credit || 'Shared with love from The James NZ', background: o.bg || JNZX.bgFor(), filename: 'TheJamesNZ-' + String(o.title || 'post').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) });
@@ -649,7 +694,7 @@
       var drawn = JNZX.cover && JNZX.cover(it.name), witty = JNZX.coverLine ? JNZX.coverLine(it.name) : '';
       var src = (img ? jAsset(img) : null) || drawn;
       return h('button', { key: it.name, type: 'button', className: 'jx-shop-card', onClick: function () { props.navigate(it.name); } },
-        h('span', { className: 'jx-shop-img' + (drawn ? ' is-drawn' : ''), style: src ? null : { background: TILE[k % TILE.length] } }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : h(Ico, { size: 44 })),
+        h('span', { className: 'jx-shop-img' + (drawn ? ' is-drawn' : ''), style: src ? null : { background: TILE[k % TILE.length] } }, src ? h('img', { src: src, alt: '', loading: 'lazy', onLoad: JNZX.focusImg }) : h(Ico, { size: 44 })),
         h('span', { className: 'jx-shop-body' }, h('strong', null, it.displayName || it.name), info[1] && h('span', { className: 'jx-shop-desc' }, info[1]), witty && h('em', { className: 'jx-shop-witty' }, '“' + witty + '”'), h('span', { className: 'jx-shop-go' }, 'Open →')));
     }
     var found = qq.trim() ? items.filter(function (it) { return ((it.displayName || it.name) + ' ' + ((TOPIC[it.name] || [])[1] || '')).toLowerCase().indexOf(qq.toLowerCase()) >= 0; }) : null;
@@ -661,7 +706,7 @@
       var drawn = JNZX.cover && JNZX.cover(it.name), emo = (JNZX.coverEmoji && JNZX.coverEmoji(it.name)) || GEMO[title] || '✨';
       var src = (img ? jAsset(img) : null) || drawn;
       return h('button', { key: it.name, type: 'button', className: 'mk-card', onClick: function () { props.navigate(it.name); } },
-        h('span', { className: 'mk-card-media', style: src ? null : { background: TILE[kk % TILE.length] } }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : h(Ico, { size: 44 }), h('span', { className: 'mk-card-shade' }), h('span', { className: 'mk-card-badge', 'aria-hidden': true }, emo)),
+        h('span', { className: 'mk-card-media', style: src ? null : { background: TILE[kk % TILE.length] } }, src ? h('img', { src: src, alt: '', loading: 'lazy', onLoad: JNZX.focusImg }) : h(Ico, { size: 44 }), h('span', { className: 'mk-card-shade' }), h('span', { className: 'mk-card-badge', 'aria-hidden': true }, emo)),
         h('span', { className: 'mk-card-body' }, h('strong', { className: 'mk-card-title' }, it.displayName || it.name), info[1] && h('span', { className: 'mk-card-desc' }, info[1]), h('span', { className: 'mk-card-go' }, 'Explore ', h('span', { 'aria-hidden': true }, '→'))));
     }
     return h('div', { className: 'jx-page jx-landing mk-landing' },
