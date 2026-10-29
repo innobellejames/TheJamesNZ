@@ -1048,3 +1048,11 @@ main .jx-shop-img img,main .jx-hub img{object-position:50% 18%}
 html[data-reading-theme="dark"] .jx-bub-chips button{background:#18211f!important;color:#eef3f1!important;border-color:#3a4a46!important}
 .jx-hol-card .jx-catchy,.jx-make .jx-catchy{margin:0!important;padding:0 18px 16px!important;font-size:.85rem}
 html body main .mk-card .mk-card-media>img{width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;aspect-ratio:auto!important}
+.jx-feast-cover,.jx-lib-cover{display:block;width:100%;max-height:300px;object-fit:cover;object-position:50% 30%;border-radius:18px;margin:0 0 16px;box-shadow:0 4px 14px rgba(20,36,58,.1)}
+@media (max-width:600px){.jx-feast-cover,.jx-lib-cover{max-height:200px}}
+@media print{.jx-lib-cover{max-height:180px}}
+/* Weather & What to Wear: playful moving family */
+@keyframes jx-fam-frames{0%{background-position-x:0%}25%{background-position-x:33.3333%}50%{background-position-x:66.6667%}75%{background-position-x:100%}100%{background-position-x:0%}}
+@keyframes jx-fam-bob{0%,100%{transform:translateY(0) scale(1) rotate(0)}25%{transform:translateY(-6px) scale(1.02) rotate(-.6deg)}50%{transform:translateY(0) scale(1.03)}75%{transform:translateY(-4px) scale(1.02) rotate(.6deg)}}
+.family-motion-stage .family-outfit-animation.moving,.family-motion-stage .family-outfit-animation.play.moving{animation:jx-fam-frames 6s step-end infinite,jx-fam-bob 1.5s ease-in-out infinite!important;border-radius:16px}
+@media (prefers-reduced-motion:reduce){.family-motion-stage .family-outfit-animation.moving{animation:none!important}}

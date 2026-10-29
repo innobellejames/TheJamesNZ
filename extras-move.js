@@ -96,6 +96,48 @@
       })));
   }
 
+
+  /* ---------- share & print: a tidy session card ---------- */
+  function rr(g, x, y, w, hh, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + hh, r); g.arcTo(x + w, y + hh, x, y + hh, r); g.arcTo(x, y + hh, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
+  function wrapT(g, t, w) { var out = [], cur = ''; String(t).split(' ').forEach(function (x) { var n = cur ? cur + ' ' + x : x; if (g.measureText(n).width > w && cur) { out.push(cur); cur = x; } else cur = n; }); if (cur) out.push(cur); return out; }
+  function drawSession(o, img) {
+    var W = 1240, H = 1754, c = document.createElement('canvas'); c.width = W; c.height = H; var g = c.getContext('2d');
+    g.fillStyle = '#f7f4ec'; g.fillRect(0, 0, W, H);
+    g.fillStyle = '#14243a'; g.fillRect(0, 0, W, 210);
+    g.textAlign = 'center'; g.fillStyle = '#d5b16d'; g.font = '600 30px Georgia, serif'; g.fillText('M O V E   Y O U R   W A Y', W / 2, 80);
+    g.fillStyle = '#fff'; g.font = '700 60px "Playfair Display", Georgia, serif'; g.fillText((ICON[o.part] || '') + ' ' + o.part, W / 2, 160);
+    var px = 70, py = 250, pw = W - 140, ph = 520;
+    g.save(); rr(g, px, py, pw, ph, 30); g.clip();
+    if (img) { var k = Math.max(pw / img.naturalWidth, ph / img.naturalHeight), dw = img.naturalWidth * k, dh = img.naturalHeight * k; g.drawImage(img, px + (pw - dw) / 2, py + (ph - dh) * 0.25, dw, dh); } else { g.fillStyle = '#dfe9e3'; g.fillRect(px, py, pw, ph); }
+    g.restore();
+    var chips = [o.level + ' effort', o.place, o.list.length + ' moves', 'about ' + o.mins + ' min'], cx = px, cy = py + ph + 40;
+    g.font = '700 28px Arial, sans-serif'; g.textAlign = 'left';
+    chips.forEach(function (t) { var w = g.measureText(t).width + 48; rr(g, cx, cy, w, 54, 27); g.fillStyle = '#245a45'; g.fill(); g.fillStyle = '#fff'; g.fillText(t, cx + 24, cy + 37); cx += w + 14; });
+    var y = cy + 100;
+    o.list.forEach(function (m, i) {
+      g.font = '26px Arial, sans-serif'; var lines = wrapT(g, m[1], W - 300), hh = 84 + lines.length * 36;
+      rr(g, 70, y, W - 140, hh, 22); g.fillStyle = '#ffffff'; g.fill(); g.strokeStyle = '#dfe7e2'; g.lineWidth = 2; g.stroke();
+      g.fillStyle = '#e7f0ea'; g.beginPath(); g.arc(130, y + 48, 32, 0, 7); g.fill(); g.fillStyle = '#245a45'; g.font = '800 32px Arial, sans-serif'; g.textAlign = 'center'; g.fillText(String(i + 1), 130, y + 59);
+      g.textAlign = 'left'; g.fillStyle = '#14243a'; g.font = '700 34px Georgia, serif'; g.fillText(m[0], 190, y + 58);
+      g.fillStyle = '#3b4a46'; g.font = '26px Arial, sans-serif'; lines.forEach(function (l, j) { g.fillText(l, 190, y + 100 + j * 36); });
+      y += hh + 20;
+    });
+    g.fillStyle = '#5a6b66'; g.font = 'italic 26px Georgia, serif'; g.textAlign = 'left';
+    wrapT(g, o.d.note + ' Move ' + o.d.work + 's, rest ' + o.d.rest + 's.', W - 160).forEach(function (l) { y += 36; g.fillText(l, 80, y); });
+    g.font = '22px Arial, sans-serif'; g.fillStyle = '#7a8a86'; y += 20;
+    wrapT(g, 'Warm up first, breathe normally and stop if anything hurts. Check with your doctor or physio if you are pregnant, injured or managing a health condition.', W - 160).forEach(function (l) { if (y < H - 140) { y += 30; g.fillText(l, 80, y); } });
+    g.textAlign = 'center'; g.fillStyle = '#14243a'; g.font = '700 32px Georgia, serif'; g.fillText('T H E   J A M E S   N Z', W / 2, H - 70);
+    g.fillStyle = '#657184'; g.font = '24px Arial, sans-serif'; g.fillText('www.thejamesnz.com', W / 2, H - 32);
+    return c;
+  }
+  function withImg(src, fn) { var im = new Image(); im.onload = function () { fn(im); }; im.onerror = function () { fn(null); }; im.src = src; }
+  function sessionCard(o) { return new Promise(function (ok, bad) { withImg(o.photo, function (im) { drawSession(o, im).toBlob(function (b) { b ? ok(new File([b], 'TheJamesNZ-move-your-way.png', { type: 'image/png' })) : bad(Error('blob')); }, 'image/png'); }); }); }
+  function printCard(o) {
+    var w = window.open('', '_blank'); if (!w) { alert('Please allow pop-ups to print.'); return; }
+    w.document.write('<!doctype html><title>Move Your Way</title><p style="font-family:sans-serif">Preparing your page…</p>');
+    withImg(o.photo, function (im) { var url = drawSession(o, im).toDataURL('image/png'); w.document.open(); w.document.write('<!doctype html><title>Move Your Way · The James NZ</title><style>@page{size:A4;margin:8mm}body{margin:0}img{width:100%;display:block}</style><img src="' + url + '" onload="setTimeout(function(){print()},300)">'); w.document.close(); });
+  }
+
   function MoveYourWay() {
     var st = useState(load), c = st[0], setC = st[1];
     var part = c.part, level = c.level, place = c.place;
@@ -135,10 +177,13 @@
         h(Choice, { label: '1. Body area', items: Object.keys(MOVES), value: part, onPick: pick('part'), icons: ICON }),
         h(Choice, { label: '2. Effort', items: LEVELS, value: level, onPick: pick('level'), icons: { Easy: '🌱', Normal: '🚶', Intense: '🔥' } }),
         h(Choice, { label: '3. Where', items: PLACES, value: place, onPick: pick('place'), icons: { Indoor: '🏠', Outdoor: '🌳' } })),
-      h('div', { className: 'jx-move-hero', key: level + place, style: { backgroundImage: 'linear-gradient(#08131850,#081318d0),url("' + photo + '")' } },
-        h('span', { className: 'jx-move-pill' }, (ICON[part] || '') + ' ' + part + ' · ' + level + ' · ' + place),
-        h('h2', null, list.length + ' moves · about ' + Math.max(1, Math.round(total / 60)) + ' minutes'),
-        h('p', null, d.note)),
+      h('div', { className: 'jx-move-hero2', key: level + place },
+        h('div', { className: 'jx-move-pic' }, h('img', { src: photo, alt: 'The James family moving together' }), h('span', { className: 'jx-move-pill' }, (ICON[part] || '') + ' ' + part + ' · ' + level + ' · ' + place)),
+        h('div', { className: 'jx-move-info' },
+          h('h2', null, list.length + ' moves · about ' + Math.max(1, Math.round(total / 60)) + ' min'),
+          h('div', { className: 'jx-move-stats' },
+            h('span', null, h('b', null, d.work + 's'), ' move'), h('span', null, h('b', null, d.rest + 's'), ' rest'), h('span', null, h('b', null, d.rounds), d.rounds > 1 ? ' rounds' : ' round')),
+          h('p', null, d.note))),
       h('ol', { className: 'jx-move-list', key: part + level + place }, list.map(function (m, i) {
         return h('li', { key: m[0], className: cur && cur.i === i && T.phase !== 'Done' && (T.run || T.step > 0) ? 'now' : '' }, h('h3', null, m[0]), h('p', null, m[1]));
       })),
@@ -156,7 +201,10 @@
           } }, '⏭ Skip'),
           h('button', { type: 'button', className: 'secondary', onClick: function () { setT({ step: 0, phase: 'Move', left: d.work, run: false }); } }, '↺ Restart'))),
       h('p', { className: 'small-note' }, 'Warm up with 2 minutes of easy marching or walking and finish with gentle stretches. Breathe normally and stop if you feel pain, dizziness or unusual breathlessness. If you are pregnant, recovering after birth, injured or managing a health condition, check with your doctor or physio first. Intense means a harder version — not moving as fast as possible.'),
-      JNZX.ShareMini && h(JNZX.ShareMini, { title: 'Move Your Way — ' + part, text: shareText, label: 'Share this session' }));
+      h('div', { className: 'jx-row jx-move-out' },
+        JNZX.ShareMini && h(JNZX.ShareMini, { title: 'Move Your Way — ' + part, text: shareText, label: 'Share this session', picture: function () { return sessionCard(info()); } }),
+        h('button', { type: 'button', className: 'secondary', onClick: function () { printCard(info()); } }, '🖨️ Print this session')));
+    function info() { return { part: part, level: level, place: place, photo: photo, list: list, d: d, mins: Math.max(1, Math.round(total / 60)) }; }
   }
 
   try { Workouts = MoveYourWay; BodyWorkouts = function () { return null; }; } catch (e) { console.warn('[JNZX] move', e); }
@@ -169,6 +217,12 @@
     '.jx-move-list{list-style:none;padding:0;margin:18px 0;display:grid;gap:12px;counter-reset:mv;animation:jxMoveIn .35s ease}.jx-move-list li{counter-increment:mv;position:relative;padding:14px 16px 14px 58px;border:1px solid #dfe7e2;border-radius:14px;background:#fff}' +
     '.jx-move-list li:before{content:counter(mv);position:absolute;left:14px;top:14px;width:32px;height:32px;border-radius:50%;background:#e7f0ea;color:#245a45;font-weight:800;display:grid;place-items:center}.jx-move-list li.now{border-color:#245a45;box-shadow:0 0 0 2px #245a4533}.jx-move-list h3{margin:0 0 4px;font-size:18px}.jx-move-list p{margin:0}' +
     '.jx-move-timer{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;padding:16px 18px;border-radius:16px;background:#f3f7f4;margin-bottom:14px}.jx-move-timer h3{margin:2px 0}.jx-move-count{font-size:34px;font-weight:800;margin:0}' +
+    '.jx-move-hero2{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:0;border-radius:20px;overflow:hidden;background:#fff;box-shadow:0 4px 14px rgba(20,36,58,.1);animation:jxMoveIn .35s ease}' +
+    '.jx-move-pic{position:relative;min-height:260px}.jx-move-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 45%}.jx-move-pic .jx-move-pill{position:absolute;left:14px;bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.2)}' +
+    '.jx-move-info{padding:22px 24px;display:flex;flex-direction:column;justify-content:center;gap:10px}.jx-move-info h2{margin:0;font-family:"Playfair Display",Georgia,serif;color:#14243a}.jx-move-info p{margin:0;color:#3b4a46}' +
+    '.jx-move-stats{display:flex;gap:8px;flex-wrap:wrap}.jx-move-stats span{background:#e7f0ea;color:#245a45;border-radius:12px;padding:6px 12px;font-size:.9rem}.jx-move-stats b{font-size:1.1rem;margin-right:2px}' +
+    '@media (max-width:700px){.jx-move-hero2{grid-template-columns:1fr}.jx-move-pic{min-height:220px}}' +
+    'html[data-reading-theme="dark"] .jx-move-hero2{background:#18211f}html[data-reading-theme="dark"] .jx-move-info h2{color:#f1f4f3}html[data-reading-theme="dark"] .jx-move-info p{color:#d7e2de}html[data-reading-theme="dark"] .jx-move-stats span{background:#26322f;color:#bfe6d2}' +
     '@keyframes jxMoveIn{from{opacity:.3;transform:translateY(6px)}to{opacity:1;transform:none}}' +
     'html[data-reading-theme="dark"] .jx-move-chip{background:#1c2626;color:#eef3f1;border-color:#3d4d4a}html[data-reading-theme="dark"] .jx-move-chip.on{background:#7fc4a2;color:#0f1a17;border-color:#7fc4a2}' +
     'html[data-reading-theme="dark"] .jx-move-list li{background:#1c2626;border-color:#33433f;color:#eef3f1}html[data-reading-theme="dark"] .jx-move-list li:before{background:#2b3b37;color:#bfe6d2}html[data-reading-theme="dark"] .jx-move-timer{background:#1c2626;color:#eef3f1}' +
