@@ -495,6 +495,75 @@
     g.textAlign = 'center'; g.fillStyle = design === 'night' ? '#f4f1e8' : ink; g.font = 'bold 30px ' + SANS; g.fillText(done + ' of ' + n + ' done', W / 2, H - 92);
     g.font = '22px ' + SANS; g.fillStyle = design === 'night' ? 'rgba(244,241,232,.7)' : hexA(ink, 0.6); g.fillText('My Kiwi Adventures · The James NZ · www.thejamesnz.com', W / 2, H - 52); g.textAlign = 'left';
   }
+
+  /* City & town lists with a region filter */
+  var NZ_REGIONS = [
+    ['Northland', ['Whangārei', 'Kaitaia', 'Kerikeri']],
+    ['Auckland', ['Auckland', 'Pukekohe']],
+    ['Waikato', ['Hamilton', 'Taupō', 'Cambridge', 'Tokoroa']],
+    ['Bay of Plenty', ['Tauranga', 'Rotorua', 'Whakatāne']],
+    ['Gisborne', ['Gisborne']],
+    ["Hawke's Bay", ['Napier', 'Hastings']],
+    ['Taranaki', ['New Plymouth']],
+    ['Manawatū-Whanganui', ['Whanganui', 'Palmerston North']],
+    ['Wellington', ['Wellington', 'Lower Hutt', 'Upper Hutt', 'Porirua', 'Masterton']],
+    ['Tasman', ['Richmond']],
+    ['Nelson', ['Nelson']],
+    ['Marlborough', ['Blenheim']],
+    ['West Coast', ['Greymouth']],
+    ['Canterbury', ['Christchurch', 'Timaru', 'Ashburton']],
+    ['Otago', ['Dunedin', 'Queenstown', 'Wānaka', 'Oamaru']],
+    ['Southland', ['Invercargill']]
+  ];
+  function CityLists() {
+    var st = JNZX.useStored('james-nz-bucket-v1', { cities: {}, extra: [] }), data = st[0] || { cities: {}, extra: [] }, setData = st[1];
+    if (!data.cities) data = { cities: {}, extra: data.extra || [] };
+    var extraReg = data.extraRegion || {};
+    var rg = JNZX.useStored('jnzx-city-region', 'Auckland'), region = rg[0], setRegion = rg[1];
+    function citiesIn(r) {
+      var base = [];
+      NZ_REGIONS.forEach(function (x) { if (r === 'All regions' || x[0] === r) base = base.concat(x[1]); });
+      (data.extra || []).forEach(function (n) { if (r === 'All regions' || extraReg[n] === r) base.push(n); });
+      return base;
+    }
+    var list = citiesIn(region);
+    var cs = useState(list[0] || 'Auckland'), city = cs[0], setCity = cs[1];
+    if (list.indexOf(city) < 0 && list.length) city = list[0];
+    var cu = useState(''), custom = cu[0], setCustom = cu[1];
+    var tx = useState(''), text = tx[0], setText = tx[1];
+    var kd = useState('Go to'), kind = kd[0], setKind = kd[1];
+    var items = (data.cities[city]) || (typeof xCityDefault === 'function' ? xCityDefault(city) : []);
+    function update(next) { setData(function (d) { d = d || { cities: {}, extra: [] }; var c = Object.assign({}, d.cities); c[city] = next; return Object.assign({}, d, { cities: c }); }); }
+    var post = items.map(function (r) { return (r.done ? '✓ ' : '□ ') + r.kind + ': ' + r.text; }).join('\n');
+    var bg = './photo-share/inspiration.webp';
+    try { if (JNZX.cover && JNZX.cover('Kiwi Adventures')) bg = JNZX.cover('Kiwi Adventures'); } catch (e) {}
+    return h('section', { className: 'j-section jx-citylists' },
+      h('div', { className: 'jx-row jx-form' },
+        h('label', null, 'Region', h('select', { value: region, onChange: function (e) { setRegion(e.target.value); var l = citiesIn(e.target.value); if (l.length) setCity(l[0]); } },
+          ['All regions'].concat(NZ_REGIONS.map(function (x) { return x[0]; })).map(function (n) { return h('option', { key: n, value: n }, n); }))),
+        h('label', null, 'City or town', h('select', { value: city, onChange: function (e) { setCity(e.target.value); } },
+          list.map(function (n) { return h('option', { key: n, value: n }, n); })))),
+      h('form', { className: 'jx-row jx-form', onSubmit: function (e) { e.preventDefault(); var n = custom.trim(); if (!n) return;
+          var all = citiesIn('All regions'); if (all.indexOf(n) < 0) { var r = region === 'All regions' ? 'Auckland' : region; setData(function (d) { d = d || { cities: {}, extra: [] }; var er = Object.assign({}, d.extraRegion || {}); er[n] = r; return Object.assign({}, d, { extra: (d.extra || []).concat([n]), extraRegion: er }); }); if (region === 'All regions') setRegion(r); }
+          setCity(n); setCustom(''); } },
+        h('label', null, 'Add another town' + (region !== 'All regions' ? ' in ' + region : ''), h('input', { value: custom, maxLength: 60, placeholder: 'e.g. Te Anau', onChange: function (e) { setCustom(e.target.value); } })),
+        h('button', { type: 'submit', className: 'secondary' }, 'Add town')),
+      h('h2', null, city + ' bucket list'),
+      h('div', { className: 'x-edit-list' }, items.map(function (r, i) {
+        return h('div', { className: 'x-edit-row', key: city + i },
+          h('input', { type: 'checkbox', checked: !!r.done, 'aria-label': 'Completed ' + r.text, onChange: function (e) { var v = e.target.checked; update(items.map(function (x, n) { return n === i ? Object.assign({}, x, { done: v }) : x; })); } }),
+          h('span', null, r.kind),
+          h('input', { value: r.text, 'aria-label': 'Bucket list idea ' + (i + 1), onChange: function (e) { var v = e.target.value; update(items.map(function (x, n) { return n === i ? Object.assign({}, x, { text: v }) : x; })); } }),
+          h('button', { type: 'button', className: 'secondary', onClick: function () { update(items.filter(function (_, n) { return n !== i; })); } }, 'Remove'));
+      })),
+      h('form', { className: 'jx-row jx-form', onSubmit: function (e) { e.preventDefault(); var v = text.trim(); if (!v) return; update(items.concat([{ kind: kind, text: v, done: false }])); setText(''); } },
+        h('label', null, 'Type', h('select', { value: kind, onChange: function (e) { setKind(e.target.value); } }, ['Go to', 'Food to try', 'Must experience'].map(function (k) { return h('option', { key: k, value: k }, k); }))),
+        h('label', null, 'Your idea', h('input', { value: text, maxLength: 140, placeholder: 'e.g. Picnic at the botanic gardens', onChange: function (e) { setText(e.target.value); } })),
+        h('button', { type: 'submit', className: 'primary' }, 'Add idea')),
+      h('div', { className: 'jx-row' },
+        JNZX.ShareMini ? h(JNZX.ShareMini, { label: 'Share this list', title: city + ' · our bucket list', text: city + ' · our bucket list\n' + post, bg: bg }) : null),
+      h('p', { className: 'small-note' }, 'Ideas are suggestions, not bookings. Check opening hours, access, weather and costs before you go.'));
+  }
   try {
     var BaseBucket = NZBucket;
     NZBucket = function KiwiAdventures() {
@@ -513,7 +582,7 @@
         h('div', { className: 'jx-tablist', role: 'tablist' },
           h('button', { type: 'button', role: 'tab', 'aria-selected': tab === 'poster', className: 'jx-tab' + (tab === 'poster' ? ' is-on' : ''), onClick: function () { setTab('poster'); } }, '🗺️ Family bucket list'),
           h('button', { type: 'button', role: 'tab', 'aria-selected': tab === 'cities', className: 'jx-tab' + (tab === 'cities' ? ' is-on' : ''), onClick: function () { setTab('cities'); } }, '🏙️ City & town lists')),
-        tab === 'cities' ? h(BaseBucket) : h(Frag, null,
+        tab === 'cities' ? h(CityLists) : h(Frag, null,
           h('div', { className: 'jx-row jx-form' },
             h('label', null, 'Title', h('input', { value: d.title, maxLength: 30, onChange: function (e) { var v = e.target.value; set(function (x) { return Object.assign({}, x, { title: v }); }); } })),
             h('label', null, 'Subtitle', h('input', { value: d.subtitle, maxLength: 50, onChange: function (e) { var v = e.target.value; set(function (x) { return Object.assign({}, x, { subtitle: v }); }); } }))),

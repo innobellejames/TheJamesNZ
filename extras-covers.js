@@ -110,6 +110,7 @@
     return cache[name] || (cache[name] = uri(svg({ s: c[0], p: c[1], e: c[2], m: c[3] }, 600, 400)));
   };
   JNZX.coverLine = function (name) { var c = C[name]; return c ? c[4] : ''; };
+  JNZX.coverEmoji = function (name) { var c = C[name]; return c ? c[2] : ''; };
   JNZX.heroCover = function (group) {
     var c = HERO[group]; if (!c) return null;
     return cache['h:' + group] || (cache['h:' + group] = uri(svg({ s: c[0], p: c[1], e: c[2], m: c[3] }, 1000, 640, true)));

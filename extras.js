@@ -232,11 +232,12 @@
     var hb = HUBS[props.tab];
     return h('div', { className: 'jx-hub' },
       JNZX.Header(hb.kicker, hb.title, hb.blurb),
-      h('div', { className: 'jx-shop-grid jx-hub-grid' }, hb.kids.map(function (k) {
-        var drawn = JNZX.cover && JNZX.cover(k), info = TOPIC[k] || [null, ''], src = drawn || (info[0] ? jAsset(info[0]) : null), witty = JNZX.coverLine ? JNZX.coverLine(k) : '';
-        return h('button', { key: k, type: 'button', className: 'jx-shop-card', onClick: function () { props.navigate(k); } },
-          h('span', { className: 'jx-shop-img' + (drawn ? ' is-drawn' : '') }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : null),
-          h('span', { className: 'jx-shop-body' }, h('strong', null, JNZX.label(k)), info[1] && h('span', { className: 'jx-shop-desc' }, info[1]), witty && h('em', { className: 'jx-shop-witty' }, '“' + witty + '”'), h('span', { className: 'jx-shop-go' }, 'Open →')));
+      h('span', { className: 'mk-label' }, 'WHAT’S INSIDE'),
+      h('div', { className: 'mk-grid' }, hb.kids.map(function (k) {
+        var drawn = JNZX.cover && JNZX.cover(k), info = TOPIC[k] || [null, ''], src = drawn || (info[0] ? jAsset(info[0]) : null), emo = (JNZX.coverEmoji && JNZX.coverEmoji(k)) || '✨';
+        return h('button', { key: k, type: 'button', className: 'mk-card', onClick: function () { props.navigate(k); } },
+          h('span', { className: 'mk-card-media' }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : null, h('span', { className: 'mk-card-shade' }), h('span', { className: 'mk-card-badge', 'aria-hidden': true }, emo)),
+          h('span', { className: 'mk-card-body' }, h('strong', { className: 'mk-card-title' }, JNZX.label(k)), info[1] && h('span', { className: 'mk-card-desc' }, info[1]), h('span', { className: 'mk-card-go' }, 'Explore ', h('span', { 'aria-hidden': true }, '→'))));
       })),
       h(ShareBar, { tab: props.tab }));
   }
@@ -332,13 +333,13 @@
       var done = function () { setMsg('Link copied.'); };
       JNZX.copyText(url).then(done, function () { setMsg('Copy this link: ' + url); });
     }
-    async function share() {
+    var ss = useState(null), sheet = ss[0], setSheet = ss[1];
+    function share() {
       if (props.getInfo) { var d2 = props.getInfo(); title = d2.title || title; text = d2.text || text; }
-      if (navigator.share) {
-        try { await navigator.share({ title: title, text: text + '\n\n' + url }); setMsg(''); return; }
-        catch (e) { if (e && e.name === 'AbortError') return; }
-      }
-      setOpen(true);
+      var blurb = (TOPIC[tab] || [])[1] || '';
+      if (!blurb && tab && tab.indexOf('group:') === 0) { var gg = GROUPS.find(function (x) { return 'group:' + x.title === tab; }); blurb = gg ? gg.blurb : ''; }
+      var words = text.indexOf(blurb) < 0 && blurb ? title + '\n' + blurb : text;
+      setSheet({ title: title, text: words, url: url, bg: props.bg || JNZX.bgFor(tab) });
     }
     var enc = encodeURIComponent;
     return h('div', { className: 'jx-share' },
@@ -351,7 +352,8 @@
         h('a', { className: 'secondary', href: 'mailto:?subject=' + enc(title + ' · The James NZ') + '&body=' + enc(text + '\n' + url) }, 'Email'),
         h('button', { type: 'button', className: 'secondary', onClick: copy }, 'Copy link'),
         props.printable && h('button', { type: 'button', className: 'secondary', onClick: function () { window.print(); } }, 'Print or save as PDF')),
-      msg && h('p', { className: 'small-note', role: 'status' }, msg));
+      msg && h('p', { className: 'small-note', role: 'status' }, msg),
+      sheet && h(ShareSheet, { o: sheet, onClose: function () { setSheet(null); } }));
   }
   JNZX.ShareBar = ShareBar;
   /* Share bar at the end of pages that came from the original site */
@@ -389,8 +391,18 @@
     }
     return 'menu';
   };
+  JNZX.bgFor = function (tab) {
+    tab = tab || JNZX._tab || '';
+    try {
+      var t = TOPIC[tab]; if (t && t[0]) return jAsset(t[0]);
+      var g = GROUPS.find(function (x) { return 'group:' + x.title === tab || x.items.some(function (it) { return it.name === tab; }); });
+      if (JNZX.cover && JNZX.cover(tab)) return JNZX.cover(tab);
+      if (g && g.image) return jAsset(g.image);
+    } catch (e) {}
+    return jAsset('./photo-share/inspiration.webp');
+  };
   JNZX.makePicture = function (o) {
-    return createPhotoPost({ title: o.title, text: o.text, credit: o.credit || 'Shared with love from The James NZ', background: o.bg || jAsset('./photo-share/inspiration.webp'), filename: 'TheJamesNZ-' + String(o.title || 'post').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) });
+    return createPhotoPost({ title: o.title, text: o.text, credit: o.credit || 'Shared with love from The James NZ', background: o.bg || JNZX.bgFor(), filename: 'TheJamesNZ-' + String(o.title || 'post').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40) });
   };
   JNZX.sendPicture = async function (file, o) {
     // called straight from a tap so phones (especially iPhone and iPad) allow the share
@@ -411,20 +423,34 @@
     useEffect(function () { var b = ref.current && ref.current.querySelector('button'); if (b) b.focus(); function k(e) { if (e.key === 'Escape') props.onClose(); } document.addEventListener('keydown', k); return function () { document.removeEventListener('keydown', k); }; }, []);
     var ios = /iP(hone|ad|od)/.test(navigator.userAgent) || navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1;
     var sms = 'sms:' + (ios ? '&' : '?') + 'body=' + enc(msg);
+    var pe = useState(false), picFail = pe[0], setPicFail = pe[1];
+    useEffect(function () {
+      var live = true;
+      Promise.resolve().then(function () { return JNZX.makePicture(o); }).then(function (f) { if (live) setPic({ file: f, url: URL.createObjectURL(f) }); }, function () {
+        // background could not load: try the plain default picture
+        return JNZX.makePicture(Object.assign({}, o, { bg: jAsset('./photo-share/inspiration.webp') })).then(function (f) { if (live) setPic({ file: f, url: URL.createObjectURL(f) }); }, function () { if (live) setPicFail(true); });
+      });
+      return function () { live = false; };
+    }, []);
     function act(fn) { return function () { setBusy(true); setNote(''); Promise.resolve(fn()).then(function (r) { setBusy(false); if (r) setNote(r); }, function (e) { setBusy(false); setNote((e && e.message) || 'Something went wrong — try Copy instead.'); }); }; }
     return typeof import_react_dom !== "undefined" && import_react_dom.createPortal ? import_react_dom.createPortal(h('div', { className: 'jx-ssheet-back', onClick: function (e) { if (e.target === e.currentTarget) props.onClose(); } },
       h('div', { className: 'jx-ssheet', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Share ' + o.title, ref: ref },
         h('div', { className: 'jx-ssheet-head' }, h('strong', null, 'Share'), h('button', { type: 'button', className: 'jx-ssheet-x', 'aria-label': 'Close', onClick: props.onClose }, '✕')),
-        pic ? h('img', { className: 'jx-ssheet-img', src: pic.url, alt: 'Picture of this post' }) : h('p', { className: 'jx-ssheet-preview' }, o.text.length > 220 ? o.text.slice(0, 220) + '…' : o.text),
+        pic ? h('img', { className: 'jx-ssheet-img', src: pic.url, alt: 'Picture of this post with The James NZ footer' }) :
+          h('div', { className: 'jx-ssheet-wait' }, picFail ? h('p', { className: 'jx-ssheet-preview' }, o.text.length > 220 ? o.text.slice(0, 220) + '…' : o.text) : h('p', { className: 'jx-ssheet-preview' }, '🖼️ Preparing your picture…')),
+        h('button', { type: 'button', className: 'jx-ssheet-main', disabled: busy || (!pic && !picFail), onClick: act(function () {
+          if (pic) return JNZX.sendPicture(pic.file, o).then(function (r) { return r; });
+          return JNZX.sharePost(o).then(function (r) { if (r === 'shared') props.onClose(); if (r === 'menu') return 'Choose an app below.'; return ''; });
+        }) }, pic ? '📤 Share picture, words & link' : (picFail ? '📤 Share words & link' : 'Preparing…')),
         h('div', { className: 'jx-ssheet-grid' },
-          navigator.share && h('button', { type: 'button', disabled: busy, onClick: act(function () { return JNZX.sharePost(o).then(function (r) { if (r === 'shared') props.onClose(); return ''; }); }) }, h('span', null, '📤'), 'Share to an app'),
-          pic ? h('button', { type: 'button', className: 'is-ready', onClick: act(function () { return JNZX.sendPicture(pic.file, o); }) }, h('span', null, '🖼️'), 'Send the picture') :
-            h('button', { type: 'button', disabled: busy, onClick: act(function () { return JNZX.makePicture(o).then(function (f) { setPic({ file: f, url: URL.createObjectURL(f) }); return 'Picture ready — tap “Send the picture”.'; }); }) }, h('span', null, '🖼️'), busy ? 'Preparing…' : 'Make a picture'),
-          h('a', { href: 'https://wa.me/?text=' + enc(msg), target: '_blank', rel: 'noopener noreferrer' }, h('span', null, '💬'), 'WhatsApp'),
+          navigator.share && h('button', { type: 'button', disabled: busy, onClick: act(function () { return JNZX.sharePost(o).then(function (r) { if (r === 'shared') props.onClose(); return ''; }); }) }, h('span', null, '💬'), 'Words & link only'),
+          pic && h('button', { type: 'button', onClick: function () { savePhotoFile(pic.file); setNote('Picture saved. Attach it to any message or post.'); } }, h('span', null, '⬇️'), 'Save picture'),
+          h('a', { href: 'https://wa.me/?text=' + enc(msg), target: '_blank', rel: 'noopener noreferrer' }, h('span', null, '🟢'), 'WhatsApp'),
           h('a', { href: 'https://www.facebook.com/sharer/sharer.php?u=' + enc(o.url) + '&quote=' + enc(o.text), target: '_blank', rel: 'noopener noreferrer' }, h('span', null, '📘'), 'Facebook'),
           h('a', { href: 'mailto:?subject=' + enc(o.title + ' · The James NZ') + '&body=' + enc(msg) }, h('span', null, '✉️'), 'Email'),
           h('a', { href: sms }, h('span', null, '📱'), 'Text message'),
-          h('button', { type: 'button', onClick: act(function () { return JNZX.copyText(msg).then(function () { return '✅ Copied — paste it anywhere.'; }, function () { return 'Press and hold the text above to copy it.'; }); }) }, h('span', null, '📋'), 'Copy words & link')),
+          h('button', { type: 'button', onClick: act(function () { return JNZX.copyText(msg).then(function () { return '✅ Copied — paste it anywhere.'; }, function () { return 'Press and hold the text to copy it.'; }); }) }, h('span', null, '📋'), 'Copy words & link')),
+        h('p', { className: 'jx-ssheet-tip' }, 'WhatsApp, Facebook, email and text send the words and link. To include the picture there, use “Save picture” and attach it.'),
         note && h('p', { className: 'jx-ssheet-note', role: 'status' }, note))), document.body) : null;
   }
   JNZX.ShareSheet = ShareSheet;
@@ -448,7 +474,8 @@
     return h('div', { className: 'jx-page' }, props.children);
   }
   JNZX.Header = function (kicker, title, text) {
-    return h('header', { className: 'jx-head' }, h('p', { className: 'eyebrow' }, kicker), h('h1', null, title), text && h('p', { className: 'jx-lead' }, text));
+    var t = String(title || ''), m = t.match(/^(.*?)(\S+?)([.!?…]*)$/), tt = m && m[1] ? [m[1], h('span', { key: 'a', className: 'mk-accent' }, m[2]), m[3]] : t;
+    return h('header', { className: 'jx-head mk-head' }, h('p', { className: 'eyebrow' }, kicker), h('h1', null, tt), text && h('p', { className: 'jx-lead' }, text));
   };
   /* Tabs: [{id,label,render()}] */
   JNZX.Tabs = function Tabs(props) {
@@ -627,20 +654,33 @@
     }
     var found = qq.trim() ? items.filter(function (it) { return ((it.displayName || it.name) + ' ' + ((TOPIC[it.name] || [])[1] || '')).toLowerCase().indexOf(qq.toLowerCase()) >= 0; }) : null;
     var k = 0;
-    return h('div', { className: 'jx-page jx-landing jx-shop' },
-      h('header', { className: 'jx-shop-hero' },
-        h('div', { className: 'jx-shop-hero-media' }, h('img', { src: (JNZX.heroCover && JNZX.heroCover(title)) || jAsset(g.image), alt: '', className: 'jx-shop-hero-img' + (JNZX.heroCover && JNZX.heroCover(title) ? ' is-drawn' : '') })),
-        h('div', { className: 'jx-shop-hero-txt' }, h('p', { className: 'eyebrow' }, 'THE JAMES NZ · ' + title.toUpperCase()), h('h1', null, title), h('p', null, g.blurb),
-          first && h('button', { type: 'button', className: 'primary', onClick: function () { props.navigate(first.name); } }, 'Start with ' + (first.displayName || first.name) + ' →'))),
-      title === 'Kiwi Adventures' && JNZX.WorldGlobe ? h(JNZX.WorldGlobe, { compact: true }) : null,
-      h('div', { className: 'jx-shop-tools' },
-        h('nav', { className: 'jx-cat-bar', 'aria-label': title + ' sections' }, sections.map(function (sec, si) { return h('button', { key: si, type: 'button', onClick: function () { setQ(''); setTimeout(function () { var el = document.getElementById('jx-shop-' + si); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 20); } }, sec.heading + ' (' + sec.items.length + ')'); })),
+    var words = title.split(' '), accent = words.pop(), lead = words.join(' ');
+    var GEMO = { 'Everyday Joy': '☕', 'Kiwi Adventures': '🥝', 'Family Together': '🏡', 'Learning': '📚', 'Faith & Hope': '🙏', 'Modern & Lifestyle': '💡', 'Community': '🤝' };
+    function mcard(it, kk) {
+      var info = TOPIC[it.name] || [null, ''], Ico = it.icon || Icons.grid, img = info[0];
+      var drawn = JNZX.cover && JNZX.cover(it.name), emo = (JNZX.coverEmoji && JNZX.coverEmoji(it.name)) || GEMO[title] || '✨';
+      var src = drawn || (img ? jAsset(img) : null);
+      return h('button', { key: it.name, type: 'button', className: 'mk-card', onClick: function () { props.navigate(it.name); } },
+        h('span', { className: 'mk-card-media', style: src ? null : { background: TILE[kk % TILE.length] } }, src ? h('img', { src: src, alt: '', loading: 'lazy' }) : h(Ico, { size: 44 }), h('span', { className: 'mk-card-shade' }), h('span', { className: 'mk-card-badge', 'aria-hidden': true }, emo)),
+        h('span', { className: 'mk-card-body' }, h('strong', { className: 'mk-card-title' }, it.displayName || it.name), info[1] && h('span', { className: 'mk-card-desc' }, info[1]), h('span', { className: 'mk-card-go' }, 'Explore ', h('span', { 'aria-hidden': true }, '→'))));
+    }
+    return h('div', { className: 'jx-page jx-landing mk-landing' },
+      h('header', { className: 'mk-hero' },
+        h('nav', { className: 'mk-crumb', 'aria-label': 'Breadcrumb' }, h('button', { type: 'button', onClick: function () { props.navigate('Home'); } }, 'Home'), h('span', { 'aria-hidden': true }, '›'), h('span', null, title)),
+        h('h1', { className: 'mk-hero-title' }, lead ? lead + ' ' : '', h('span', { className: 'mk-accent' }, accent)),
+        h('p', { className: 'mk-hero-text' }, g.blurb),
+        h('div', { className: 'mk-hero-actions' },
+          first && h('button', { type: 'button', className: 'mk-btn', onClick: function () { props.navigate(first.name); } }, 'Start with ' + (first.displayName || first.name) + ' →'),
+          h('span', { className: 'mk-hero-count' }, items.length + ' topics'))),
+      h('div', { className: 'mk-tools' },
+        h('nav', { className: 'mk-pills', 'aria-label': title + ' sections' }, sections.map(function (sec, si) { return h('button', { key: si, type: 'button', onClick: function () { setQ(''); setTimeout(function () { var el = document.getElementById('jx-shop-' + si); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 30); } }, sec.heading); })),
         h(JNZX.Search, { value: qq, onChange: setQ, placeholder: 'Search ' + items.length + ' topics in ' + title })),
-      found ? h('section', { className: 'jx-shop-sec' }, h('div', { className: 'jx-shop-sec-head' }, h('h2', null, 'Results'), h('span', { className: 'jx-muted' }, found.length + ' topic' + (found.length === 1 ? '' : 's'))), h('div', { className: 'jx-shop-grid' }, found.map(function (it, i) { return card(it, i); })))
+      found ? h('section', { className: 'mk-sec' }, h('span', { className: 'mk-label' }, 'SEARCH RESULTS'), h('h2', { className: 'mk-h2' }, found.length + ' topic' + (found.length === 1 ? '' : 's') + ' found'), h('div', { className: 'mk-grid' }, found.map(function (it, i) { return mcard(it, i); })))
         : sections.map(function (sec, si) {
-          return h('section', { key: si, id: 'jx-shop-' + si, className: 'jx-shop-sec' },
-            h('div', { className: 'jx-shop-sec-head' }, h('h2', null, sec.heading), h('span', { className: 'jx-muted' }, sec.items.length + ' topic' + (sec.items.length === 1 ? '' : 's'))),
-            h('div', { className: 'jx-shop-grid' }, sec.items.map(function (it) { return card(it, k++); })));
+          return h('section', { key: si, id: 'jx-shop-' + si, className: 'mk-sec' },
+            h('span', { className: 'mk-label' }, si === 0 ? 'WHAT WE OFFER' : title.toUpperCase()),
+            h('h2', { className: 'mk-h2' }, sec.heading === 'Explore' ? 'All of ' + title : sec.heading),
+            h('div', { className: 'mk-grid' }, sec.items.map(function (it) { return mcard(it, k++); })));
         }),
       h(ShareBar, { tab: props.tab, title: title }));
   }

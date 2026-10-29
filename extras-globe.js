@@ -363,7 +363,7 @@
     var cvRef = useRef(null), dotsRef = useRef([]), viewRef = useRef({ lat: -15, lon: 150 }), drag = useRef(null), spin = useRef(true), frame = useRef(0);
     var st = useState(18), sel = st[0], setSel = st[1];
     var nw = useState(Date.now()), now = nw[0], setNow = nw[1];
-    var go = useState(function () { try { return window.matchMedia('(min-width: 900px)').matches; } catch (e) { return false; } }), globeOpen = go[0], setGlobeOpen = go[1];
+    var go = useState(false), globeOpen = go[0], setGlobeOpen = go[1];
     var dark = (function () { try { return document.documentElement.getAttribute('data-reading-theme') === 'dark'; } catch (e) { return false; } })();
     useEffect(function () { var id = setInterval(function () { setNow(Date.now()); }, 15000); return function () { clearInterval(id); }; }, []);
     useEffect(function () {
@@ -420,7 +420,7 @@
       h(Picker, { sel: sel, choose: choose }),
       h('div', { className: 'jx-row jx-wc-actions' }, h(JNZX.ShareMini, { title: 'Time in ' + placeName, text: shareText, label: 'Share these times' })),
       h('details', { className: 'jx-wc-more' }, h('summary', null, '💱 Money converter'), h(CurrencyBox, { key: 'cur-' + sel, place: P })),
-      h('details', { className: 'jx-wc-more', open: globeOpen, onToggle: function (e) { setGlobeOpen(e.currentTarget.open); } }, h('summary', null, '🌏 Spin the globe'),
+      h('details', { className: 'jx-wc-more', open: globeOpen, onToggle: function (e) { setGlobeOpen(e.currentTarget.open); } }, h('summary', null, '🌏 Spin the globe (optional)'),
         h('div', { className: 'jx-globe-stage' },
           h('canvas', { ref: cvRef, width: 360, height: 360, className: 'jx-globe-canvas', role: 'img', 'aria-label': 'Globe showing ' + P[0], onPointerDown: down, onPointerMove: move, onPointerUp: up, onPointerCancel: function () { drag.current = null; } }),
           h('div', { className: 'jx-row jx-globe-ctl' },
@@ -482,6 +482,10 @@
       '.jx-gp-note{margin:0;font-size:15px}.jx-gp-count{margin:0;font-size:13px}' +
       'html[data-reading-theme="dark"] .jx-gp{background:#1b2524;color:#eef3f1;border-color:#33433f}html[data-reading-theme="dark"] .jx-gp-chip,html[data-reading-theme="dark"] .jx-gp-field select,html[data-reading-theme="dark"] .jx-gp-field input{background:#141c1b;color:#eef3f1;border-color:#3a4a46}' +
       'html[data-reading-theme="dark"] .jx-gp-chip.is-on{background:#7fc4a2;color:#0f1a17;border-color:#7fc4a2}html[data-reading-theme="dark"] .jx-gp-field,html[data-reading-theme="dark"] .jx-gp-note{color:#eef3f1}';
+    css += '.jx-wc{gap:10px;max-width:760px}.jx-wc-t{padding:10px 14px;border-radius:14px}.jx-wc-clock{font-size:clamp(1.5rem,4.4vw,2.1rem)!important;margin:2px 0}.jx-wc-where{font-size:.88rem}.jx-wc-day{font-size:.82rem}' +
+      '.jx-wc-diff span{padding:4px 10px;font-size:.78rem}.jx-wc-facts{font-size:.9rem}.jx-wc .jx-gp{padding:10px 12px;gap:8px}' +
+      '.jx-wc-more .jx-globe-canvas{max-width:240px!important;height:auto}.jx-wc-more{padding:8px 12px}' +
+      '@media (max-width:600px){.jx-wc-times{grid-template-columns:1fr 1fr}.jx-wc-diff{grid-column:1/-1;order:3}}';
     var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
   })();
 })();
