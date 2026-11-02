@@ -403,13 +403,24 @@
     return jAsset('./photo-share/inspiration.webp');
   };
   /* Weather › share today's outfit: the family's current outfit frame on a card */
+  /* draw a whole picture into a box: soft blurred fill behind, nothing cropped */
+  JNZX.drawFit = function (g, img, x, y, w, hh) {
+    var k = Math.max(w / img.naturalWidth, hh / img.naturalHeight), dw = img.naturalWidth * k, dh = img.naturalHeight * k;
+    g.save(); g.beginPath(); g.rect(x, y, w, hh); g.clip();
+    try { g.filter = 'blur(24px) brightness(.85)'; } catch (e) {}
+    g.drawImage(img, x + (w - dw) / 2, y + (hh - dh) / 2, dw, dh);
+    try { g.filter = 'none'; } catch (e) {}
+    var k2 = Math.min(w / img.naturalWidth, hh / img.naturalHeight), cw = img.naturalWidth * k2, ch = img.naturalHeight * k2;
+    g.drawImage(img, x + (w - cw) / 2, y + (hh - ch) / 2, cw, ch);
+    g.restore();
+  };
   JNZX.outfitCard = function (o, src) {
     return new Promise(function (ok, bad) {
       var img = new Image(); img.onerror = function () { bad(Error('image')); };
       img.onload = function () {
         var W = 1080, H = 1920, c = document.createElement('canvas'); c.width = W; c.height = H; var g = c.getContext('2d');
         var k = Math.max(W / img.naturalWidth, H / img.naturalHeight), dw = img.naturalWidth * k, dh = img.naturalHeight * k;
-        g.drawImage(img, (W - dw) / 2, (H - dh) * 0.3, dw, dh);
+        JNZX.drawFit(g, img, 0, 0, W, H);
         var gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(0, 'rgba(0,0,0,.45)'); gr.addColorStop(.25, 'rgba(0,0,0,0)'); gr.addColorStop(.45, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.65)'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
         function pill(x, y, t, bg, fg) { g.font = '700 40px Arial, sans-serif'; var w = g.measureText(t).width + 56; g.fillStyle = bg; g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, 70, 35); else g.rect(x, y, w, 70); g.fill(); g.fillStyle = fg; g.fillText(t, x + 28, y + 48); return w; }
         g.textAlign = 'left'; var x = 50; x += pill(x, 60, o.look || '', 'rgba(255,255,255,.93)', '#14243a') + 14; pill(x, 60, o.style || '', '#d5b16d', '#14243a');

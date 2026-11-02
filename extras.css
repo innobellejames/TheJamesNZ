@@ -1056,3 +1056,11 @@ html body main .mk-card .mk-card-media>img{width:100%!important;height:100%!impo
 @keyframes jx-fam-bob{0%,100%{transform:translateY(0) scale(1) rotate(0)}25%{transform:translateY(-6px) scale(1.02) rotate(-.6deg)}50%{transform:translateY(0) scale(1.03)}75%{transform:translateY(-4px) scale(1.02) rotate(.6deg)}}
 .family-motion-stage .family-outfit-animation.moving,.family-motion-stage .family-outfit-animation.play.moving{animation:jx-fam-frames 6s step-end infinite,jx-fam-bob 1.5s ease-in-out infinite!important;border-radius:16px}
 @media (prefers-reduced-motion:reduce){.family-motion-stage .family-outfit-animation.moving{animation:none!important}}
+/* show whole cover pictures (no cropped heads) */
+html body main img.jx-feast-cover,html body main img.jx-lib-cover{height:320px!important;max-height:320px!important;object-fit:contain!important;background:#efe9dd}
+@media (max-width:600px){html body main img.jx-feast-cover,html body main img.jx-lib-cover{height:240px!important}}
+html[data-reading-theme="dark"] main img.jx-feast-cover,html[data-reading-theme="dark"] main img.jx-lib-cover{background:#1b2524}
+.jx-money-per{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.jx-money-per button{border:1px solid #d6dfe3!important;background:#fff!important;color:#2c3e50!important;border-radius:999px!important;padding:8px 16px!important;font-weight:700;cursor:pointer}
+.jx-money-per button.is-on{background:var(--mp,#168c89)!important;border-color:var(--mp,#168c89)!important;color:#fff!important}
+html[data-reading-theme="dark"] .jx-money-per button{background:#18211f!important;color:#eef3f1!important;border-color:#3a4a46!important}

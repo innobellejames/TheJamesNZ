@@ -108,7 +108,7 @@
     g.fillStyle = '#fff'; g.font = '700 60px "Playfair Display", Georgia, serif'; g.fillText((ICON[o.part] || '') + ' ' + o.part, W / 2, 160);
     var px = 70, py = 250, pw = W - 140, ph = 520;
     g.save(); rr(g, px, py, pw, ph, 30); g.clip();
-    if (img) { var k = Math.max(pw / img.naturalWidth, ph / img.naturalHeight), dw = img.naturalWidth * k, dh = img.naturalHeight * k; g.drawImage(img, px + (pw - dw) / 2, py + (ph - dh) * 0.25, dw, dh); } else { g.fillStyle = '#dfe9e3'; g.fillRect(px, py, pw, ph); }
+    if (img && JNZX.drawFit) JNZX.drawFit(g, img, px, py, pw, ph); else { g.fillStyle = '#dfe9e3'; g.fillRect(px, py, pw, ph); }
     g.restore();
     var chips = [o.level + ' effort', o.place, o.list.length + ' moves', 'about ' + o.mins + ' min'], cx = px, cy = py + ph + 40;
     g.font = '700 28px Arial, sans-serif'; g.textAlign = 'left';
@@ -178,7 +178,7 @@
         h(Choice, { label: '2. Effort', items: LEVELS, value: level, onPick: pick('level'), icons: { Easy: '🌱', Normal: '🚶', Intense: '🔥' } }),
         h(Choice, { label: '3. Where', items: PLACES, value: place, onPick: pick('place'), icons: { Indoor: '🏠', Outdoor: '🌳' } })),
       h('div', { className: 'jx-move-hero2', key: level + place },
-        h('div', { className: 'jx-move-pic' }, h('img', { src: photo, alt: 'The James family moving together' }), h('span', { className: 'jx-move-pill' }, (ICON[part] || '') + ' ' + part + ' · ' + level + ' · ' + place)),
+        h('div', { className: 'jx-move-pic', style: { backgroundImage: 'url("' + photo + '")' } }, h('img', { src: photo, alt: 'The James family moving together' }), h('span', { className: 'jx-move-pill' }, (ICON[part] || '') + ' ' + part + ' · ' + level + ' · ' + place)),
         h('div', { className: 'jx-move-info' },
           h('h2', null, list.length + ' moves · about ' + Math.max(1, Math.round(total / 60)) + ' min'),
           h('div', { className: 'jx-move-stats' },
@@ -218,7 +218,7 @@
     '.jx-move-list li:before{content:counter(mv);position:absolute;left:14px;top:14px;width:32px;height:32px;border-radius:50%;background:#e7f0ea;color:#245a45;font-weight:800;display:grid;place-items:center}.jx-move-list li.now{border-color:#245a45;box-shadow:0 0 0 2px #245a4533}.jx-move-list h3{margin:0 0 4px;font-size:18px}.jx-move-list p{margin:0}' +
     '.jx-move-timer{display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:center;padding:16px 18px;border-radius:16px;background:#f3f7f4;margin-bottom:14px}.jx-move-timer h3{margin:2px 0}.jx-move-count{font-size:34px;font-weight:800;margin:0}' +
     '.jx-move-hero2{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:0;border-radius:20px;overflow:hidden;background:#fff;box-shadow:0 4px 14px rgba(20,36,58,.1);animation:jxMoveIn .35s ease}' +
-    '.jx-move-pic{position:relative;min-height:260px}.jx-move-pic img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 45%}.jx-move-pic .jx-move-pill{position:absolute;left:14px;bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.2)}' +
+    '.jx-move-pic{position:relative;min-height:280px;background-size:cover;background-position:center;overflow:hidden}.jx-move-pic:before{content:"";position:absolute;inset:-20px;background:inherit;filter:blur(18px) brightness(.85)}html body main .jx-move-pic img{position:absolute!important;inset:0;width:100%!important;height:100%!important;max-height:none!important;object-fit:contain!important}.jx-move-pic .jx-move-pill{position:absolute;left:14px;bottom:14px;box-shadow:0 2px 8px rgba(0,0,0,.2)}' +
     '.jx-move-info{padding:22px 24px;display:flex;flex-direction:column;justify-content:center;gap:10px}.jx-move-info h2{margin:0;font-family:"Playfair Display",Georgia,serif;color:#14243a}.jx-move-info p{margin:0;color:#3b4a46}' +
     '.jx-move-stats{display:flex;gap:8px;flex-wrap:wrap}.jx-move-stats span{background:#e7f0ea;color:#245a45;border-radius:12px;padding:6px 12px;font-size:.9rem}.jx-move-stats b{font-size:1.1rem;margin-right:2px}' +
     '@media (max-width:700px){.jx-move-hero2{grid-template-columns:1fr}.jx-move-pic{min-height:220px}}' +

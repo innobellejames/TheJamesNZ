@@ -25302,7 +25302,7 @@ async function createPhotoPost(post) {
 	const ctx = canvas.getContext("2d");
 	if (!ctx) throw new Error("Your browser cannot prepare a photo here.");
 	const edge = Math.min(image.naturalWidth, image.naturalHeight);
-	ctx.drawImage(image, (image.naturalWidth - edge) / 2, (image.naturalHeight - edge) / 2, edge, edge, 0, 0, 1080, 1080);
+	ctx.drawImage(image, (image.naturalWidth - edge) / 2, (image.naturalHeight - edge) * 0.15, edge, edge, 0, 0, 1080, 1080);
 	ctx.fillStyle = "rgba(8,19,24,.72)";
 	ctx.fillRect(0, 0, 1080, 1080);
 	ctx.textAlign = "center";

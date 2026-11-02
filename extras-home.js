@@ -337,7 +337,13 @@
       return Object.keys(months).length ? months : null;
     } catch (e) { return null; }
   }
-  function totals(m) { var o = {}; MGROUPS.forEach(function (g) { var rows = m[g[0]] || []; o[g[0]] = { plan: rows.reduce(function (s, r) { return s + num(r.plan); }, 0), actual: rows.reduce(function (s, r) { return s + num(r.actual); }, 0) }; }); return o; }
+  var PER = { week: 12 / 52, fortnight: 12 / 26, month: 1, quarter: 3, year: 12 };
+  var PER_LABEL = { week: 'Weekly', fortnight: 'Fortnightly', month: 'Monthly', quarter: 'Quarterly', year: 'Yearly' };
+  var PER_WORD = { week: 'a week', fortnight: 'a fortnight', month: 'a month', quarter: 'a quarter', year: 'a year' };
+  function mv(r, k) { return num(r[k]) / (PER[r[k + 'Per'] || 'month'] || 1); } // monthly value
+  function round2(x) { return Math.round(x * 100) / 100; }
+  function totals(m) { var o = {}; MGROUPS.forEach(function (g) { var rows = m[g[0]] || []; o[g[0]] = { plan: rows.reduce(function (s, r) { return s + mv(r, 'plan'); }, 0), actual: rows.reduce(function (s, r) { return s + mv(r, 'actual'); }, 0) }; }); return o; }
+  function scaleT(T, f) { var o = {}; Object.keys(T).forEach(function (k) { o[k] = { plan: T[k].plan * f, actual: T[k].actual * f }; }); return o; }
   function shades(accent, n) { var out = [], c = accent.replace('#', ''), r = parseInt(c.slice(0, 2), 16), g = parseInt(c.slice(2, 4), 16), b = parseInt(c.slice(4, 6), 16); for (var i = 0; i < n; i++) { var f = 1 - i / (n + 0.5); out.push('rgb(' + Math.round(r * f + 255 * (1 - f)) + ',' + Math.round(g * f + 255 * (1 - f)) + ',' + Math.round(b * f + 255 * (1 - f)) + ')'); } return out; }
   function Donut(props) {
     var data = props.data.filter(function (d) { return d.v > 0; }), sum = data.reduce(function (s, d) { return s + d.v; }, 0), a = -Math.PI / 2;
@@ -355,13 +361,13 @@
         h('small', null, d.label));
     }), h('p', { className: 'jx-legend-inline' }, h('span', { className: 'jx-key', style: { background: props.c1 } }), 'Planned ', h('span', { className: 'jx-key', style: { background: props.c2 } }), 'Actual'));
   }
-  function drawMoney(c, monthLabel, m, t) {
-    var W = 1240, M = 56, g = c.getContext('2d'), T = totals(m), out = T.bills.actual + T.expenses.actual + T.savings.actual + T.debts.actual, cols = shades(t.accent, 4);
+  function drawMoney(c, monthLabel, m, t, per) {
+    per = per || 'month'; var W = 1240, M = 56, g = c.getContext('2d'), T = scaleT(totals(m), PER[per]), out = T.bills.actual + T.expenses.actual + T.savings.actual + T.debts.actual, cols = shades(t.accent, 4);
     var rows = MGROUPS.slice(1).map(function (gr, i) { return [gr[1], T[gr[0]].plan, T[gr[0]].actual, cols[i], gr[0]]; });
     c.width = W; c.height = 860 + 64 + 5 * 62 + 60 + 50;
     g.fillStyle = t.bg; g.fillRect(0, 0, W, c.height);
     g.fillStyle = t.ink; g.font = '64px ' + SERIF; g.textAlign = 'center'; g.fillText('My Money Plan', W / 2, 110);
-    g.font = 'bold 28px ' + SANS; g.fillStyle = t.accent; g.fillText(monthLabel.toUpperCase(), W / 2, 158); g.textAlign = 'left';
+    g.font = 'bold 28px ' + SANS; g.fillStyle = t.accent; g.fillText((PER_LABEL[per] + ' view · ' + monthLabel).toUpperCase(), W / 2, 158); g.textAlign = 'left';
     var tiles = [['Total income', T.income.actual || T.income.plan], ['Total spending', out], ['Left to spend', (T.income.actual || T.income.plan) - out], ['Left to allocate', T.income.plan - (T.bills.plan + T.expenses.plan + T.savings.plan + T.debts.plan)]];
     var tw = (W - 2 * M - 3 * 20) / 4;
     tiles.forEach(function (tl, i) { var x = M + i * (tw + 20); g.fillStyle = hexA(t.accent, 0.12); rr(g, x, 200, tw, 140, 18); g.fill(); g.fillStyle = hexA(t.ink, 0.7); g.font = '23px ' + SANS; g.fillText(tl[0], x + 22, 244); g.fillStyle = tl[1] < 0 ? '#c0392b' : t.ink; g.font = 'bold 38px ' + SANS; g.fillText(money(tl[1]), x + 22, 300); });
@@ -381,7 +387,7 @@
     [['Budget', M + 24], ['Planned', M + 420], ['Actual', M + 680], ['Status', M + 940]].forEach(function (hd) { g.fillText(hd[0], hd[1], ty + 42); });
     var all = [['Income', T.income.plan, T.income.actual, null, 'income']].concat(rows);
     all.forEach(function (r, i) { var y = ty + 64 + i * 62 + 42; g.fillStyle = i % 2 ? hexA(t.accent, 0.06) : 'transparent'; if (i % 2) g.fillRect(M, y - 42, W - 2 * M, 62); g.fillStyle = t.ink; g.font = '26px ' + SANS; g.fillText(r[0], M + 24, y); g.fillText(money(r[1]), M + 420, y); g.fillText(money(r[2]), M + 680, y); var ok = r[4] === 'savings' || r[4] === 'income' ? r[2] >= r[1] : r[2] <= r[1]; g.fillStyle = ok ? '#2e8b57' : '#c0392b'; g.font = 'bold 30px ' + SANS; g.fillText(r[1] || r[2] ? (ok ? '✓' : '✗') : '—', M + 960, y); });
-    var fy = ty + 64 + all.length * 62 + 60; g.fillStyle = hexA(t.ink, 0.55); g.font = '21px ' + SANS; g.fillText('Household plan in NZD. A personal record, not financial advice. · www.thejamesnz.com', M, fy);
+    var fy = ty + 64 + all.length * 62 + 60; g.fillStyle = hexA(t.ink, 0.55); g.font = '21px ' + SANS; g.fillText('Amounts ' + PER_WORD[per] + ' in NZD. A personal record, not financial advice. · www.thejamesnz.com', M, fy);
   }
   try {
     BudgetTracker = function MoneyPlan() {
@@ -390,25 +396,31 @@
       var today = new Date().toLocaleDateString('en-CA', { timeZone: 'Pacific/Auckland' }).slice(0, 7);
       var ms = useState(today), month = ms[0], setMonth = ms[1];
       var m = data.months[month] || blankMonth();
+      var pp = JNZX.useStored('jnzx-money-period', 'month'), per = PER[pp[0]] ? pp[0] : 'month', setPer = pp[1], F = PER[per];
+      function dv(r, k) { if (r[k] === '' || r[k] == null) return ''; return (r[k + 'Per'] || 'month') === per ? r[k] : String(round2(mv(r, k) * F)); }
+      function setVal(gk, r, k, v) { var o = {}; o[k] = v; o[k + 'Per'] = per; updRow(gk, r.id, o); }
       var t = themeOf(data.theme);
       function setData(fn) { setRaw(function (prev) { return fn(prev || data); }); }
-      function setMonthData(fn) { setData(function (d) { var months = Object.assign({}, d.months); months[month] = fn(d.months[month] || blankMonth()); return Object.assign({}, d, { months: months }); }); }
+      function setMonthData(fn) { setData(function (d) { var months = Object.assign({}, d.months); months[month] = fn(d.months[month] || m); return Object.assign({}, d, { months: months }); }); }
       function updRow(gk, id, o) { setMonthData(function (mm) { var x = Object.assign({}, mm); x[gk] = mm[gk].map(function (r) { return r.id === id ? Object.assign({}, r, o) : r; }); return x; }); }
-      var T = totals(m), out = T.bills.actual + T.expenses.actual + T.savings.actual + T.debts.actual, planOut = T.bills.plan + T.expenses.plan + T.savings.plan + T.debts.plan;
+      var T = scaleT(totals(m), F), out = T.bills.actual + T.expenses.actual + T.savings.actual + T.debts.actual, planOut = T.bills.plan + T.expenses.plan + T.savings.plan + T.debts.plan;
       var inc = T.income.actual || T.income.plan;
       var cols = shades(t.accent, 4);
       var monthLabel = (function () { var p = month.split('-'); return new Date(Date.UTC(+p[0], +p[1] - 1, 15)).toLocaleDateString('en-NZ', { month: 'long', year: 'numeric', timeZone: 'UTC' }); })();
-      var ref = usePoster(function (c) { if (c) drawMoney(c, monthLabel, m, t); }, [JSON.stringify(m), JSON.stringify(data.theme), month]);
+      var ref = usePoster(function (c) { if (c) drawMoney(c, monthLabel, m, t, per); }, [JSON.stringify(m), JSON.stringify(data.theme), month, per]);
       var prevKey = (function () { var p = month.split('-'), d = new Date(Date.UTC(+p[0], +p[1] - 2, 1)); return d.toISOString().slice(0, 7); })();
-      function copyPrev() { var p = data.months[prevKey]; if (!p) return; setMonthData(function () { var x = {}; MGROUPS.forEach(function (gr) { x[gr[0]] = (p[gr[0]] || []).map(function (r) { return { id: uid(), name: r.name, plan: r.plan, actual: '' }; }); }); return x; }); }
-      function csv() { var L = [['Month', 'Group', 'Item', 'Planned NZD', 'Actual NZD']]; MGROUPS.forEach(function (gr) { (m[gr[0]] || []).forEach(function (r) { L.push([month, gr[1], r.name, num(r.plan).toFixed(2), num(r.actual).toFixed(2)]); }); }); save(new Blob(['\ufeff' + L.map(function (r) { return r.map(function (x) { return '"' + String(x).replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n')], { type: 'text/csv' }), 'TheJamesNZ-money-plan-' + month + '.csv'); }
+      function copyPrev() { var p = data.months[prevKey]; if (!p) return; setMonthData(function () { var x = {}; MGROUPS.forEach(function (gr) { x[gr[0]] = (p[gr[0]] || []).map(function (r) { return { id: uid(), name: r.name, plan: r.plan, planPer: r.planPer, actual: '' }; }); }); return x; }); }
+      function csv() { var L = [['Month', 'Period', 'Group', 'Item', 'Planned NZD', 'Actual NZD']]; MGROUPS.forEach(function (gr) { (m[gr[0]] || []).forEach(function (r) { L.push([month, PER_LABEL[per], gr[1], r.name, (mv(r, 'plan') * F).toFixed(2), (mv(r, 'actual') * F).toFixed(2)]); }); }); save(new Blob(['\ufeff' + L.map(function (r) { return r.map(function (x) { return '"' + String(x).replace(/"/g, '""') + '"'; }).join(','); }).join('\r\n')], { type: 'text/csv' }), 'TheJamesNZ-money-plan-' + month + '.csv'); }
       var cv = useState({ amt: '', from: 'week' }), conv = cv[0], setConv = cv[1];
-      var perMonth = num(conv.amt) * ({ week: 52, fortnight: 26, month: 12, year: 1 }[conv.from]) / 12;
+      var perMonth = num(conv.amt) * ({ week: 52, fortnight: 26, month: 12, quarter: 4, year: 1 }[conv.from]) / 12;
       return h('div', { className: 'jx-page jx-money', style: { '--mp': t.accent } },
-        JNZX.Header('MODERN & LIFESTYLE · MY MONEY PLAN', 'My Money Plan.', 'A monthly household budget in New Zealand dollars: plan your income, bills, everyday spending, savings and debts, then track what really happened. Saved on this device.'),
+        JNZX.Header('MODERN & LIFESTYLE · MY MONEY PLAN', 'My Money Plan.', 'A household budget in New Zealand dollars — weekly, fortnightly, monthly, quarterly or yearly. Plan your income, bills, everyday spending, savings and debts, then track what really happened. Saved on this device.'),
         h('div', { className: 'jx-row jx-form' },
+          h('label', null, 'Amounts per', h('select', { value: per, onChange: function (e) { setPer(e.target.value); } }, Object.keys(PER).map(function (k) { return h('option', { key: k, value: k }, PER_LABEL[k]); }))),
           h('label', null, 'Month', h('input', { type: 'month', value: month, onChange: function (e) { if (e.target.value) setMonth(e.target.value); } })),
           data.months[prevKey] && h('button', { type: 'button', className: 'secondary', onClick: copyPrev }, 'Copy plan from last month')),
+        h('div', { className: 'jx-money-per', role: 'tablist', 'aria-label': 'Budget period' }, Object.keys(PER).map(function (k) { return h('button', { key: k, type: 'button', role: 'tab', 'aria-selected': per === k, className: per === k ? 'is-on' : '', onClick: function () { setPer(k); } }, PER_LABEL[k]); })),
+        per !== 'month' && h('p', { className: 'small-note' }, 'Showing amounts ' + PER_WORD[per] + '. Type amounts ' + PER_WORD[per] + ' — Mateo converts everything for you (' + (per === 'quarter' || per === 'year' ? 'based on this month’s plan' : 'a year has 52 weeks and 26 fortnights') + ').'),
         h('div', { className: 'jx-stats jx-keep-colour' },
           h('div', { className: 'jx-stat' }, h('span', null, 'Total income'), h('strong', null, money(inc))),
           h('div', { className: 'jx-stat' }, h('span', null, 'Total spending'), h('strong', null, money(out))),
@@ -424,13 +436,13 @@
           var rows = m[gr[0]] || [], tt = T[gr[0]];
           return h('section', { key: gr[0], className: 'jx-card jx-money-g' },
             h('h3', null, gr[2] + ' ' + gr[1]),
-            h('div', { className: 'jx-money-head' }, h('span', null, gr[0] === 'income' ? 'Source' : 'Item'), h('span', null, gr[0] === 'income' ? 'Expected' : 'Planned'), h('span', null, 'Actual'), h('span', null, '')),
+            h('div', { className: 'jx-money-head' }, h('span', null, gr[0] === 'income' ? 'Source' : 'Item'), h('span', null, (gr[0] === 'income' ? 'Expected' : 'Planned') + (per !== 'month' ? ' (' + PER_WORD[per] + ')' : '')), h('span', null, 'Actual'), h('span', null, '')),
             rows.map(function (r) {
-              var over = gr[0] !== 'income' && gr[0] !== 'savings' && num(r.actual) > num(r.plan) && num(r.plan) > 0;
+              var over = gr[0] !== 'income' && gr[0] !== 'savings' && mv(r, 'actual') > mv(r, 'plan') && mv(r, 'plan') > 0;
               return h('div', { key: r.id, className: 'jx-money-row' + (over ? ' is-over' : '') },
                 h('input', { value: r.name, 'aria-label': gr[1] + ' item name', onChange: function (e) { updRow(gr[0], r.id, { name: e.target.value }); } }),
-                h('input', { type: 'number', min: 0, step: 0.01, value: r.plan, placeholder: '0.00', 'aria-label': 'Planned amount for ' + r.name, onChange: function (e) { updRow(gr[0], r.id, { plan: e.target.value }); } }),
-                h('input', { type: 'number', min: 0, step: 0.01, value: r.actual, placeholder: '0.00', 'aria-label': 'Actual amount for ' + r.name, onChange: function (e) { updRow(gr[0], r.id, { actual: e.target.value }); } }),
+                h('input', { type: 'number', min: 0, step: 0.01, value: dv(r, 'plan'), placeholder: '0.00', 'aria-label': 'Planned amount for ' + r.name, onChange: function (e) { setVal(gr[0], r, 'plan', e.target.value); } }),
+                h('input', { type: 'number', min: 0, step: 0.01, value: dv(r, 'actual'), placeholder: '0.00', 'aria-label': 'Actual amount for ' + r.name, onChange: function (e) { setVal(gr[0], r, 'actual', e.target.value); } }),
                 h('button', { type: 'button', className: 'jx-x', 'aria-label': 'Remove ' + r.name, onClick: function () { setMonthData(function (mm) { var x = Object.assign({}, mm); x[gr[0]] = mm[gr[0]].filter(function (y) { return y.id !== r.id; }); return x; }); } }, '×'));
             }),
             h('div', { className: 'jx-money-row jx-money-total' }, h('strong', null, 'Total'), h('strong', null, money(tt.plan)), h('strong', null, money(tt.actual)), h('span')),
@@ -438,14 +450,14 @@
         })),
         h('div', { className: 'jx-card' }, h('h3', null, 'Pay or bill converter'), h('div', { className: 'jx-row jx-form' },
           h('label', null, 'Amount (NZD)', h('input', { type: 'number', min: 0, step: 0.01, value: conv.amt, style: { width: '9em' }, onChange: function (e) { setConv(Object.assign({}, conv, { amt: e.target.value })); } })),
-          h('label', null, 'Every', h('select', { value: conv.from, onChange: function (e) { setConv(Object.assign({}, conv, { from: e.target.value })); } }, [['week', 'week'], ['fortnight', 'fortnight'], ['month', 'month'], ['year', 'year']].map(function (x) { return h('option', { key: x[0], value: x[0] }, x[1]); }))),
-          h('p', { className: 'jx-big-sm' }, '= ' + money(perMonth) + ' a month · ' + money(perMonth * 12 / 52) + ' a week'))),
+          h('label', null, 'Every', h('select', { value: conv.from, onChange: function (e) { setConv(Object.assign({}, conv, { from: e.target.value })); } }, [['week', 'week'], ['fortnight', 'fortnight'], ['month', 'month'], ['quarter', 'quarter'], ['year', 'year']].map(function (x) { return h('option', { key: x[0], value: x[0] }, x[1]); }))),
+          h('p', { className: 'jx-big-sm' }, '= ' + money(perMonth * 12 / 52) + ' a week · ' + money(perMonth * 12 / 26) + ' a fortnight · ' + money(perMonth) + ' a month · ' + money(perMonth * 3) + ' a quarter · ' + money(perMonth * 12) + ' a year'))),
         h('section', { className: 'jx-poster-sec' },
-          h('h2', null, 'Your monthly summary'),
+          h('h2', null, 'Your ' + PER_LABEL[per].toLowerCase() + ' summary'),
           h('p', { className: 'jx-muted' }, 'Choose colours for your summary and charts, then save or print it.'),
           h(ThemePicker, { value: data.theme, onChange: function (v) { setData(function (d) { return Object.assign({}, d, { theme: v }); }); } }),
           h('div', { className: 'jx-poster-preview jx-keep-colour' }, h('canvas', { ref: ref, 'aria-label': 'Monthly money summary preview' })),
-          h(ExportBar, { canvasRef: ref, name: 'TheJamesNZ-money-plan-' + month, title: 'My Money Plan · ' + monthLabel, extra: h('button', { type: 'button', className: 'secondary', onClick: csv }, 'Download spreadsheet (CSV)') })),
+          h(ExportBar, { canvasRef: ref, name: 'TheJamesNZ-money-plan-' + per + '-' + month, title: 'My Money Plan · ' + PER_LABEL[per] + ' · ' + monthLabel, extra: h('button', { type: 'button', className: 'secondary', onClick: csv }, 'Download spreadsheet (CSV)') })),
         h('div', { className: 'jx-note' }, h('strong', null, 'Helpful, free and independent: '), 'Sorted (sorted.org.nz) has budgeting guides and tools, and MoneyTalks (0800 345 123) offers free financial help.'),
         h('p', { className: 'small-note' }, 'Your figures stay in this browser. Sharing the summary picture shares your numbers, so choose what you’re comfortable with. This is a household record, not financial advice.'));
     };
@@ -619,7 +631,8 @@
     var cu = useState(''), custom = cu[0], setCustom = cu[1];
     var tx = useState(''), text = tx[0], setText = tx[1];
     var kd = useState('Go to'), kind = kd[0], setKind = kd[1];
-    var items = (data.cities[city]) || (typeof xCityDefault === 'function' ? xCityDefault(city) : []);
+    var regOf = extraReg[city] || (JNZX.cityRegion && JNZX.cityRegion(city)) || (region !== 'All regions' ? region : '');
+    var items = (data.cities[city]) || (typeof xCityDefault === 'function' ? xCityDefault(city, regOf) : []);
     function update(next) { setData(function (d) { d = d || { cities: {}, extra: [] }; var c = Object.assign({}, d.cities); c[city] = next; return Object.assign({}, d, { cities: c }); }); }
     var post = items.map(function (r) { return (r.done ? '✓ ' : '□ ') + r.kind + ': ' + r.text; }).join('\n');
     var bg = './photo-share/inspiration.webp';
@@ -643,6 +656,7 @@
           h('input', { value: r.text, 'aria-label': 'Bucket list idea ' + (i + 1), onChange: function (e) { var v = e.target.value; update(items.map(function (x, n) { return n === i ? Object.assign({}, x, { text: v }) : x; })); } }),
           h('button', { type: 'button', className: 'secondary', onClick: function () { update(items.filter(function (_, n) { return n !== i; })); } }, 'Remove'));
       })),
+      data.cities[city] && items.length < 20 && h('p', null, h('button', { type: 'button', className: 'secondary', onClick: function () { var have = {}; items.forEach(function (x) { have[x.text.toLowerCase()] = 1; }); update(items.concat((typeof xCityDefault === 'function' ? xCityDefault(city, regOf) : []).filter(function (x) { return !have[x.text.toLowerCase()]; }))); } }, '✨ Add more ideas for ' + city)),
       h('form', { className: 'jx-row jx-form', onSubmit: function (e) { e.preventDefault(); var v = text.trim(); if (!v) return; update(items.concat([{ kind: kind, text: v, done: false }])); setText(''); } },
         h('label', null, 'Type', h('select', { value: kind, onChange: function (e) { setKind(e.target.value); } }, ['Go to', 'Food to try', 'Must experience'].map(function (k) { return h('option', { key: k, value: k }, k); }))),
         h('label', null, 'Your idea', h('input', { value: text, maxLength: 140, placeholder: 'e.g. Picnic at the botanic gardens', onChange: function (e) { setText(e.target.value); } })),

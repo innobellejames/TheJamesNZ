@@ -488,6 +488,25 @@
     'Kaitaia': ['Drive to Cape Rēinga lighthouse', 'Explore Ninety Mile Beach', 'Slide down the Te Paki sand dunes', 'Try fresh local seafood'],
     'Kerikeri': ['Visit the Stone Store, NZ’s oldest stone building', 'Walk to Rainbow Falls', 'Explore the Waitangi Treaty Grounds nearby', 'Taste local citrus and chocolate']
   };
+  var REGION_OF = { 'Whangārei': 'Northland', 'Kaitaia': 'Northland', 'Kerikeri': 'Northland', 'Auckland': 'Auckland', 'Pukekohe': 'Auckland', 'Hamilton': 'Waikato', 'Taupō': 'Waikato', 'Cambridge': 'Waikato', 'Tokoroa': 'Waikato', 'Tauranga': 'Bay of Plenty', 'Rotorua': 'Bay of Plenty', 'Whakatāne': 'Bay of Plenty', 'Gisborne': 'Gisborne', 'Napier': "Hawke's Bay", 'Hastings': "Hawke's Bay", 'New Plymouth': 'Taranaki', 'Whanganui': 'Manawatū-Whanganui', 'Palmerston North': 'Manawatū-Whanganui', 'Wellington': 'Wellington', 'Lower Hutt': 'Wellington', 'Upper Hutt': 'Wellington', 'Porirua': 'Wellington', 'Masterton': 'Wellington', 'Richmond': 'Tasman', 'Nelson': 'Nelson', 'Blenheim': 'Marlborough', 'Greymouth': 'West Coast', 'Christchurch': 'Canterbury', 'Timaru': 'Canterbury', 'Ashburton': 'Canterbury', 'Dunedin': 'Otago', 'Queenstown': 'Otago', 'Wānaka': 'Otago', 'Oamaru': 'Otago', 'Invercargill': 'Southland' };
+  var REGION_IDEAS = {
+    'Northland': ['Take a boat trip in the Bay of Islands to the Hole in the Rock', 'Visit the Waitangi Treaty Grounds', 'Stand beside Tāne Mahuta, the giant kauri in Waipoua Forest', 'See Christ Church in Russell, NZ’s oldest surviving church', 'Swim in the clear Kai Iwi Lakes', 'Explore the Hokianga Harbour and sand dunes at Ōpononi', 'Snorkel or picnic along the Tutukākā Coast', 'Try fresh Northland kūmara and citrus from a roadside stall'],
+    'Auckland': ['Walk up the volcano on Rangitoto Island', 'See Lion Rock and the black sand at Piha', 'Meet the animals at Auckland Zoo', 'Look out from the Sky Tower', 'Visit the birds on Tiritiri Matangi Island', 'Walk a waterfall track in the Waitākere Ranges', 'Snorkel with fish at Goat Island Marine Reserve', 'Try a Ponsonby or Dominion Road food crawl'],
+    'Waikato': ['Visit Hobbiton near Matamata', 'Float under the glowworms at Waitomo Caves', 'Watch the surfers at Raglan', 'Walk to Bridal Veil Falls', 'Dig your own spa at Hot Water Beach on the Coromandel', 'Walk to Cathedral Cove', 'Explore the tunnels of Karangahake Gorge', 'Climb up beside Wairere Falls'],
+    'Bay of Plenty': ['Picnic at McLaren Falls Park', 'Soak in the Mount Maunganui hot pools', 'Wander the gardens at Te Puna Quarry Park', 'Swim under Kaiate Falls', 'Walk the Papamoa Hills', 'Paddle on Lake Tarawera', 'Relax at Ōhope Beach', 'Taste fresh kiwifruit in Te Puke'],
+    'Gisborne': ['Slide down the Rere Rockslide in summer', 'See Rere Falls', 'Walk among the trees at Eastwoodhill Arboretum', 'Walk the long Tolaga Bay Wharf', 'Soak at Morere Hot Springs', 'Visit Tairāwhiti Museum', 'Watch the surf at Wainui Beach', 'Shop the Gisborne farmers’ market'],
+    "Hawke's Bay": ['See the gannet colony at Cape Kidnappers on a guided tour', 'Cycle the Hawke’s Bay Trails', 'Walk around the Ahuriri waterfront', 'Swim at Waimarama Beach', 'Walk to Shine Falls', 'Picnic at Clifton Reserve', 'Explore Havelock North village', 'Try a summer fruit ice cream'],
+    'Taranaki': ['Walk among the rhododendrons at Pukeiti', 'See Dawson Falls on the mountain', 'Photograph the Pouakai Tarns reflection', 'Drive the Forgotten World Highway', 'Climb Paritutu Rock for sea views', 'Visit Tūpare garden', 'Watch the waves at Ōpunake', 'Try a Taranaki farm-shop treat'],
+    'Manawatū-Whanganui': ['Look at Mt Ruapehu from Whakapapa Village', 'Walk the Tongariro Alpine Crossing (fit walkers, good weather)', 'Jet boat to the Bridge to Nowhere', 'Visit the Te Āpiti wind farm lookout', 'See the working Dutch windmill in Foxton', 'Meet the giant carrot in Ohakune', 'Take a photo with the gumboot in Taihape', 'Walk Himatangi Beach'],
+    'Wellington': ['Spot native birds at Zealandia', 'Tour the Wētā Cave workshop', 'Take a day trip to Kapiti Island', 'Walk the coast to the Red Rocks seal colony', 'See the Putangirua Pinnacles in the Wairarapa', 'Climb to Cape Palliser lighthouse', 'Meet the animals at Wellington Zoo', 'Try a Martinborough café lunch'],
+    'Tasman': ['Walk part of the Abel Tasman Coast Track', 'Swim at golden Kaiteriteri Beach', 'See the clear water of Te Waikoropupū Springs', 'Kayak to Split Apple Rock', 'Explore Māpua Wharf', 'See Farewell Spit', 'Picnic on Rabbit Island', 'Pick berries or apples in season'],
+    'Nelson': ['Walk part of the Abel Tasman Coast Track', 'Swim at Kaiteriteri Beach', 'Visit Founders Heritage Park', 'See Te Waikoropupū Springs', 'Kayak to Split Apple Rock', 'Explore Māpua Wharf', 'Walk the Maitai River', 'Try a Nelson seafood lunch'],
+    'Marlborough': ['Walk part of the Queen Charlotte Track', 'Cruise the Marlborough Sounds', 'Visit the Edwin Fox ship museum in Picton', 'Go whale watching in Kaikōura', 'See the seals at Ohau Point', 'Try green-lipped mussels in Havelock', 'Walk the Wither Hills', 'See EcoWorld in Picton'],
+    'West Coast': ['Walk to the blue water of Hokitika Gorge', 'Walk the Franz Josef glacier valley', 'See the mirror reflections at Lake Matheson', 'See the Pancake Rocks at Punakaiki', 'Watch the seals at Cape Foulwind', 'Collect driftwood on Hokitika Beach', 'Bike part of the West Coast Wilderness Trail', 'Visit the Denniston Plateau'],
+    'Canterbury': ['Visit the Church of the Good Shepherd at Lake Tekapo', 'Walk the Hooker Valley Track at Aoraki/Mount Cook', 'Swim in the Hanmer Springs pools', 'See Hector’s dolphins at Akaroa', 'Meet the animals at Orana Wildlife Park', 'Visit the International Antarctic Centre', 'Explore the Castle Hill boulders', 'Build sandcastles at Sumner Beach'],
+    'Otago': ['Walk down to Tunnel Beach', 'Bike part of the Otago Central Rail Trail', 'Walk Arrowtown in autumn colour', 'Ride the Shotover Jet', 'See the Moeraki Boulders', 'Visit Nugget Point lighthouse', 'Paddle at Lake Hāwea', 'Spot birds at Orokonui Ecosanctuary'],
+    'Southland': ['Cruise Milford Sound / Piopiotahi', 'Visit the Te Anau glowworm caves', 'Take a photo at the Bluff signpost', 'Ferry across to Stewart Island / Rakiura', 'See the petrified forest at Curio Bay', 'Walk to McLean Falls in the Catlins', 'Walk to Key Summit on the Routeburn', 'Meet the giant brown trout in Gore']
+  };
   var CITY_GENERIC = [
     ['Go to', 'A local library — free events, books and holiday programmes'],
     ['Go to', 'The best playground in town for a family picnic'],
@@ -496,13 +515,20 @@
     ['Must experience', 'A weekend farmers’ market'],
     ['Must experience', 'A sunset walk at a local lookout'],
     ['Must experience', 'A free community event or festival'],
-    ['Go to', 'The local i-SITE for maps and hidden gems']
+    ['Go to', 'The local i-SITE for maps and hidden gems'],
+    ['Go to', 'The botanic gardens or a big local park'],
+    ['Must experience', 'A bike ride on a local cycle trail'],
+    ['Food to try', 'An ice cream from the local dairy on a hot day'],
+    ['Must experience', 'A visit to the local marae open day or cultural centre (when invited)']
   ];
+  function kindOf(t) { return /try|taste|grab|brunch|pie|treat|mussels|oyster|whitebait|seafood|burger|ice cream|lunch|food|kūmara|kiwifruit|citrus|fruit|berries|apples/i.test(t) ? 'Food to try' : /walk|swim|ride|cruise|climb|bike|kayak|paddle|soak|slide|float|snorkel|watch|photograph|spot|see|look/i.test(t) ? 'Must experience' : 'Go to'; }
+  JNZX.cityRegion = function (city) { return REGION_OF[city] || ''; };
   try {
-    xCityDefault = function (city) {
-      var own = (CITY[city] || ['Choose a local park, museum or public garden', 'Find a walking track near town', 'Visit the local museum or gallery']).map(function (t, i) { return { kind: i === CITY[city] && CITY[city].length - 1 ? 'Food to try' : /try|taste|grab|brunch|pie|treat|mussels|oyster|whitebait|seafood|burger/i.test(t) ? 'Food to try' : i % 2 ? 'Must experience' : 'Go to', text: t, done: false }; });
-      var extra = CITY_GENERIC.map(function (g) { return { kind: g[0], text: g[1], done: false }; });
-      return own.concat(extra).slice(0, Math.max(10, own.length + extra.length));
+    xCityDefault = function (city, region) {
+      var own = (CITY[city] || ['Find the best walking track near town', 'Visit the local museum or gallery']).map(function (t) { return { kind: kindOf(t), text: t, done: false }; });
+      var reg = (REGION_IDEAS[region || REGION_OF[city]] || []).map(function (t) { return { kind: kindOf(t), text: t + ' (' + (region || REGION_OF[city]) + ')', done: false }; });
+      var seen = {}, all = own.concat(reg, CITY_GENERIC.map(function (g) { return { kind: g[0], text: g[1], done: false }; })).filter(function (x) { var k = x.text.toLowerCase().replace(/\s*\(.*\)$/, ''); if (seen[k]) return false; seen[k] = 1; return true; });
+      return all;
     };
   } catch (e) {}
 

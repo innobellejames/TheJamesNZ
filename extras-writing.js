@@ -658,6 +658,10 @@
     [/\b(?:and )?(?:I|we) (?:will )?(?:take|answer) (?:any |some |your )?questions? (?:at |in )?(?:the )?end(?: of)?(?: the| my| our)?(?: presentation| talk| session| meeting| class| lesson)?\b/gi, function (m) { return /^and /i.test(m) ? 'and I will answer questions at the end' : 'I will answer questions at the end'; }, '“I will answer questions at the end”']
   );
   GRAM_POST.push([/\b(please|feel free to|you can|you may|can) ask question\b(?! (?:about|to|of|for))/gi, function (m, a) { return a + ' ask questions'; }, '“Ask questions” (more than one)']);
+  GRAM_POST.push(
+    [new RegExp('\\b(present|presenting|explain|explaining|show|showing|discuss|discussing|introduce|introducing|share|sharing|demonstrate|demonstrating|review|reviewing|describe|describing) (?!(?:the|a|an|my|our|your|his|her|their|this|that|these|those|some|it|them|you|us|him|me)\\b)((?:[a-z]+ ){0,3}(?:procedure|procedures|process|processes|plan|system|results|findings|method|methods|policy|steps|design|budget|proposal|strategy|framework|model|data|survey|timeline|schedule|guidelines|rules|checklist|programme|program|project|report|options|recommendations))\\b', 'gi'), function (m, v, np) { return v + ' the ' + np; }, 'Use “the” before a specific thing: “present the water treatment procedure”'],
+    [/(^|[.!?]\s+)(?:please\s+)?(?:you can\s+|you may\s+)?ask(?: me)?(?: any| your| some)?(?: questions?)?(?: at| in)?(?: the)? end(?: of)?(?: the| my| our| this)? ?(presentation|talk|session|meeting|class|lesson|speech|workshop)?\s*(?=[.!?]|$)/gi, function (m, a, n) { return a + 'Please ask questions at the end' + (n ? ' of the ' + n.toLowerCase() : '') ; }, 'Invite questions politely: “Please ask questions at the end of the presentation.”']
+  );
   var ING_BASE = {}; Object.keys(VERB).forEach(function (b) { ING_BASE[VERB[b][2]] = b; });
   GRAM_POST.push(
     [/\b(thank you|thanks|grateful|thankful|sorry|apologise|apologize|excuse me|forgive me) for (help|support|call|visit|come|invite|share|send|teach|listen|wait|understand|care|bring|give|make|take|look|join|remind|check|reply|answer|organise|organize|cook|drive|pray|encourage|tell|show|let|be|do|keep) (me|us|him|her|them|my|our|the|this|that|it|everything|all|so|such|to|in|with|on|for|a|an|your)\b/gi, function (m, a, v, o) { var b = v.toLowerCase(); var ing = VERB[b] ? VERB[b][2] : (/e$/.test(b) && !/ee$/.test(b) ? b.slice(0, -1) : b) + 'ing'; if (b === 'let') ing = 'letting'; if (b === 'be') ing = 'being'; return a + ' for ' + ing + ' ' + o; }, 'After “thank you for”, use the -ing form: “thank you for helping me”'],
@@ -1021,6 +1025,7 @@
       var startOfSentence = /(^|[.!?]\s*|\n\s*)$/.test(text.slice(0, off + pre.length));
       if (/[^a-zA-Z’']/.test(bare)) return m; // te reo Māori and other words with macrons
       if (/^[A-Z]/.test(bare) && !known(bare)) return m; // names and places
+      if (/\b(i am|i’m|i'm|im|my name is|my name’s|name is|this is|call me|it is|it’s|meet|named|called|with|and|from|to|by|dear|hi|hello|thanks|thank you)\s+$/i.test(text.slice(0, off + pre.length)) && !known(bare) && bare.length >= 3) { if (/\b(i am|i’m|i'm|im|my name is|my name’s|name is|this is|call me|named|called|dear|hi|hello)\s+$/i.test(text.slice(0, off + pre.length))) { var NM = bare.charAt(0).toUpperCase() + bare.slice(1); changes.push({ from: bare, to: NM, why: 'Names start with a capital letter' }); return pre + NM + wd.slice(bare.length); } }
       if (known(bare)) return m;
       var lb = bare.toLowerCase();
       if (Object.prototype.hasOwnProperty.call(MISSPELL, lb) || /^(dont|doesnt|didnt|cant|wont|isnt|wasnt|arent|werent|havent|hasnt|hadnt|couldnt|wouldnt|shouldnt|im|ive|youre|theyre|thats|whats|lets|its|id|ill|hes|shes|theres|wheres|whos)$/.test(lb)) return m;
