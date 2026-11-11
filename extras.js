@@ -163,7 +163,10 @@
       keep('Home & garden', 'Home & Green', 'Live lightly'),
       add('x:sustainable', 'Sustainable Living & Recycling', Icons.leaf),
       add('x:public-holidays', 'NZ Public Holidays', Icons.calendar, 'Plan & work'),
-      add('x:jobs', 'Job Search NZ', Icons.briefcase)
+      add('x:jobs', 'Job Search NZ', Icons.briefcase),
+      add('x:shop', 'Family Printables', Icons.gift, 'Support us'),
+      add('x:support', 'Support The James NZ', Icons.hand),
+      add('x:privacy', 'Privacy & Terms', Icons.scroll)
     ] }
   ];
   GROUPS.forEach(function (g) { g.items = g.items.filter(Boolean); });
@@ -671,6 +674,9 @@
     'Grocery list': ['./photo-share/savings-groceries.webp', 'A colourful grocery list with a budget.'],
     'Budget tracker': ['./photo-share/savings-money.webp', 'Plan income, bills, spending and savings.'],
     'x:diy': ['./story-pages/story-10-middle.webp', '18 simple home projects with NZ safety notes.'],
+    'x:shop': ['./story-pages/story-05-end.webp', 'Printable family packs — bucket lists, holiday fun, money planner, faith packs and joke cards.'],
+    'x:support': ['./story-pages/story-30-middle.webp', 'Easy ways to help keep The James NZ free.'],
+    'x:privacy': ['./october/children-0.webp', 'How we look after your information, and our terms.'],
     'x:holidays': ['./story-cartoons/story-05.webp', '36 indoor activities for rainy school holidays.'],
     'x:celebrations': ['./october/loaves-0.webp', 'Christmas, Easter, Matariki and important NZ days.'],
     'Languages': ['./oct7-country/about-humans.webp', 'Greetings and phrases from around the world.'],

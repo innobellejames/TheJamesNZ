@@ -1064,3 +1064,8 @@ html[data-reading-theme="dark"] main img.jx-feast-cover,html[data-reading-theme=
 .jx-money-per button{border:1px solid #d6dfe3!important;background:#fff!important;color:#2c3e50!important;border-radius:999px!important;padding:8px 16px!important;font-weight:700;cursor:pointer}
 .jx-money-per button.is-on{background:var(--mp,#168c89)!important;border-color:var(--mp,#168c89)!important;color:#fff!important}
 html[data-reading-theme="dark"] .jx-money-per button{background:#18211f!important;color:#eef3f1!important;border-color:#3a4a46!important}
+main .jx-news .jx-news-row{display:flex!important;flex-direction:row!important;flex-wrap:wrap;gap:8px;align-items:stretch;grid-template-columns:none!important}
+main .jx-news .jx-news-row input{flex:1 1 220px!important;height:48px!important;min-height:0!important;max-width:none!important;padding:0 14px!important;background:#fff!important;color:#14243a!important;border:0!important;border-radius:12px!important}
+main .jx-news .jx-news-row button{flex:0 0 auto;height:48px}
+main .jx-news .jx-news-ok{display:flex!important;flex-direction:row!important;grid-template-columns:none!important;font-weight:400}
+main .jx-news .jx-news-ok input{flex:0 0 18px}

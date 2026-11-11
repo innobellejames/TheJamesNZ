@@ -1,0 +1,16 @@
+{
+  "name": "The James NZ",
+  "short_name": "James NZ",
+  "description": "Faith, family and community from Aotearoa New Zealand — jokes, prayers, Kiwi adventures, holiday fun and more.",
+  "start_url": "./?source=homescreen",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#fffaf2",
+  "theme_color": "#163d6b",
+  "lang": "en-NZ",
+  "icons": [
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "./icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -27511,7 +27511,7 @@ function SiteNavigation({ tab, onNavigate }) {
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
 				onClick: () => go("FAQ"),
 				children: "FAQ"
-			})] })] })
+			}), jH("button", { onClick: () => go("x:shop") }, "Printables"), jH("button", { onClick: () => go("x:privacy") }, "Privacy")] })] })
 		}),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
 			className: "header bookstore-header",
@@ -27527,7 +27527,7 @@ function SiteNavigation({ tab, onNavigate }) {
 				}),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("div", {
 					className: "header-shortcuts",
-					children: [jH("button",{type:"button",className:"jx-hdr-mateo",onClick:()=>go("Mateo · AI friend")},"Ask Mateo"),jH("button",{type:"button",onClick:()=>go("How to use this website")},"Website guide")]
+					children: [jH("button",{type:"button",className:"jx-hdr-support",onClick:()=>go("x:support")},"💛 Support"),jH("button",{type:"button",className:"jx-hdr-mateo",onClick:()=>go("Mateo · AI friend")},"Ask Mateo"),jH("button",{type:"button",onClick:()=>go("How to use this website")},"Website guide")]
 				}),
 				jH(PageShare),
 				/* @__PURE__ */ (0, import_jsx_runtime.jsxs)(Sheet, {
