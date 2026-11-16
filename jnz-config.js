@@ -45,7 +45,7 @@ window.JNZ_CONFIG = {
     'routines-chore-charts': { url: '', price: 'NZ$7' },
     'family-emergency-plan': { url: '', price: 'NZ$6' },
     /* All 12 packs in one download (upload every PDF to one shop product) */
-    'complete-collection':   { url: '', price: 'NZ$45' }
+    'complete-collection':   { url: '', price: 'NZ$39' }
   },
 
   /* 7. Multi-buy promotion. Create matching discount codes in your shop
@@ -56,8 +56,8 @@ window.JNZ_CONFIG = {
   promo: {
     on: true,
     storeUrl: '',
-    two:   { percent: 20, code: 'FAMILY2' },   // buy any 2 packs
-    three: { percent: 30, code: 'FAMILY3' },   // buy 3 or more packs
+    two:   { percent: 30, code: 'FAMILY2' },   // buy any 2 packs
+    three: { percent: 50, code: 'FAMILY3' },   // buy 3 or more packs
     ends: ''                                   // optional, e.g. '31 January 2027'
   },
 

@@ -55,18 +55,21 @@
       h('div', { className: 'jx-bundle-top' },
         h('strong', null, '🎁 My bundle · ' + items.length + (items.length === 1 ? ' pack' : ' packs')),
         h('button', { type: 'button', className: 'jx-bundle-clear', onClick: function () { bkSet([]); } }, 'Clear')),
-      h('div', { className: 'jx-bundle-chips' }, items.map(function (p) { return h('button', { key: p.id, type: 'button', title: 'Remove', onClick: function () { bkToggle(p.id); } }, p.emoji + ' ' + p.title + ' ✕'); })),
+      h('ul', { className: 'jx-bundle-items' }, items.map(function (p) { var u = shopInfo(p.id).url; return h('li', { key: p.id },
+        h('span', null, p.emoji + ' ' + p.title + (shopInfo(p.id).price ? ' · ' + shopInfo(p.id).price : '')),
+        u && h('a', { href: u, target: '_blank', rel: 'noopener', className: 'jx-bundle-open' }, 'Add to cart ↗'),
+        h('button', { type: 'button', className: 'jx-bundle-rm', 'aria-label': 'Remove ' + p.title, onClick: function () { bkToggle(p.id); } }, '✕')); })),
       h('div', { className: 'jx-bundle-sum' },
         total > 0 && h('span', null, 'Packs: ', h('b', null, money(total))),
         t && h('span', { className: 'jx-bundle-save' }, 'You save ' + t.percent + '%: ', h('b', null, '−' + money(save))),
         t && total > 0 && h('span', null, 'You pay: ', h('b', { className: 'jx-bundle-pay' }, money(total - save)))),
       next && h('p', { className: 'jx-bundle-next' }, '💡 ' + next),
       t && h('div', { className: 'jx-bundle-code' }, h('span', null, 'Use code at checkout:'), h('button', { type: 'button', onClick: copy, 'aria-label': 'Copy code ' + t.code }, h('code', null, t.code), copied ? ' ✓ copied' : ' 📋')),
-      collN && total > collN && h('p', { className: 'jx-bundle-next' }, '⭐ Tip: the Complete Family Collection (all 12 packs) is only ' + coll.price + '.'),
+      collN && (total - save) > collN && h('p', { className: 'jx-bundle-next' }, '⭐ Tip: the Complete Family Collection (all 12 packs) is only ' + coll.price + '.'),
       h('div', { className: 'jx-bundle-go' },
         store ? h('a', { className: 'jx-buy', href: store, target: '_blank', rel: 'noopener' }, 'Go to checkout →')
-          : h('span', { className: 'jx-soon' }, 'Checkout opening soon'),
-        h('small', null, 'Add the same packs to the shop cart, then enter the code. The discount is applied at checkout.')));
+          : (items.some(function (p) { return shopInfo(p.id).url; }) ? null : h('span', { className: 'jx-soon' }, 'Checkout opening soon')),
+        h('small', null, 'Tap “Add to cart” for each pack (it opens our secure shop), then enter the code at checkout. The discount is applied by the shop.')));
   }
 
   function Ribbon() {
@@ -316,15 +319,27 @@
     '.jx-hp-k{display:inline-block;font-size:.72rem;letter-spacing:.12em;font-weight:900;color:#d5b16d}' +
     '.jx-bundle{position:sticky;bottom:10px;z-index:30;margin:22px 0;background:#fff;border:2px solid #d5b16d;border-radius:20px;padding:14px 16px;box-shadow:0 10px 30px rgba(20,36,58,.18);display:grid;gap:8px;color:#14243a}' +
     '.jx-bundle-top{display:flex;justify-content:space-between;align-items:center;gap:10px}.jx-bundle-clear{background:none!important;border:0!important;color:#7a6a4a!important;text-decoration:underline;cursor:pointer;padding:2px!important}' +
-    '.jx-bundle-chips{display:flex;flex-wrap:wrap;gap:6px}.jx-bundle-chips button{background:#f6efe0!important;border:0!important;border-radius:999px!important;padding:4px 10px!important;font-size:.82rem;color:#3a2a08!important;cursor:pointer}' +
-    '.jx-bundle-sum{display:flex;flex-wrap:wrap;gap:14px;font-size:.98rem}.jx-bundle-save{color:#b5401f}.jx-bundle-pay{font-size:1.2rem}.jx-bundle-next{margin:0;font-size:.9rem;color:#5b4a26}' +
+        '.jx-bundle-sum{display:flex;flex-wrap:wrap;gap:14px;font-size:.98rem}.jx-bundle-save{color:#b5401f}.jx-bundle-pay{font-size:1.2rem}.jx-bundle-next{margin:0;font-size:.9rem;color:#5b4a26}' +
     '.jx-bundle-code{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.jx-bundle-code button{background:#14243a!important;color:#fff!important;border:0!important;border-radius:10px!important;padding:6px 12px!important;cursor:pointer}.jx-bundle-code code{font-weight:900;letter-spacing:.06em;color:#ffd98a}' +
     '.jx-bundle-go{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.jx-bundle-go small{color:#657184;flex:1 1 220px}' +
     '.jx-ribbon{display:flex;align-items:stretch;background:linear-gradient(90deg,#b5401f,#d5713a);color:#fff;font-size:.92rem;position:relative;z-index:40}.jx-ribbon-go{flex:1;background:none!important;border:0!important;color:#fff!important;padding:8px 12px!important;text-align:center;cursor:pointer;font:inherit}.jx-ribbon-go b{color:#fff}.jx-ribbon-x{background:none!important;border:0!important;color:#fff!important;padding:0 14px!important;font-size:16px;cursor:pointer}' +
     '.jx-home-promo{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:18px;align-items:center;background:linear-gradient(135deg,#fff4dc,#ffe4c4);border-radius:24px;padding:20px 22px;margin:22px 0;color:#3a2a08}.jx-home-promo h2{margin:4px 0 6px;font-family:"Playfair Display",Georgia,serif;color:#14243a!important}.jx-home-promo p{color:#4d3b14!important;margin:0 0 12px}.jx-home-promo .jx-hp-k{color:#b5401f}.jx-home-promo .jx-buy{border:0;cursor:pointer;font-size:1rem}' +
     '.jx-hp-pics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.jx-hp-pics img{width:100%;aspect-ratio:210/297;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.18)}.jx-hp-pics img:nth-child(odd){transform:rotate(-3deg)}.jx-hp-pics img:nth-child(even){transform:rotate(3deg) translateY(6px)}' +
     '@media (max-width:700px){.jx-coll,.jx-home-promo{grid-template-columns:1fr}.jx-offer{flex-direction:column;gap:6px}.jx-ribbon{font-size:.82rem}.jx-bundle{bottom:6px}}' +
-    'html[data-reading-theme="dark"] .jx-bundle{background:#18211f;color:#f1f4f3}html[data-reading-theme="dark"] .jx-bundle-next,html[data-reading-theme="dark"] .jx-bundle-go small{color:#d7e2de}html[data-reading-theme="dark"] .jx-cats button{background:#26322f!important;color:#e6efec!important}html[data-reading-theme="dark"] .jx-cats button.is-on{background:#d5b16d!important;color:#14243a!important}';
+    'html[data-reading-theme="dark"] .jx-bundle{background:#18211f;color:#f1f4f3}html[data-reading-theme="dark"] .jx-bundle-next,html[data-reading-theme="dark"] .jx-bundle-go small{color:#d7e2de}html[data-reading-theme="dark"] .jx-cats button{background:#26322f!important;color:#e6efec!important}html[data-reading-theme="dark"] .jx-cats button.is-on{background:#d5b16d!important;color:#14243a!important}' +
+    '.jx-bundle-items{list-style:none;margin:0;padding:0;display:grid;gap:6px}.jx-bundle-items li{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:#f6efe0;border-radius:12px;padding:6px 10px;color:#3a2a08}.jx-bundle-items li span{flex:1 1 200px;font-weight:700;font-size:.92rem}' +
+    '.jx-bundle-open{background:#168c89;color:#fff!important;text-decoration:none;font-weight:800;border-radius:999px;padding:5px 12px;font-size:.85rem}.jx-bundle-rm{background:none!important;border:0!important;color:#7a6a4a!important;cursor:pointer;padding:2px 6px!important}' +
+    /* dark mode for the offer, promo and bundle */
+    'html[data-reading-theme="dark"] .jx-offer,html[data-reading-theme="dark"] .jx-home-promo{background:linear-gradient(135deg,#2b2312,#3a2c12)!important;border-color:#d5b16d!important;color:#f6ead2!important}' +
+    'html[data-reading-theme="dark"] .jx-offer h2,html[data-reading-theme="dark"] .jx-home-promo h2{color:#ffe2a8!important}' +
+    'html[data-reading-theme="dark"] .jx-offer p,html[data-reading-theme="dark"] .jx-home-promo p,html[data-reading-theme="dark"] .jx-offer-tiers b,html[data-reading-theme="dark"] .jx-offer-tiers small{color:#f6ead2!important}' +
+    'html[data-reading-theme="dark"] .jx-offer-tiers span{background:#1d1d1d!important;color:#f6ead2!important;border:1px solid #5a4a28}html[data-reading-theme="dark"] .jx-offer-tiers em,html[data-reading-theme="dark"] .jx-home-promo .jx-hp-k,html[data-reading-theme="dark"] .jx-bundle-save,html[data-reading-theme="dark"] .jx-bundle-save b{color:#ff9f7a!important}' +
+    'html[data-reading-theme="dark"] .jx-offer-tiers code{background:#3a3020!important;color:#ffd98a!important}' +
+    'html[data-reading-theme="dark"] .jx-coll .jx-prod-price{color:#ffd98a!important}html[data-reading-theme="dark"] .jx-hp-k{color:#e8c98a!important}' +
+    'html[data-reading-theme="dark"] .jx-bundle{background:#1d1d1d!important;border-color:#d5b16d!important}html[data-reading-theme="dark"] .jx-bundle-items li{background:#2b2312!important}html[data-reading-theme="dark"] .jx-bundle-items li span,html[data-reading-theme="dark"] .jx-bundle-next{color:#f6ead2!important}html[data-reading-theme="dark"] .jx-bundle-rm,html[data-reading-theme="dark"] .jx-bundle-clear{color:#e8c98a!important}' +
+    'html[data-reading-theme="dark"] .jx-add{background:#2b2312!important;color:#ffd98a!important}html[data-reading-theme="dark"] .jx-add.is-in{background:#d5b16d!important;color:#14243a!important}' +
+    'html[data-reading-theme="dark"] .jx-prod-meta{color:#c9d3d0!important}html[data-reading-theme="dark"] .jx-note{color:#f6f6f6}' +
+    'html[data-reading-theme="dark"] .jx-cats button{background:#292929!important;color:#f6f6f6!important;border:1px solid #575757!important}html[data-reading-theme="dark"] .jx-cats button.is-on{background:#d5b16d!important;color:#14243a!important}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   /* ---------------- gentle "add to home screen" banner on phones (once) ---------------- */
