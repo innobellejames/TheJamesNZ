@@ -95,6 +95,29 @@
       h('div', { className: 'jx-hp-pics', 'aria-hidden': 'true' }, picks.map(function (id) { return h('img', { key: id, src: './shop-' + id + '-0.webp', alt: '', loading: 'lazy' }); })));
   }
 
+
+  /* ---------------- Community › Meet Local Makers spotlight ---------------- */
+  function MakersSpot(props) {
+    var b = useBasket();
+    var coll = shopInfo('complete-collection');
+    var feat = ['kiwi-bucket-list', 'advent-christmas-pack', 'matariki-aotearoa-pack', 'routines-chore-charts'].map(function (id) { return PRODUCTS.filter(function (p) { return p.id === id; })[0]; });
+    return h('section', { className: 'jx-maker jx-keep-colour', 'aria-label': 'Local maker: The James NZ Family Printables' },
+      h('div', { className: 'jx-maker-head' },
+        h('span', { className: 'jx-hp-k' }, 'LOCAL MAKER SPOTLIGHT · AOTEAROA'),
+        h('h2', null, 'The James NZ — Family Printables'),
+        h('p', null, 'A small New Zealand family business making printable packs for Kiwi families: bucket lists, Matariki, Advent & Lent, faith guides, chore charts, meal planners, emergency plans and more. Instant download, print at home on A4.'),
+        promoOn() && h('p', { className: 'jx-maker-offer' }, '🎁 ' + offerLine() + (coll.price ? ' · all 12 packs ' + coll.price : ''))),
+      h('div', { className: 'jx-maker-grid' }, feat.map(function (p) { var s = shopInfo(p.id), inB = b.indexOf(p.id) >= 0; return h('div', { key: p.id, className: 'jx-maker-item' },
+        h('img', { src: './shop-' + p.id + '-0.webp', alt: p.title + ' cover', loading: 'lazy' }),
+        h('b', null, p.title), h('span', null, (s.price || '') + ' · ' + p.pages + ' pages'),
+        s.url ? h('a', { className: 'jx-buy', href: s.url, target: '_blank', rel: 'noopener' }, 'Buy →')
+          : (promoOn() ? h('button', { type: 'button', className: 'jx-add' + (inB ? ' is-in' : ''), 'aria-pressed': inB, onClick: function () { bkToggle(p.id); } }, inB ? '✓ In bundle' : '＋ Bundle') : h('span', { className: 'jx-soon' }, 'Coming soon'))); })),
+      h('div', { className: 'jx-maker-go' },
+        h('button', { type: 'button', className: 'jx-buy', onClick: function () { go(props, 'x:shop'); } }, 'See all 12 packs →'),
+        b.length ? h('span', null, '🎁 ' + b.length + ' in your bundle') : null));
+  }
+  JNZX.makersSpot = function (navigate) { return h(MakersSpot, { key: 'jx-makers', navigate: navigate }); };
+
   /* ---------------- Add to home screen ---------------- */
   var deferred = null, listeners = [];
   window.addEventListener('beforeinstallprompt', function (e) { e.preventDefault(); deferred = e; listeners.forEach(function (f) { f(); }); });
@@ -339,7 +362,12 @@
     'html[data-reading-theme="dark"] .jx-bundle{background:#1d1d1d!important;border-color:#d5b16d!important}html[data-reading-theme="dark"] .jx-bundle-items li{background:#2b2312!important}html[data-reading-theme="dark"] .jx-bundle-items li span,html[data-reading-theme="dark"] .jx-bundle-next{color:#f6ead2!important}html[data-reading-theme="dark"] .jx-bundle-rm,html[data-reading-theme="dark"] .jx-bundle-clear{color:#e8c98a!important}' +
     'html[data-reading-theme="dark"] .jx-add{background:#2b2312!important;color:#ffd98a!important}html[data-reading-theme="dark"] .jx-add.is-in{background:#d5b16d!important;color:#14243a!important}' +
     'html[data-reading-theme="dark"] .jx-prod-meta{color:#c9d3d0!important}html[data-reading-theme="dark"] .jx-note{color:#f6f6f6}' +
-    'html[data-reading-theme="dark"] .jx-cats button{background:#292929!important;color:#f6f6f6!important;border:1px solid #575757!important}html[data-reading-theme="dark"] .jx-cats button.is-on{background:#d5b16d!important;color:#14243a!important}';
+    'html[data-reading-theme="dark"] .jx-cats button{background:#292929!important;color:#f6f6f6!important;border:1px solid #575757!important}html[data-reading-theme="dark"] .jx-cats button.is-on{background:#d5b16d!important;color:#14243a!important}' +
+    '.jx-maker{background:linear-gradient(135deg,#fff4dc,#ffe9c2);border:2px solid #d5b16d;border-radius:24px;padding:20px 22px;margin:18px 0;display:grid;gap:14px;color:#3a2a08}.jx-maker h2{margin:4px 0 6px;font-family:"Playfair Display",Georgia,serif;color:#14243a!important}.jx-maker p{margin:0 0 6px;color:#4d3b14!important}.jx-maker .jx-hp-k{color:#b5401f}.jx-maker-offer{font-weight:800;color:#b5401f!important}' +
+    '.jx-maker-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:12px}.jx-maker-item{background:#fff;border-radius:14px;padding:10px;display:grid;gap:6px;justify-items:start;box-shadow:0 2px 8px rgba(20,36,58,.08)}.jx-maker-item img{width:100%;aspect-ratio:210/297;object-fit:cover;border-radius:8px}.jx-maker-item b{font-size:.92rem;color:#14243a}.jx-maker-item span{font-size:.82rem;color:#5b4a26}.jx-maker-item .jx-buy,.jx-maker-item .jx-add{padding:6px 12px!important;font-size:.85rem}' +
+    '.jx-maker-go{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.jx-maker-go .jx-buy{border:0;cursor:pointer;font-size:1rem}.jx-maker-go span{font-weight:700}' +
+    'html[data-reading-theme="dark"] .jx-maker{background:linear-gradient(135deg,#2b2312,#3a2c12)!important}html[data-reading-theme="dark"] .jx-maker h2{color:#ffe2a8!important}html[data-reading-theme="dark"] .jx-maker p,html[data-reading-theme="dark"] .jx-maker-go span{color:#f6ead2!important}html[data-reading-theme="dark"] .jx-maker-offer,html[data-reading-theme="dark"] .jx-maker .jx-hp-k{color:#ff9f7a!important}' +
+    'html[data-reading-theme="dark"] .jx-maker-item{background:#1d1d1d!important}html[data-reading-theme="dark"] .jx-maker-item b{color:#f6f6f6!important}html[data-reading-theme="dark"] .jx-maker-item span{color:#e6d9b8!important}';
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   /* ---------------- gentle "add to home screen" banner on phones (once) ---------------- */

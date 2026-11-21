@@ -43114,6 +43114,7 @@ function Home({ canEdit }) {
 										children: [/* @__PURE__ */ (0, import_jsx_runtime.jsx)(Plus, { size: 18 }), business ? "Edit advert" : "Create advert"]
 									})]
 								}),
+								window.JNZX && JNZX.makersSpot ? JNZX.makersSpot(navigate) : null,
 								/* @__PURE__ */ (0, import_jsx_runtime.jsx)(ComingSoonBusiness, {}),
 								loading ? /* @__PURE__ */ (0, import_jsx_runtime.jsx)("p", { children: "Loading business details…" }) : business ? /* @__PURE__ */ (0, import_jsx_runtime.jsxs)("article", {
 									className: "business-ad",
