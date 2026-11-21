@@ -55,7 +55,7 @@ window.JNZ_CONFIG = {
         one cart). Set on: false to switch the offer off. */
   promo: {
     on: true,
-    storeUrl: '',
+    storeUrl: 'https://payhip.com/TheJamesNZ',
     two:   { percent: 30, code: 'FAMILY2' },   // buy any 2 packs
     three: { percent: 50, code: 'FAMILY3' },   // buy 3 or more packs
     ends: ''                                   // optional, e.g. '31 January 2027'

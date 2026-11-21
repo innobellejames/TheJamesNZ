@@ -24,7 +24,7 @@
     { id: 'family-emergency-plan', cat: 'home', title: 'Family Emergency Plan & Safety Pack', emoji: '🚨', pages: 8, sub: 'Be ready together — a fill-in plan, fridge contacts, grab-bag and home kit checklists.', inside: ['Fridge contacts page (111, Healthline, Poisons Centre)', 'Family emergency plan', 'Grab bag and home emergency kit checklists', 'Home safety check', 'Fire escape plan grid', 'Kids’ “What would I do?” page'] }
   ];
   JNZX.products = PRODUCTS;
-  function shopInfo(id) { var s = (C.shop || {})[id] || {}; return { url: s.url || '', price: s.price || '' }; }
+  function shopInfo(id) { var s = (C.shop || {})[id] || {}, st = (C.promo || {}).storeUrl || ''; return { url: s.url || st, price: s.price || '', own: !!s.url }; }
   var GST = function () { return cfg('gstRegistered', false) ? ' incl. GST' : ''; };
 
 
@@ -55,7 +55,7 @@
       h('div', { className: 'jx-bundle-top' },
         h('strong', null, '🎁 My bundle · ' + items.length + (items.length === 1 ? ' pack' : ' packs')),
         h('button', { type: 'button', className: 'jx-bundle-clear', onClick: function () { bkSet([]); } }, 'Clear')),
-      h('ul', { className: 'jx-bundle-items' }, items.map(function (p) { var u = shopInfo(p.id).url; return h('li', { key: p.id },
+      h('ul', { className: 'jx-bundle-items' }, items.map(function (p) { var u = shopInfo(p.id).own ? shopInfo(p.id).url : ''; return h('li', { key: p.id },
         h('span', null, p.emoji + ' ' + p.title + (shopInfo(p.id).price ? ' · ' + shopInfo(p.id).price : '')),
         u && h('a', { href: u, target: '_blank', rel: 'noopener', className: 'jx-bundle-open' }, 'Add to cart ↗'),
         h('button', { type: 'button', className: 'jx-bundle-rm', 'aria-label': 'Remove ' + p.title, onClick: function () { bkToggle(p.id); } }, '✕')); })),
@@ -69,7 +69,7 @@
       h('div', { className: 'jx-bundle-go' },
         store ? h('a', { className: 'jx-buy', href: store, target: '_blank', rel: 'noopener' }, 'Go to checkout →')
           : (items.some(function (p) { return shopInfo(p.id).url; }) ? null : h('span', { className: 'jx-soon' }, 'Checkout opening soon')),
-        h('small', null, 'Tap “Add to cart” for each pack (it opens our secure shop), then enter the code at checkout. The discount is applied by the shop.')));
+        h('small', null, items.some(function (p) { return shopInfo(p.id).own; }) ? 'Tap “Add to cart” for each pack (it opens our secure shop), then enter the code at checkout. The discount is applied by the shop.' : 'Opens our secure Payhip shop: add these packs to your cart, then enter the code at checkout. The discount is applied by the shop.')));
   }
 
   function Ribbon() {
@@ -200,7 +200,7 @@
         h('p', { className: 'jx-prod-meta' }, 'Instant PDF download · ' + p.pages + ' A4 pages · print at home'),
         h('div', { className: 'jx-prod-buy' },
           s.price && h('strong', { className: 'jx-prod-price' }, s.price + GST()),
-          s.url ? h('a', { className: 'jx-buy', href: s.url, target: '_blank', rel: 'noopener' }, 'Buy & download →')
+          s.url ? h('a', { className: 'jx-buy', href: s.url, target: '_blank', rel: 'noopener' }, s.own ? 'Buy & download →' : 'Buy in our shop →')
             : h('span', { className: 'jx-soon' }, 'Coming soon'),
           promoOn() && h('button', { type: 'button', className: 'jx-add' + (inB ? ' is-in' : ''), 'aria-pressed': inB, onClick: function () { bkToggle(p.id); } }, inB ? '✓ In my bundle' : '＋ Add to my bundle'))));
   }
@@ -230,7 +230,7 @@
           h('p', null, 'All 12 packs — ' + PRODUCTS.reduce(function (a, p) { return a + p.pages; }, 0) + ' printable pages for the whole year: faith, fun, home and Kiwi life.'),
           h('div', { className: 'jx-prod-buy' },
             h('strong', { className: 'jx-prod-price' }, coll.price + GST()),
-            coll.url ? h('a', { className: 'jx-buy', href: coll.url, target: '_blank', rel: 'noopener' }, 'Get all 12 →') : h('span', { className: 'jx-soon' }, 'Coming soon')))),
+            coll.url ? h('a', { className: 'jx-buy', href: coll.url, target: '_blank', rel: 'noopener' }, coll.own ? 'Get all 12 →' : 'Get all 12 in our shop →') : h('span', { className: 'jx-soon' }, 'Coming soon')))),
       h('div', { className: 'jx-cats', role: 'tablist', 'aria-label': 'Filter packs' }, CATS.map(function (c) { return h('button', { key: c[0], type: 'button', role: 'tab', 'aria-selected': cat === c[0], className: cat === c[0] ? 'is-on' : '', onClick: function () { setCat(c[0]); } }, c[1]); })),
       h('div', { className: 'jx-prod-list' }, list.map(function (p) { return h(Product, { key: p.id, p: p }); })),
       h(BundleBar, props),
