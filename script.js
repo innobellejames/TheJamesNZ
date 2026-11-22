@@ -27511,7 +27511,7 @@ function SiteNavigation({ tab, onNavigate }) {
 			}), /* @__PURE__ */ (0, import_jsx_runtime.jsx)("button", {
 				onClick: () => go("FAQ"),
 				children: "FAQ"
-			}), jH("button", { onClick: () => go("x:shop") }, "Printables"), jH("button", { onClick: () => go("x:privacy") }, "Privacy")] })] })
+			}), jH("button", { onClick: () => go("x:privacy") }, "Privacy")] })] })
 		}),
 		/* @__PURE__ */ (0, import_jsx_runtime.jsxs)("header", {
 			className: "header bookstore-header",
